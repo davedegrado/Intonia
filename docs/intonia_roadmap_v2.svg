@@ -1,0 +1,99 @@
+<svg viewBox="0 0 1280 680" xmlns="http://www.w3.org/2000/svg" role="img" font-family="'Segoe UI', -apple-system, sans-serif">
+<title>Roadmap Intonia v2 — con Karaoke Mode</title>
+<rect x="0" y="0" width="1280" height="680" fill="#F9F9F7"/>
+
+<text x="60" y="52" fill="#0B0B0B" font-size="28" font-weight="700">Roadmap Intonia — v2</text>
+<text x="60" y="78" fill="#52514E" font-size="15">Dalla base tecnica alla pubblicazione, con il Karaoke Mode in rotta</text>
+
+<!-- timeline -->
+<line x1="120" y1="150" x2="1040" y2="150" stroke="#0B0B0B" stroke-opacity="0.2" stroke-width="3"/>
+<line x1="1040" y1="150" x2="1160" y2="150" stroke="#0B0B0B" stroke-opacity="0.1" stroke-width="2" stroke-dasharray="4 5"/>
+
+<!-- 1 Fondamenta: FATTO -->
+<circle cx="120" cy="150" r="24" fill="#184F95"/>
+<path d="M109 150 l8 8 l16 -18" stroke="#F9F9F7" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="200" width="200" height="180" rx="10" fill="#FCFCFB" stroke="#0B0B0B" stroke-opacity="0.1"/>
+<rect x="30" y="200" width="200" height="34" rx="10" fill="#184F95"/>
+<text x="45" y="223" fill="#F9F9F7" font-size="11" font-weight="600">FATTO</text>
+<text x="45" y="256" fill="#0B0B0B" font-size="17" font-weight="700">Fondamenta</text>
+<text x="45" y="280" fill="#52514E" font-size="12.5">• Pitch engine (YIN + fry)</text>
+<text x="45" y="300" fill="#52514E" font-size="12.5">• Libreria + editor custom</text>
+<text x="45" y="320" fill="#52514E" font-size="12.5">• Test estensione vocale</text>
+<text x="45" y="340" fill="#52514E" font-size="12.5">• Nuova icona app</text>
+
+<!-- 2 Pre-lancio: IN CORSO -->
+<circle cx="350" cy="150" r="24" fill="#F9F9F7" stroke="#184F95" stroke-width="3"/>
+<text x="350" y="156" text-anchor="middle" fill="#184F95" font-size="16" font-weight="700">2</text>
+<rect x="260" y="200" width="200" height="200" rx="10" fill="#FCFCFB" stroke="#0B0B0B" stroke-opacity="0.1"/>
+<rect x="260" y="200" width="200" height="34" rx="10" fill="#FFFFFF"/>
+<text x="275" y="223" fill="#184F95" font-size="11" font-weight="600">IN CORSO</text>
+<text x="275" y="256" fill="#0B0B0B" font-size="17" font-weight="700">Pre-lancio</text>
+<text x="275" y="280" fill="#52514E" font-size="12.5">✓ Impostazioni (tema, notaz.)</text>
+<text x="275" y="300" fill="#52514E" font-size="12.5">✓ Profilo, stats, streak</text>
+<text x="275" y="320" fill="#52514E" font-size="12.5">✓ Calibrazione rumore</text>
+<text x="275" y="344" fill="#52514E" font-size="12.5">• Test su device reali</text>
+<text x="275" y="364" fill="#52514E" font-size="12.5">• Soundfont con licenza OK</text>
+
+<!-- 3 Apertura -->
+<circle cx="580" cy="150" r="24" fill="#F9F9F7" stroke="#0B0B0B" stroke-opacity="0.2" stroke-width="3"/>
+<text x="580" y="156" text-anchor="middle" fill="#52514E" font-size="16" font-weight="700">3</text>
+<rect x="490" y="200" width="200" height="180" rx="10" fill="#FCFCFB" stroke="#0B0B0B" stroke-opacity="0.1"/>
+<rect x="490" y="200" width="200" height="34" rx="10" fill="#FFFFFF"/>
+<text x="505" y="223" fill="#52514E" font-size="11" font-weight="600">DOPO</text>
+<text x="505" y="256" fill="#0B0B0B" font-size="17" font-weight="700">Apertura al pubblico</text>
+<text x="505" y="280" fill="#52514E" font-size="12.5">• Onboarding con obiettivo</text>
+<text x="505" y="300" fill="#52514E" font-size="12.5">• Percorsi guidati beginner</text>
+<text x="505" y="320" fill="#52514E" font-size="12.5">• Localizzazione inglese</text>
+<text x="505" y="344" fill="#52514E" font-size="12.5">• Spike K0: fattibilità</text>
+<text x="505" y="364" fill="#52514E" font-size="12.5">estrazione melodia (ML)</text>
+
+<!-- K Karaoke Mode (evidenziato) -->
+<circle cx="810" cy="150" r="24" fill="#F9F9F7" stroke="#6D28D9" stroke-width="3"/>
+<text x="810" y="156" text-anchor="middle" fill="#6D28D9" font-size="15" font-weight="700">K</text>
+<rect x="720" y="200" width="200" height="220" rx="10" fill="#FCFCFB" stroke="#6D28D9" stroke-opacity="0.5"/>
+<rect x="720" y="200" width="200" height="34" rx="10" fill="#6D28D9"/>
+<text x="735" y="223" fill="#F9F9F7" font-size="11" font-weight="600">LA SVOLTA</text>
+<text x="735" y="256" fill="#0B0B0B" font-size="17" font-weight="700">Karaoke Mode</text>
+<text x="735" y="280" fill="#52514E" font-size="12.5">• K1: karaoke da file locali</text>
+<text x="735" y="300" fill="#52514E" font-size="12.5">(melody track on-device,</text>
+<text x="735" y="320" fill="#52514E" font-size="12.5">piano-roll, scoring)</text>
+<text x="735" y="344" fill="#52514E" font-size="12.5">• K2: report + esercizi</text>
+<text x="735" y="364" fill="#52514E" font-size="12.5">suggeriti dagli errori</text>
+<text x="735" y="388" fill="#52514E" font-size="12.5">• K3: UltraStar / YouTube</text>
+<text x="735" y="408" fill="#52514E" font-size="12.5">(da validare, opz.)</text>
+
+<!-- 4 Store & Monetizzazione -->
+<circle cx="1040" cy="150" r="24" fill="#F9F9F7" stroke="#0B0B0B" stroke-opacity="0.2" stroke-width="3"/>
+<text x="1040" y="156" text-anchor="middle" fill="#52514E" font-size="16" font-weight="700">4</text>
+<rect x="950" y="200" width="200" height="180" rx="10" fill="#FCFCFB" stroke="#0B0B0B" stroke-opacity="0.1"/>
+<rect x="950" y="200" width="200" height="34" rx="10" fill="#FFFFFF"/>
+<text x="965" y="223" fill="#52514E" font-size="11" font-weight="600">POI</text>
+<text x="965" y="256" fill="#0B0B0B" font-size="17" font-weight="700">Store &amp; Monetizz.</text>
+<text x="965" y="280" fill="#52514E" font-size="12.5">• Acquisto unico: editor +</text>
+<text x="965" y="300" fill="#52514E" font-size="12.5">Karaoke Mode premium</text>
+<text x="965" y="320" fill="#52514E" font-size="12.5">• Asset store, privacy policy</text>
+
+<!-- Futuro -->
+<circle cx="1200" cy="150" r="16" fill="none" stroke="#898781" stroke-width="2" stroke-dasharray="3 4"/>
+<text x="1200" y="155" text-anchor="middle" fill="#898781" font-size="14" font-weight="700">+</text>
+<rect x="990" y="440" width="260" height="160" rx="10" fill="#F9F9F7" stroke="#0B0B0B" stroke-opacity="0.1" stroke-dasharray="4 5"/>
+<text x="1005" y="466" fill="#0B0B0B" font-size="15" font-weight="700">Futuro (opzionale)</text>
+<text x="1005" y="490" fill="#52514E" font-size="12.5">• Ear training, intervalli, accordi</text>
+<text x="1005" y="510" fill="#52514E" font-size="12.5">• Altri strumenti (non solo voce)</text>
+<text x="1005" y="530" fill="#52514E" font-size="12.5">• K4: cloud (Demucs server,</text>
+<text x="1005" y="550" fill="#52514E" font-size="12.5">catalogo melody condiviso)</text>
+<text x="1005" y="570" fill="#52514E" font-size="12.5">• Cloud sync</text>
+<path d="M 1040 380 L 1040 620 L 1250 620 L 1250 600" stroke="#0B0B0B" stroke-opacity="0.1" stroke-width="1.5" fill="none" stroke-dasharray="3 4"/>
+
+<!-- legenda -->
+<circle cx="60" cy="640" r="7" fill="#184F95"/>
+<text x="75" y="645" fill="#898781" font-size="12">Fatto</text>
+<circle cx="140" cy="640" r="7" fill="#F9F9F7" stroke="#184F95" stroke-width="2"/>
+<text x="155" y="645" fill="#898781" font-size="12">In corso</text>
+<circle cx="240" cy="640" r="7" fill="#F9F9F7" stroke="#0B0B0B" stroke-opacity="0.2" stroke-width="2"/>
+<text x="255" y="645" fill="#898781" font-size="12">Pianificato</text>
+<circle cx="350" cy="640" r="7" fill="#F9F9F7" stroke="#6D28D9" stroke-width="2"/>
+<text x="365" y="645" fill="#898781" font-size="12">Karaoke Mode</text>
+<circle cx="480" cy="640" r="7" fill="none" stroke="#898781" stroke-width="2" stroke-dasharray="2 2"/>
+<text x="495" y="645" fill="#898781" font-size="12">Futuro / opzionale</text>
+</svg>

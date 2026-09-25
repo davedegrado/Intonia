@@ -1,0 +1,28 @@
+name: vocal_scale_trainer
+description: Offline vocal training app for pitch, scales, and musical memory.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.3.2
+  go_router: ^17.3.0
+  flutter_midi_pro: ^3.1.6
+  record: ^7.1.1
+  path_provider: ^2.1.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/soundfonts/
