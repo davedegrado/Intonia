@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
 import 'package:vocal_scale_trainer/features/range/application/range_test_controller.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/training_settings.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/controllers/trainer_controller.dart';
@@ -147,6 +148,39 @@ void main() {
   });
 
   group('RangeTestController', () {
+    test('counts validated and skipped notes for the UI', () async {
+      final mic = FakeMicrophonePitchService();
+      final container = _container(mic, FakeMidiPro());
+      addTearDown(container.dispose);
+      final sub = container.listen(rangeTestControllerProvider, (previous, next) {});
+      addTearDown(sub.close);
+      final controller = container.read(rangeTestControllerProvider.notifier);
+
+      await controller.start();
+      final target = container.read(rangeTestControllerProvider).targetNote;
+      await Future<void>.delayed(const Duration(milliseconds: 1150)); // mute della guida
+      final sung = PitchDetectionResult(
+        frequency: target.frequency,
+        note: target,
+        cents: 0,
+        confidence: 1,
+        isStable: true,
+      );
+      mic.emit(sung);
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      mic.emit(sung);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      var state = container.read(rangeTestControllerProvider);
+      expect(state.validatedCount, 1);
+      expect(state.skippedCount, 0);
+
+      controller.skipNote();
+      state = container.read(rangeTestControllerProvider);
+      expect(state.skippedCount, 1);
+      expect(state.validatedCount, 1);
+    });
+
     test('permission denied returns to setup with a message', () async {
       final mic = FakeMicrophonePitchService(permissionGranted: false);
       final container = _container(mic, FakeMidiPro());

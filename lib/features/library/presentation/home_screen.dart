@@ -140,6 +140,7 @@ class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObser
             IntoniaMascot(
               mood: tuner.active ? MascotMood.listening : MascotMood.idle,
               size: 56,
+              greetOnAppear: true,
             ),
             const SizedBox(width: 8),
             Expanded(

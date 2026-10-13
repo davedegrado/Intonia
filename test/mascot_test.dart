@@ -7,6 +7,7 @@ import 'package:vocal_scale_trainer/features/trainer/domain/note_progress.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/trainer_mascot_mood.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/trainer_state.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/training_settings.dart';
+import 'package:vocal_scale_trainer/features/trainer/domain/training_state_machine.dart';
 
 Widget _host(Widget child, {Brightness brightness = Brightness.dark, bool reduceMotion = false}) {
   return MaterialApp(
@@ -30,17 +31,23 @@ TrainerState _trainer({
   bool isListening = false,
   List<NoteProgressStatus>? progress,
   int currentIndex = 0,
+  TrainingValidationState? validationState,
+  TrainerMode mode = TrainerMode.train,
 }) {
   const notes = [
     MusicalNote(pitchClass: PitchClass.c, octave: 4),
     MusicalNote(pitchClass: PitchClass.e, octave: 4),
   ];
-  final initial = TrainerState.initial(settings: TrainingSettings.defaults(), sequence: notes);
+  final initial = TrainerState.initial(
+    settings: TrainingSettings.defaults().copyWith(mode: mode),
+    sequence: notes,
+  );
   return initial.copyWith(
     isPlaying: isPlaying,
     isListening: isListening,
     progress: progress,
     currentIndex: currentIndex,
+    validationState: validationState,
   );
 }
 
@@ -63,6 +70,17 @@ void main() {
       expect(success.leftArm, greaterThan(1), reason: 'braccia alzate');
       expect(retry.tilt, lessThan(-0.1), reason: 'inclinazione');
       expect(retry.rightArm, greaterThan(retry.leftArm), reason: 'gesto incoraggiante');
+
+      final greeting = MascotPose.of(MascotMood.greeting, 0.25);
+      expect(greeting.rightArm, greaterThan(1), reason: 'braccio alzato per salutare');
+      expect(greeting.smile, greaterThan(idle.smile));
+    });
+
+    test('idle glances around from time to time', () {
+      final looks = [for (var i = 0; i < 50; i++) MascotPose.of(MascotMood.idle, i / 50).lookX];
+      expect(looks.any((x) => x < -0.5), isTrue);
+      expect(looks.any((x) => x > 0.5), isTrue);
+      expect(looks.where((x) => x == 0), isNotEmpty);
     });
 
     test('listening makes the tines vibrate over the loop', () {
@@ -131,6 +149,54 @@ void main() {
       expect(_painter(tester).pose.waves, 1, reason: 'posa dello stato, senza movimento');
     });
 
+    testWidgets('a reaction plays for its duration, then returns to the base mood', (tester) async {
+      await tester.pumpWidget(_host(const IntoniaMascot(mood: MascotMood.listening)));
+      await tester.pumpWidget(_host(const IntoniaMascot(
+        mood: MascotMood.listening,
+        reaction: MascotReaction(
+          mood: MascotMood.success,
+          id: 1,
+          duration: Duration(milliseconds: 500),
+        ),
+      )));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(_painter(tester).mood, MascotMood.success);
+
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 700));
+      expect(_painter(tester).mood, MascotMood.listening);
+    });
+
+    testWidgets('a reaction already present when mounted is not replayed', (tester) async {
+      await tester.pumpWidget(_host(const IntoniaMascot(
+        mood: MascotMood.idle,
+        reaction: MascotReaction(mood: MascotMood.success, id: 7),
+      )));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(_painter(tester).mood, MascotMood.idle);
+    });
+
+    testWidgets('greets when it appears, then settles on its mood', (tester) async {
+      await tester.pumpWidget(_host(const IntoniaMascot(greetOnAppear: true)));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(_painter(tester).mood, MascotMood.greeting);
+
+      await tester.pump(const Duration(milliseconds: 1800));
+      await tester.pump(const Duration(milliseconds: 700));
+      expect(_painter(tester).mood, MascotMood.idle);
+    });
+
+    testWidgets('tapping it triggers a short celebration', (tester) async {
+      await tester.pumpWidget(_host(const IntoniaMascot()));
+      await tester.tap(find.byType(IntoniaMascot));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(_painter(tester).mood, MascotMood.success);
+
+      await tester.pump(const Duration(milliseconds: 1200));
+      await tester.pump(const Duration(milliseconds: 700));
+      expect(_painter(tester).mood, MascotMood.idle);
+    });
+
     testWidgets('is decorative unless a semantic label is given', (tester) async {
       final handle = tester.ensureSemantics();
       await tester.pumpWidget(_host(const IntoniaMascot(semanticLabel: 'Mascotte di Intonia')));
@@ -150,13 +216,18 @@ void main() {
       expect(mascotMoodForTrainer(_trainer(isPlaying: true)), MascotMood.listening);
     });
 
-    test('success when the current note was validated', () {
+    test('success right after a note is validated, also when already moved to the next', () {
+      // Con la guida su ogni nota l'indice è già avanzato: conta lo stato
+      // della macchina (in attesa del cambio nota dopo una convalida).
       final state = _trainer(
         isPlaying: true,
         isListening: true,
-        progress: const [NoteProgressStatus.correct, NoteProgressStatus.pending],
+        progress: const [NoteProgressStatus.correct, NoteProgressStatus.current],
+        currentIndex: 1,
+        validationState: TrainingValidationState.waitChange,
       );
       expect(mascotMoodForTrainer(state), MascotMood.success);
+      expect(mascotMessageForTrainer(state), 'Perfetto! Continua così.');
     });
 
     test('retry when the current note was marked wrong', () {
@@ -164,8 +235,18 @@ void main() {
         isPlaying: true,
         isListening: true,
         progress: const [NoteProgressStatus.error, NoteProgressStatus.pending],
+        validationState: TrainingValidationState.waitRetry,
       );
       expect(mascotMoodForTrainer(state), MascotMood.retry);
+      expect(mascotMessageForTrainer(state), 'Quasi! Prova ancora.');
+    });
+
+    test('messages follow the mode when idle or listening', () {
+      expect(mascotMessageForTrainer(_trainer()), 'Pronto ad allenare il tuo orecchio?');
+      expect(mascotMessageForTrainer(_trainer(isPlaying: true, mode: TrainerMode.listen)),
+          'Ascolta bene la sequenza…');
+      expect(mascotMessageForTrainer(_trainer(isPlaying: true, isListening: true)),
+          'Canta la nota: ti ascolto.');
     });
 
     test('success when the exercise is completed, even after stopping', () {

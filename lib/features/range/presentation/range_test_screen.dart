@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
 import '../../../core/session/range_record.dart';
+import '../../mascot/domain/mascot_mood.dart';
+import '../../mascot/presentation/mascot_coach.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../trainer/presentation/widgets/pitch_feedback_panel.dart';
 import '../application/range_test_controller.dart';
@@ -83,6 +87,8 @@ class _SetupView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        _RangeCoach(state: state),
+        const SizedBox(height: 16),
         Text('Come funziona',
             style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
@@ -210,6 +216,8 @@ class _TestingView extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
+              _RangeCoach(state: state),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Icon(descending ? Icons.south : Icons.north, color: theme.colorScheme.primary),
@@ -329,6 +337,8 @@ class _ResultView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        _RangeCoach(state: state),
+        const SizedBox(height: 16),
         Card(
           color: theme.colorScheme.primaryContainer,
           child: Padding(
@@ -385,6 +395,77 @@ class _ResultView extends StatelessWidget {
           child: const Text('Torna alla libreria'),
         ),
       ],
+    );
+  }
+}
+
+/// Mascotte del test di estensione: stato di base per fase e reazione breve a
+/// ogni nota convalidata (festa) o saltata (incoraggiamento).
+class _RangeCoach extends StatefulWidget {
+  const _RangeCoach({required this.state});
+
+  final RangeTestState state;
+
+  @override
+  State<_RangeCoach> createState() => _RangeCoachState();
+}
+
+class _RangeCoachState extends State<_RangeCoach> {
+  static const _flashDuration = Duration(milliseconds: 1400);
+
+  MascotReaction? _reaction;
+  String? _flashMessage;
+  Timer? _flashTimer;
+  int _events = 0;
+
+  @override
+  void didUpdateWidget(_RangeCoach oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final now = widget.state;
+    final before = oldWidget.state;
+    if (now.validatedCount > before.validatedCount) {
+      _flash(MascotMood.success, 'Bravo! Prossima nota.');
+    } else if (now.skippedCount > before.skippedCount) {
+      _flash(MascotMood.retry, 'Nessun problema, proviamo la prossima.');
+    }
+  }
+
+  void _flash(MascotMood mood, String message) {
+    _events++;
+    _reaction = MascotReaction(mood: mood, id: _events, duration: _flashDuration);
+    _flashMessage = message;
+    _flashTimer?.cancel();
+    _flashTimer = Timer(_flashDuration, () {
+      if (mounted) {
+        setState(() => _flashMessage = null);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _flashTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = widget.state;
+    final (mood, message) = switch (state.phase) {
+      RangePhase.setup => (
+          MascotMood.idle,
+          'Parti da una nota comoda: scendiamo insieme verso il grave.',
+        ),
+      RangePhase.descending => (MascotMood.listening, 'Canta la nota: andiamo verso il grave.'),
+      RangePhase.ascending => (MascotMood.listening, 'Ora saliamo verso l\'acuto!'),
+      RangePhase.done => state.lowestMidi != null
+          ? (MascotMood.success, 'Ecco la tua estensione! Ottimo lavoro.')
+          : (MascotMood.retry, 'Riproviamo partendo da una nota più comoda.'),
+    };
+    return MascotCoach(
+      mood: mood,
+      reaction: _reaction,
+      message: _flashMessage ?? message,
     );
   }
 }

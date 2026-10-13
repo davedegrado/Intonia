@@ -5,7 +5,7 @@ import '../../../../core/music/exercise.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
 import '../../../settings/application/settings_providers.dart';
-import '../../../mascot/presentation/intonia_mascot.dart';
+import '../../../mascot/presentation/mascot_coach.dart';
 import '../../domain/trainer_mascot_mood.dart';
 import '../../domain/trainer_state.dart';
 import '../../domain/training_settings.dart';
@@ -112,15 +112,11 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                                       style: theme.textTheme.displaySmall
                                           ?.copyWith(fontWeight: FontWeight.w800),
                                     ),
-                                    const SizedBox(height: 8),
-                                    _StatusPill(
-                                        isPlaying: state.isPlaying, isListening: state.isListening),
                                   ],
                                 ),
                               ),
-                              // Mascotte guidata dallo stato del trainer (ascolto,
-                              // nota corretta/sbagliata, esercizio completato).
-                              IntoniaMascot(mood: mascotMoodForTrainer(state), size: 96),
+                              _StatusPill(
+                                  isPlaying: state.isPlaying, isListening: state.isListening),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -133,6 +129,13 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                         ],
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Mascotte guidata dallo stato del trainer (ascolto, nota
+                  // convalidata o da riprovare, esercizio completato).
+                  MascotCoach(
+                    mood: mascotMoodForTrainer(state),
+                    message: mascotMessageForTrainer(state),
                   ),
                   const SizedBox(height: 12),
                   if (state.settings.mode == TrainerMode.train)

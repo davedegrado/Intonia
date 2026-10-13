@@ -14,4 +14,28 @@ enum MascotMood {
 
   /// Nota da riprovare: inclinazione delicata e gesto incoraggiante.
   retry,
+
+  /// Saluto ("Ciao!"): agita un braccio, occhi sorridenti.
+  greeting,
+}
+
+/// Reazione temporanea a un evento: la mascotte assume [mood] per
+/// [duration], poi torna allo stato di base. Una nuova reazione si riconosce
+/// da un [id] diverso (es. un contatore di eventi).
+class MascotReaction {
+  const MascotReaction({
+    required this.mood,
+    required this.id,
+    this.duration = const Duration(milliseconds: 1400),
+  });
+
+  final MascotMood mood;
+  final int id;
+  final Duration duration;
+
+  @override
+  bool operator ==(Object other) => other is MascotReaction && other.mood == mood && other.id == id;
+
+  @override
+  int get hashCode => Object.hash(mood, id);
 }
