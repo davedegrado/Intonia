@@ -72,10 +72,16 @@ jobs:
           chmod 600 "$RUNNER_TEMP/asc/AuthKey.p8"
 
       # Genera la configurazione Xcode (Generated.xcconfig, Podfile, pod install)
-      # con il numero di build di questo run.
+      # con il numero di build di questo run. --no-codesign: Flutter non deve
+      # cercare certificati nel portachiavi del runner; la firma avviene dopo,
+      # in xcodebuild, con la chiave API di App Store Connect.
       - name: Configurazione Flutter per iOS
-        run: flutter build ios --release --config-only --build-number="$BUILD_NUMBER"
+        run: flutter build ios --release --config-only --no-codesign --build-number="$BUILD_NUMBER"
 
+      # Archive non firmato: con la firma automatica l'archive userebbe un
+      # profilo di sviluppo, che richiede dispositivi registrati. La firma di
+      # distribuzione (certificato gestito da Apple, nessun dispositivo
+      # necessario) viene applicata dall'export qui sotto.
       - name: Archive
         run: |
           xcodebuild archive \
@@ -84,12 +90,8 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$RUNNER_TEMP/asc/AuthKey.p8" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Export e upload su App Store Connect
         run: |
