@@ -7,6 +7,8 @@ import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
 import '../../../core/session/range_record.dart';
 import '../../../core/session/session_record.dart';
+import '../../mascot/domain/mascot_mood.dart';
+import '../../mascot/presentation/intonia_mascot.dart';
 import '../../profile/application/history_providers.dart';
 import '../../range/application/range_providers.dart';
 import '../../settings/application/settings_providers.dart';
@@ -134,6 +136,12 @@ class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObser
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
+            // In ascolto mentre il riconoscimento è attivo, a riposo altrimenti.
+            IntoniaMascot(
+              mood: tuner.active ? MascotMood.listening : MascotMood.idle,
+              size: 56,
+            ),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

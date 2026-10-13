@@ -5,6 +5,8 @@ import '../../../../core/music/exercise.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
 import '../../../settings/application/settings_providers.dart';
+import '../../../mascot/presentation/intonia_mascot.dart';
+import '../../domain/trainer_mascot_mood.dart';
 import '../../domain/trainer_state.dart';
 import '../../domain/training_settings.dart';
 import '../controllers/trainer_controller.dart';
@@ -110,11 +112,15 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                                       style: theme.textTheme.displaySmall
                                           ?.copyWith(fontWeight: FontWeight.w800),
                                     ),
+                                    const SizedBox(height: 8),
+                                    _StatusPill(
+                                        isPlaying: state.isPlaying, isListening: state.isListening),
                                   ],
                                 ),
                               ),
-                              _StatusPill(
-                                  isPlaying: state.isPlaying, isListening: state.isListening),
+                              // Mascotte guidata dallo stato del trainer (ascolto,
+                              // nota corretta/sbagliata, esercizio completato).
+                              IntoniaMascot(mood: mascotMoodForTrainer(state), size: 96),
                             ],
                           ),
                           const SizedBox(height: 16),
