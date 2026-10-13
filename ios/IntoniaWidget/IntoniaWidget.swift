@@ -10,7 +10,7 @@ private let keyStreak = "intonia_streak_at_last_training"
 /// (lib/features/home_widget/domain/widget_streak.dart) e di WidgetContent
 /// (IntoniaWidgetProvider.kt).
 struct StreakContent {
-  enum Status { trainedToday, keepStreak, start }
+  enum Status { case trainedToday, keepStreak, start }
 
   let status: Status
   let streak: Int
