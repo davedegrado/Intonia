@@ -153,7 +153,7 @@ data class WidgetContent(
                 status = WidgetStatus.TRAINED_TODAY,
                 streak = streakAtLastTraining,
                 title = streakTitle(streakAtLastTraining),
-                message = "Fatto oggi! Sei inarrestabile ✨",
+                message = "Fatto! Sei inarrestabile ✨",
                 week = week,
             )
         lastTrainingDay == yesterday && streakAtLastTraining > 0 ->
@@ -161,7 +161,7 @@ data class WidgetContent(
                 status = WidgetStatus.KEEP_STREAK,
                 streak = streakAtLastTraining,
                 title = streakTitle(streakAtLastTraining),
-                message = "Allenati oggi per non perdere la serie! 🔥",
+                message = "Allenati oggi: salva la serie! 🔥",
                 week = week,
             )
         else ->
@@ -169,7 +169,7 @@ data class WidgetContent(
                 status = WidgetStatus.START,
                 streak = 0,
                 title = "Allena l'orecchio",
-                message = "Pronto per l'allenamento di oggi? 🎵",
+                message = "Pronto ad allenarti? 🎵",
                 week = week,
             )
       }

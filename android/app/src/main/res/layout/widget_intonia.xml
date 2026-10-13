@@ -9,8 +9,8 @@
     android:padding="10dp">
 
     <FrameLayout
-        android:layout_width="84dp"
-        android:layout_height="84dp">
+        android:layout_width="78dp"
+        android:layout_height="78dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -141,18 +141,19 @@
 
         <TextView
             android:id="@+id/widget_message"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:background="@drawable/widget_pill_cta"
-            android:maxLines="2"
-            android:paddingStart="10dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:paddingStart="8dp"
             android:paddingTop="4dp"
-            android:paddingEnd="10dp"
+            android:paddingEnd="8dp"
             android:paddingBottom="5dp"
             android:text="@string/widget_default_message"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="11.5sp"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

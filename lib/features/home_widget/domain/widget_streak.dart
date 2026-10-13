@@ -81,7 +81,7 @@ class WidgetView {
         status: WidgetStatus.trainedToday,
         streak: streak,
         title: streakTitle(streak),
-        message: 'Fatto oggi! Sei inarrestabile ✨',
+        message: 'Fatto! Sei inarrestabile ✨',
         week: week,
       );
     }
@@ -90,7 +90,7 @@ class WidgetView {
         status: WidgetStatus.keepStreak,
         streak: streak,
         title: streakTitle(streak),
-        message: 'Allenati oggi per non perdere la serie! 🔥',
+        message: 'Allenati oggi: salva la serie! 🔥',
         week: week,
       );
     }
@@ -98,7 +98,7 @@ class WidgetView {
       status: WidgetStatus.start,
       streak: 0,
       title: 'Allena l\'orecchio',
-      message: 'Pronto per l\'allenamento di oggi? 🎵',
+      message: 'Pronto ad allenarti? 🎵',
       week: week,
     );
   }

@@ -52,17 +52,17 @@ struct StreakContent {
       return StreakContent(
         status: .trainedToday, streak: streakAtLastTraining,
         title: streakTitle(streakAtLastTraining),
-        message: "Fatto oggi! Sei inarrestabile ✨", week: week)
+        message: "Fatto! Sei inarrestabile ✨", week: week)
     }
     if lastTrainingDay == yesterday && streakAtLastTraining > 0 {
       return StreakContent(
         status: .keepStreak, streak: streakAtLastTraining,
         title: streakTitle(streakAtLastTraining),
-        message: "Allenati oggi per non perdere la serie! 🔥", week: week)
+        message: "Allenati oggi: salva la serie! 🔥", week: week)
     }
     return StreakContent(
       status: .start, streak: 0, title: "Allena l'orecchio",
-      message: "Pronto per l'allenamento di oggi? 🎵", week: week)
+      message: "Pronto ad allenarti? 🎵", week: week)
   }
 
   static func load(now: Date) -> StreakContent {
@@ -182,8 +182,9 @@ struct IntoniaWidgetView: View {
     Text(content.message)
       .font(.system(size: 11, weight: .bold))
       .foregroundColor(.white)
-      .lineLimit(2)
-      .minimumScaleFactor(0.85)
+      .lineLimit(3)
+      .minimumScaleFactor(0.75)
+      .fixedSize(horizontal: false, vertical: true)
       .padding(.horizontal, 9)
       .padding(.vertical, 4)
       .background(

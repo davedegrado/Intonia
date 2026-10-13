@@ -35,7 +35,7 @@ void main() {
       final view = WidgetView.of(data, DateTime(2026, 10, 13, 22));
       expect(view.status, WidgetStatus.trainedToday);
       expect(view.title, '3 giorni di fila');
-      expect(view.message, 'Fatto oggi! Sei inarrestabile ✨');
+      expect(view.message, 'Fatto! Sei inarrestabile ✨');
       expect(view.week, [false, false, false, false, true, true, true]);
     });
 
@@ -43,7 +43,7 @@ void main() {
       final view = WidgetView.of(data, DateTime(2026, 10, 14, 7));
       expect(view.status, WidgetStatus.keepStreak);
       expect(view.streak, 3);
-      expect(view.message, 'Allenati oggi per non perdere la serie! 🔥');
+      expect(view.message, 'Allenati oggi: salva la serie! 🔥');
       expect(view.week, [false, false, false, true, true, true, false]);
     });
 
