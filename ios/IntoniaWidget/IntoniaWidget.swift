@@ -84,7 +84,7 @@ struct StreakProvider: TimelineProvider {
   }
 }
 
-private let background = LinearGradient(
+private let widgetGradient = LinearGradient(
   colors: [Color(red: 0.106, green: 0.086, blue: 0.251), Color(red: 0.012, green: 0.004, blue: 0.102)],
   startPoint: .topLeading, endPoint: .bottomTrailing)
 
@@ -131,7 +131,7 @@ struct IntoniaWidgetView: View {
         }
       }
     }
-    .widgetBackground(background)
+    .widgetBackground(widgetGradient)
   }
 }
 
