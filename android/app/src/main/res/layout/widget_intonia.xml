@@ -6,22 +6,64 @@
     android:background="@drawable/widget_background"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:padding="10dp">
 
-    <ImageView
-        android:id="@+id/widget_mascot"
-        android:layout_width="76dp"
-        android:layout_height="76dp"
-        android:contentDescription="@string/widget_mascot_description"
-        android:scaleType="fitCenter"
-        android:src="@drawable/widget_mascot_invite" />
+    <FrameLayout
+        android:layout_width="84dp"
+        android:layout_height="84dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glow" />
+
+        <ImageView
+            android:id="@+id/widget_mascot"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/widget_mascot_description"
+            android:scaleType="fitCenter"
+            android:src="@drawable/widget_mascot_invite" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="6dp"
         android:layout_weight="1"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/widget_streak_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/widget_streak_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:shadowColor="#8822D3EE"
+                android:shadowRadius="12"
+                android:textColor="#22D3EE"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_streak_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:includeFontPadding="false"
+                android:maxLines="2"
+                android:textColor="#E0E7FF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/widget_title"
@@ -30,17 +72,87 @@
             android:maxLines="2"
             android:text="@string/widget_default_title"
             android:textColor="#FFFFFF"
-            android:textSize="17sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/widget_day_0"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:src="@drawable/widget_dot_off" />
+        <ImageView
+            android:id="@+id/widget_day_1"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:src="@drawable/widget_dot_off" />
+        <ImageView
+            android:id="@+id/widget_day_2"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:src="@drawable/widget_dot_off" />
+        <ImageView
+            android:id="@+id/widget_day_3"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:src="@drawable/widget_dot_off" />
+        <ImageView
+            android:id="@+id/widget_day_4"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:src="@drawable/widget_dot_off" />
+        <ImageView
+            android:id="@+id/widget_day_5"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:src="@drawable/widget_dot_off" />
+        <ImageView
+            android:id="@+id/widget_day_6"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="centerInside"
+            android:src="@drawable/widget_dot_off" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/widget_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:maxLines="3"
+            android:layout_marginTop="7dp"
+            android:background="@drawable/widget_pill_cta"
+            android:maxLines="2"
+            android:paddingStart="10dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
             android:text="@string/widget_default_message"
-            android:textColor="#C7D2FE"
-            android:textSize="13sp" />
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

@@ -54,24 +54,35 @@ enum WidgetStatus {
 /// Contenuto del widget a una certa data. La stessa logica è replicata nel
 /// codice nativo (IntoniaWidgetProvider.kt, IntoniaWidget.swift).
 class WidgetView {
-  const WidgetView(
-      {required this.status, required this.streak, required this.title, required this.message});
+  const WidgetView({
+    required this.status,
+    required this.streak,
+    required this.title,
+    required this.message,
+    required this.week,
+  });
 
   final WidgetStatus status;
   final int streak;
   final String title;
   final String message;
 
+  /// Ultimi 7 giorni, da 6 giorni fa (indice 0) a oggi (indice 6): `true` se
+  /// il giorno fa parte della serie che termina in [WidgetStreakData.lastTrainingDay].
+  final List<bool> week;
+
   factory WidgetView.of(WidgetStreakData data, DateTime now) {
     final today = WidgetStreakData.formatDay(now);
     final yesterday = WidgetStreakData.formatDay(DateTime(now.year, now.month, now.day - 1));
     final streak = data.streakAtLastTraining;
+    final week = weekOf(data, now);
     if (data.lastTrainingDay == today && streak > 0) {
       return WidgetView(
         status: WidgetStatus.trainedToday,
         streak: streak,
         title: streakTitle(streak),
-        message: 'Allenamento fatto. Sei inarrestabile!',
+        message: 'Fatto oggi! Sei inarrestabile ✨',
+        week: week,
       );
     }
     if (data.lastTrainingDay == yesterday && streak > 0) {
@@ -79,17 +90,38 @@ class WidgetView {
         status: WidgetStatus.keepStreak,
         streak: streak,
         title: streakTitle(streak),
-        message: 'Allenati oggi per non perdere la serie!',
+        message: 'Allenati oggi per non perdere la serie! 🔥',
+        week: week,
       );
     }
-    return const WidgetView(
+    return WidgetView(
       status: WidgetStatus.start,
       streak: 0,
       title: 'Allena l\'orecchio',
-      message: 'Pronto per l\'allenamento di oggi?',
+      message: 'Pronto per l\'allenamento di oggi? 🎵',
+      week: week,
     );
   }
 
   static String streakTitle(int streak) =>
       streak == 1 ? '1 giorno di fila' : '$streak giorni di fila';
+
+  static List<bool> weekOf(WidgetStreakData data, DateTime now) {
+    final last = data.lastTrainingDay;
+    final streak = data.streakAtLastTraining;
+    if (last == null || streak <= 0) {
+      return List.filled(7, false);
+    }
+    final lastDate = DateTime.parse(last);
+    final first = WidgetStreakData.formatDay(
+      DateTime(lastDate.year, lastDate.month, lastDate.day - (streak - 1)),
+    );
+    return [
+      for (var i = 6; i >= 0; i--)
+        () {
+          final day = WidgetStreakData.formatDay(DateTime(now.year, now.month, now.day - i));
+          return day.compareTo(first) >= 0 && day.compareTo(last) <= 0;
+        }(),
+    ];
+  }
 }

@@ -35,14 +35,16 @@ void main() {
       final view = WidgetView.of(data, DateTime(2026, 10, 13, 22));
       expect(view.status, WidgetStatus.trainedToday);
       expect(view.title, '3 giorni di fila');
-      expect(view.message, 'Allenamento fatto. Sei inarrestabile!');
+      expect(view.message, 'Fatto oggi! Sei inarrestabile ✨');
+      expect(view.week, [false, false, false, false, true, true, true]);
     });
 
     test('trained yesterday: keep the streak alive', () {
       final view = WidgetView.of(data, DateTime(2026, 10, 14, 7));
       expect(view.status, WidgetStatus.keepStreak);
       expect(view.streak, 3);
-      expect(view.message, 'Allenati oggi per non perdere la serie!');
+      expect(view.message, 'Allenati oggi per non perdere la serie! 🔥');
+      expect(view.week, [false, false, false, true, true, true, false]);
     });
 
     test('streak lost after a missed day', () {
@@ -50,6 +52,8 @@ void main() {
       expect(view.status, WidgetStatus.start);
       expect(view.streak, 0);
       expect(view.title, 'Allena l\'orecchio');
+      // I giorni allenati restano visibili anche a serie interrotta.
+      expect(view.week, [false, false, true, true, true, false, false]);
     });
 
     test('no history', () {
@@ -62,6 +66,14 @@ void main() {
       final view = WidgetView.of(one, DateTime(2026, 10, 1, 8));
       expect(view.status, WidgetStatus.keepStreak);
       expect(view.title, '1 giorno di fila');
+      expect(view.week, [false, false, false, false, false, true, false]);
+    });
+
+    test('a long streak fills the whole week', () {
+      const long = WidgetStreakData(lastTrainingDay: '2026-10-13', streakAtLastTraining: 40);
+      expect(WidgetView.of(long, DateTime(2026, 10, 13, 9)).week, List.filled(7, true));
+      expect(WidgetView.of(WidgetStreakData.empty, DateTime(2026, 10, 13)).week,
+          List.filled(7, false));
     });
   });
 }

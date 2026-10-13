@@ -212,7 +212,8 @@ conservare la licenza originale in `assets/soundfonts/licenses/`, registrarla in
 
 ## 7. Widget della schermata Home
 
-Mostra la mascotte, i giorni consecutivi di allenamento e un invito ad
+Mostra la mascotte, i giorni consecutivi di allenamento (numero grande e
+pallini degli ultimi 7 giorni) e un invito ad
 allenarsi; toccandolo si apre l'app.
 
 - **Dati**: l'app pubblica giorno dell'ultimo allenamento e serie a quella
