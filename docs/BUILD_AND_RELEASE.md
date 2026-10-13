@@ -37,10 +37,12 @@ insieme alla build di un APK di test. La CI non usa segreti e non pubblica nulla
 lo scaricato è uno zip che contiene l'APK). È compilato in modalità release
 (prestazioni realistiche per il riconoscimento del pitch) ma firmato con la
 chiave debug: si installa sul telefono abilitando l'installazione da origini
-sconosciute, **non è pubblicabile** su Google Play. Ogni run della CI genera
-una chiave debug nuova, quindi un APK non può aggiornare quello di un run
-precedente: disinstallare prima la versione presente (si perdono storico e
-impostazioni salvati nell'app).
+sconosciute, **non è pubblicabile** su Google Play. La chiave debug è
+conservata nella cache di GitHub Actions e riusata tra i run, così ogni APK
+si installa come aggiornamento del precedente (storico e impostazioni
+restano). Se la cache viene svuotata (es. 7 giorni senza run) nasce una chiave
+nuova e Android rifiuta l'aggiornamento ("App non installata"): in quel caso,
+una volta, disinstallare la versione presente e installare la nuova.
 
 ## 3. Build Android
 
