@@ -113,17 +113,27 @@ Verifiche da eseguire, nessuna delle quali è stata possibile senza macOS:
 ## 5. Licenze degli asset
 
 Ogni asset distribuito con l'app deve avere origine e licenza documentate.
-Stato attuale e istruzioni di sostituzione del SoundFont:
-`assets/soundfonts/README.md`. **Il SoundFont attuale non ha licenza
-verificata ed è un blocco per la pubblicazione.**
+
+- Pianoforte: `soundfonts/intonia_piano_classic.sf2`, estratto da
+  **Fluid (R3) GM SoundFont** (© 2000–2002, 2008 Frank Wen), **licenza MIT**.
+  Dettagli e verifiche: `soundfonts/soundfont-info.txt`.
+- La licenza MIT richiede di includere copyright e testo della licenza: il file
+  `soundfonts/licenses/FLUIDR3-COPYING.txt` è incluso nell'app e mostrato in
+  *Impostazioni → Info → Licenze* (`lib/app/third_party_licenses.dart`).
+- `soundfonts/intonia_piano_bright.sf2` resta nel repository ma non è incluso
+  nell'app (non è dichiarato in `pubspec.yaml`).
+
+Per aggiungere o sostituire un asset audio: dichiararlo in `pubspec.yaml`,
+conservare la licenza originale in `soundfonts/licenses/`, registrarla in
+`registerThirdPartyLicenses()` e aggiornare i crediti in *Impostazioni → Info*.
 
 ## 6. Stato delle verifiche (ottobre 2026)
 
 | Verifica | Stato |
 |---|---|
-| `dart format`, `flutter analyze`, `flutter test` (Linux, Flutter 3.44.3) | Superati localmente |
-| Workflow CI | Aggiunto, non ancora eseguito su GitHub |
-| Build Android debug/release | Non eseguita: Android SDK e repository Google Maven non raggiungibili dall'ambiente usato |
+| `dart format`, `flutter analyze`, `flutter test` (Flutter 3.44.3) | Superati localmente e in CI |
+| Build Android debug | Superata in CI |
+| Build Android release | Non eseguita: richiede la upload key |
 | Build iOS | Non eseguita: richiede macOS/Xcode |
 | Audio su dispositivi reali | Non eseguito: vedi checklist manuale |
-| Licenza SoundFont | **Bloccante** |
+| Licenza SoundFont | Risolta: FluidR3 (MIT), notice incluso nell'app |

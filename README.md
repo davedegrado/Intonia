@@ -27,9 +27,10 @@ Manual audio checks on real devices: `docs/AUDIO_MANUAL_TEST_CHECKLIST.md`.
 
 ## Audio asset
 
-The app loads `assets/soundfonts/piano.sf2` through `flutter_midi_pro`.
-**Its license is not verified and it must be replaced before publishing**:
-see `assets/soundfonts/README.md`.
+The app loads `soundfonts/intonia_piano_classic.sf2` (piano extracted from the
+Fluid (R3) GM SoundFont by Frank Wen, MIT license) through `flutter_midi_pro`.
+The license text is bundled and shown in Settings → Info → Licenses.
+See `soundfonts/soundfont-info.txt`.
 
 Android builds for `flutter_midi_pro` require CMake 3.22.1 because the plugin builds FluidSynth.
 

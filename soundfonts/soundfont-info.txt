@@ -23,8 +23,9 @@
 
 ### Preset Bright
 - Nome: Bright Yamaha Grand
-- Bank: da verificare
-- Program: da verificare
+- Bank: 0
+- Program: 1
+- Incluso nell'app: no (non dichiarato in pubspec.yaml)
 
 ## 2. Piano Classic
 
@@ -48,9 +49,10 @@
 - SHA-256: `2f6c480b90cf80b84002841978050abd7a721c16e0f2d4dfc0a3a1fee5fbb694`
 
 ### Preset Classic
-- Nome: da verificare
-- Bank: da verificare
-- Program: da verificare
+- Nome: Yamaha Grand Piano
+- Bank: 0
+- Program: 0
+- Incluso nell'app: sì, è il piano usato da PianoAudioService
 
 ## 3. Fonte e licenza
 
@@ -58,16 +60,25 @@
 - Autore indicato nei metadati: Frank Wen
 - Copyright riportato: Frank Wen 2000-2002, 2008; Toby Smithe 2008
 - Licenza dichiarata nei metadati: MIT License
-- URL della distribuzione originale: da verificare
-- File di licenza originale: da verificare
+- Distribuzione di riferimento: pacchetto Debian `fluid-soundfont-gm`
+  (sezione main, file `/usr/share/sounds/sf2/FluidR3_GM.sf2`); il file
+  `copyright` del pacchetto indica MIT, © 2000-2002, 2008 Frank Wen
+- File di licenza: `licenses/FLUIDR3-COPYING.txt` (testo MIT con il
+  copyright di Frank Wen), incluso nell'app e mostrato in Impostazioni → Info
+  → Licenze
 
 ### Note sulla licenza
 La dicitura "Licensed under the MIT License" è presente nei metadati dei file SoundFont. Prima della distribuzione di Intonia, verificare la licenza della versione originale e accertare che copra i campioni audio contenuti nei file esportati.
 
 ## 4. Verifiche ancora da completare
 
-- [ ] Verificare nome, bank e program del preset Bright
-- [ ] Verificare nome, bank e program del preset Classic
-- [ ] Identificare la distribuzione originale esatta di FluidR3_GM
-- [ ] Verificare e conservare il testo della licenza originale
-- [ ] Provare entrambi i file nell'app Intonia
+- [x] Verificare nome, bank e program del preset Bright
+- [x] Verificare nome, bank e program del preset Classic
+- [x] Identificare la distribuzione originale di FluidR3_GM (Debian fluid-soundfont-gm)
+- [x] Conservare il testo della licenza e includerlo nell'app
+- [ ] Provare il piano Classic su dispositivi reali
+      (docs/AUDIO_MANUAL_TEST_CHECKLIST.md, sezione "Riproduzione")
+
+Nota: entrambi i file contengono anche un campione "Gun" non usato da alcuno
+strumento (circa 30 KB). Si può eliminare con Polyphone, "Rimuovi elementi
+non utilizzati", senza effetti sul suono.
