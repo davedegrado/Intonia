@@ -1,7 +1,8 @@
 name: CI
 
-# Controlli automatici: formattazione, analisi statica, test e una build
-# Android debug (nessun segreto, nessun signing, nessuna pubblicazione).
+# Controlli automatici: formattazione, analisi statica, test e un APK di test
+# scaricabile dagli artifact del run (firmato con la chiave debug: non
+# pubblicabile). Nessun segreto, nessuna pubblicazione.
 on:
   push:
     branches: [main]
@@ -46,8 +47,8 @@ jobs:
       - name: Test
         run: flutter test
 
-  android-debug-build:
-    name: Build Android (debug)
+  android-build:
+    name: Build Android (APK di test)
     runs-on: ubuntu-latest
     needs: analyze-and-test
     timeout-minutes: 45
@@ -68,5 +69,21 @@ jobs:
       - name: Dipendenze
         run: flutter pub get --enforce-lockfile
 
-      - name: Build APK debug
-        run: flutter build apk --debug
+      # APK in modalità release (il riconoscimento del pitch in debug è troppo
+      # lento per prove realistiche), firmato con la chiave debug perché la
+      # upload key non è in CI: installabile per i test, NON pubblicabile.
+      - name: Build APK di test
+        env:
+          INTONIA_ALLOW_DEBUG_SIGNED_RELEASE: 'true'
+        run: flutter build apk --release
+
+      - name: Rinomina APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk "intonia-test-${GITHUB_SHA::7}.apk"
+
+      - name: Carica APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: intonia-test-apk
+          path: intonia-test-*.apk
+          if-no-files-found: error
+          retention-days: 14
