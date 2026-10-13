@@ -20,6 +20,9 @@ class RangeHistoryNotifier extends AsyncNotifier<List<RangeRecord>> {
     // Attende il caricamento dal disco: aggiungere a uno stato ancora vuoto
     // sovrascriverebbe lo storico salvato con il solo nuovo record.
     final current = List<RangeRecord>.from(await future)..add(record);
+    if (!ref.mounted) {
+      return;
+    }
     state = AsyncData(current);
     await ref.read(rangeHistoryRepositoryProvider).save(current);
   }

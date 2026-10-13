@@ -1,0 +1,101 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:vocal_scale_trainer/core/music/note.dart';
+import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
+import 'package:vocal_scale_trainer/features/trainer/domain/note_progress.dart';
+import 'package:vocal_scale_trainer/features/trainer/presentation/controllers/trainer_controller.dart';
+import 'package:vocal_scale_trainer/services/audio/piano_audio_service.dart';
+
+import 'support/audio_fakes.dart';
+
+PitchDetectionResult _sung(MusicalNote note) => PitchDetectionResult(
+      frequency: note.frequency,
+      note: note,
+      cents: 0,
+      confidence: 1,
+      isStable: true,
+    );
+
+/// Mantiene [note] stabile oltre la durata di stabilità (default 200 ms).
+Future<void> _hold(FakeMicrophonePitchService mic, MusicalNote note) async {
+  mic.emit(_sung(note));
+  await Future<void>.delayed(const Duration(milliseconds: 260));
+  mic.emit(_sung(note));
+  await Future<void>.delayed(const Duration(milliseconds: 20));
+}
+
+/// Attende la fine del mute dopo una nota guida (650 ms + 450 ms).
+Future<void> _waitGuideMute() => Future<void>.delayed(const Duration(milliseconds: 1150));
+
+void main() {
+  late FakeMicrophonePitchService mic;
+  late FakeMidiPro midi;
+  late ProviderContainer container;
+
+  setUp(() {
+    mic = FakeMicrophonePitchService();
+    midi = FakeMidiPro();
+    container = ProviderContainer(
+      overrides: [
+        microphonePitchServiceProvider.overrideWithValue(mic),
+        pianoAudioServiceProvider.overrideWithValue(PianoAudioService(midiPro: midi)),
+      ],
+    );
+  });
+
+  tearDown(() => container.dispose());
+
+  test('with the guide on every note, a correct note advances at once and plays the next guide',
+      () async {
+    final controller = container.read(trainerControllerProvider.notifier)
+      ..updateGuideEveryNote(true);
+    final sequence = container.read(trainerControllerProvider).sequence;
+    expect(sequence[0], isNot(sequence[1]));
+
+    await controller.play();
+    await _waitGuideMute();
+    await _hold(mic, sequence[0]);
+
+    var state = container.read(trainerControllerProvider);
+    expect(state.progress[0], NoteProgressStatus.correct);
+    expect(state.currentIndex, 1, reason: 'avanza subito, senza cantare la nota successiva');
+    expect(midi.played.last, sequence[1].midiNumber, reason: 'la guida suona la nota successiva');
+
+    // Tenere ancora la nota precedente non è un errore sulla nuova nota.
+    await _waitGuideMute();
+    await _hold(mic, sequence[0]);
+    state = container.read(trainerControllerProvider);
+    expect(state.currentIndex, 1);
+    expect(state.progress[1], NoteProgressStatus.current);
+
+    // La nota successiva viene convalidata e si avanza di nuovo.
+    await _hold(mic, sequence[1]); // cambio nota: riallinea la macchina a stati
+    await _hold(mic, sequence[1]); // convalida
+    state = container.read(trainerControllerProvider);
+    expect(state.progress[1], NoteProgressStatus.correct);
+    expect(state.currentIndex, 2);
+    expect(state.sessionStats.attempts.where((a) => !a.correct), isEmpty);
+
+    await controller.stop();
+  });
+
+  test('without the guide on every note, the next note waits for the singer to move on', () async {
+    final controller = container.read(trainerControllerProvider.notifier)
+      ..updateGuideEveryNote(false);
+    final sequence = container.read(trainerControllerProvider).sequence;
+
+    await controller.play();
+    await _waitGuideMute();
+    await _hold(mic, sequence[0]);
+
+    var state = container.read(trainerControllerProvider);
+    expect(state.progress[0], NoteProgressStatus.correct);
+    expect(state.currentIndex, 0, reason: 'comportamento invariato senza guida su ogni nota');
+
+    await _hold(mic, sequence[1]);
+    state = container.read(trainerControllerProvider);
+    expect(state.currentIndex, 1);
+
+    await controller.stop();
+  });
+}
