@@ -8,7 +8,7 @@ class PianoAudioService {
   PianoAudioService({MidiPro? midiPro}) : _midiPro = midiPro ?? MidiPro();
 
   /// Piano FluidR3 "Yamaha Grand Piano" (banco 0, programma 0), licenza MIT.
-  static const assetPath = 'soundfonts/intonia_piano_classic.sf2';
+  static const assetPath = 'assets/soundfonts/intonia_piano_classic.sf2';
   static const _channel = 0;
   static const _velocity = 104;
 

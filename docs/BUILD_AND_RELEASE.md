@@ -114,17 +114,17 @@ Verifiche da eseguire, nessuna delle quali è stata possibile senza macOS:
 
 Ogni asset distribuito con l'app deve avere origine e licenza documentate.
 
-- Pianoforte: `soundfonts/intonia_piano_classic.sf2`, estratto da
+- Pianoforte: `assets/soundfonts/intonia_piano_classic.sf2`, estratto da
   **Fluid (R3) GM SoundFont** (© 2000–2002, 2008 Frank Wen), **licenza MIT**.
-  Dettagli e verifiche: `soundfonts/soundfont-info.txt`.
+  Dettagli e verifiche: `assets/soundfonts/soundfont-info.txt`.
 - La licenza MIT richiede di includere copyright e testo della licenza: il file
-  `soundfonts/licenses/FLUIDR3-COPYING.txt` è incluso nell'app e mostrato in
+  `assets/soundfonts/licenses/FLUIDR3-COPYING.txt` è incluso nell'app e mostrato in
   *Impostazioni → Info → Licenze* (`lib/app/third_party_licenses.dart`).
-- `soundfonts/intonia_piano_bright.sf2` resta nel repository ma non è incluso
+- `assets/soundfonts/intonia_piano_bright.sf2` resta nel repository ma non è incluso
   nell'app (non è dichiarato in `pubspec.yaml`).
 
 Per aggiungere o sostituire un asset audio: dichiararlo in `pubspec.yaml`,
-conservare la licenza originale in `soundfonts/licenses/`, registrarla in
+conservare la licenza originale in `assets/soundfonts/licenses/`, registrarla in
 `registerThirdPartyLicenses()` e aggiornare i crediti in *Impostazioni → Info*.
 
 ## 6. Stato delle verifiche (ottobre 2026)
