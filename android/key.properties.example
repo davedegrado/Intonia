@@ -1,0 +1,7 @@
+# Copia questo file in android/key.properties (ignorato da Git) e inserisci i
+# dati della tua upload key. Non versionare mai key.properties né il keystore.
+# storeFile è relativo a android/app/ oppure assoluto.
+storeFile=/percorso/sicuro/fuori/dal/repo/intonia-upload-keystore.jks
+storePassword=CAMBIAMI
+keyAlias=upload
+keyPassword=CAMBIAMI
