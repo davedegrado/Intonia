@@ -1,0 +1,4 @@
+// Versione e numero di build dell'estensione = quelli dell'app (generati da
+// Flutter), come richiesto da App Store Connect. Solo Generated.xcconfig: non
+// le impostazioni dei Pods dell'app.
+#include "../Flutter/Generated.xcconfig"

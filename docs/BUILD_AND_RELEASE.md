@@ -101,6 +101,12 @@ CFBundleVersion iOS, da incrementare a ogni upload).
 
 ## 4. iOS
 
+Deployment target: **iOS 15.0** (richiesto da `home_widget`, iOS 14+, e da
+App Store Connect da aprile 2027). Widget della schermata Home:
+estensione WidgetKit `ios/IntoniaWidget/` (target `IntoniaWidgetExtension`,
+Bundle ID `io.github.davedegrado.intonia.IntoniaWidget`), dati condivisi con
+l'app tramite l'App Group `group.io.github.davedegrado.intonia`.
+
 Bundle Identifier: **`io.github.davedegrado.intonia`** (lo stesso di Android,
 non più modificabile dopo il primo upload). Firma: *Automatic*, senza team
 impostato nel progetto: non versionare profili, certificati o chiavi.
@@ -128,7 +134,15 @@ Configurazione, una sola volta:
    Scaricare il file `AuthKey_XXXXXXXXXX.p8` (si può scaricare **una sola
    volta**) e annotare *Key ID* e *Issuer ID*.
 4. **Team ID** — developer.apple.com → *Membership details → Team ID*.
-5. **Secret GitHub** — repository → *Settings → Secrets and variables →
+5. **App Group e widget** (serve al widget della schermata Home per leggere
+   la serie di giorni scritta dall'app):
+   - *Identifiers → +* → **App Groups**: `group.io.github.davedegrado.intonia`.
+   - *Identifiers* → `io.github.davedegrado.intonia` → abilita **App Groups**
+     → *Configure* → seleziona il gruppo → *Save*.
+   - *Identifiers → + → App IDs → App*: Bundle ID *Explicit*
+     `io.github.davedegrado.intonia.IntoniaWidget`, con **App Groups**
+     abilitato sullo stesso gruppo.
+6. **Secret GitHub** — repository → *Settings → Secrets and variables →
    Actions → New repository secret*:
 
    | Secret | Valore |
@@ -193,3 +207,19 @@ conservare la licenza originale in `assets/soundfonts/licenses/`, registrarla in
 | Build iOS | Workflow TestFlight pronto, non ancora eseguito (richiede i secret Apple) |
 | Audio su dispositivi reali | Non eseguito: vedi checklist manuale |
 | Licenza SoundFont | Risolta: FluidR3 (MIT), notice incluso nell'app |
+
+## 7. Widget della schermata Home
+
+Mostra la mascotte, i giorni consecutivi di allenamento e un invito ad
+allenarsi; toccandolo si apre l'app.
+
+- **Dati**: l'app pubblica giorno dell'ultimo allenamento e serie a quella
+  data (`lib/features/home_widget/`, `lib/services/widget/home_widget_service.dart`)
+  all'avvio e a ogni sessione salvata; il widget ricalcola lo stato del giorno
+  da solo (anche ad app chiusa), con la stessa logica in Dart, Kotlin e Swift.
+- **Android**: `IntoniaWidgetProvider.kt`, `res/layout/widget_intonia.xml`,
+  `res/xml/intonia_widget_info.xml` (3×2 celle, ridimensionabile).
+- **iOS**: `ios/IntoniaWidget/` (SwiftUI/WidgetKit, formati piccolo e medio),
+  aggiornato anche a mezzanotte.
+- **Immagini della mascotte** nei widget: generate dal disegno dell'app con
+  `flutter test tool/render_widget_mascot_test.dart`.

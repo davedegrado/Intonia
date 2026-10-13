@@ -310,11 +310,12 @@ class MascotPose {
           glow: 0.85,
           jitter: 0,
           smile: 0.85,
-          happyEyes: 0.7,
+          happyEyes: 1,
           eyeOpen: 1,
           leftArm: 0.2,
-          // Saluto: il braccio destro alzato oscilla avanti e indietro.
-          rightArm: 1.45 + 0.4 * math.sin(phase * 5),
+          // Saluto: il braccio destro alzato oscilla avanti e indietro (senza
+          // arrivare in verticale, dove finirebbe dietro il rebbio).
+          rightArm: 1.25 + 0.3 * math.sin(phase * 5),
           waves: 0,
           sparkles: 0.35,
         );
