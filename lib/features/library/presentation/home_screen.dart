@@ -46,10 +46,8 @@ class HomeScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(right: 4),
               child: ActionChip(
-                avatar: const Icon(Icons.local_fire_department,
-                    size: 18, color: Color(0xFFF97316)),
-                label: Text('$streak',
-                    style: const TextStyle(fontWeight: FontWeight.w800)),
+                avatar: const Icon(Icons.local_fire_department, size: 18, color: Color(0xFFF97316)),
+                label: Text('$streak', style: const TextStyle(fontWeight: FontWeight.w800)),
                 onPressed: () => _go(context, ref, '/profile'),
               ),
             ),
@@ -238,8 +236,7 @@ class _RangeCard extends ConsumerWidget {
                         children: [
                           Text('Test estensione vocale',
                               style: theme.textTheme.titleMedium?.copyWith(
-                                  color: colors.onPrimaryContainer,
-                                  fontWeight: FontWeight.w700)),
+                                  color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
                           Text('Scopri la tua nota più grave e più acuta e traccia i progressi.',
                               style: theme.textTheme.bodySmall
                                   ?.copyWith(color: colors.onPrimaryContainer)),
@@ -259,8 +256,7 @@ class _RangeCard extends ConsumerWidget {
                         Expanded(
                           child: Text('Estensione vocale',
                               style: theme.textTheme.titleMedium?.copyWith(
-                                  color: colors.onPrimaryContainer,
-                                  fontWeight: FontWeight.w700)),
+                                  color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
                         ),
                         Text('Rifai il test',
                             style: theme.textTheme.labelMedium
@@ -271,19 +267,18 @@ class _RangeCard extends ConsumerWidget {
                     const SizedBox(height: 8),
                     Text(
                       formatSpan(latest.spanSemitones),
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800, color: colors.onPrimaryContainer),
+                      style: theme.textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w800, color: colors.onPrimaryContainer),
                     ),
                     Text('(${latest.spanSemitones} semitoni)',
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(color: colors.onPrimaryContainer)),
+                        style:
+                            theme.textTheme.bodySmall?.copyWith(color: colors.onPrimaryContainer)),
                     const SizedBox(height: 10),
                     Row(
                       children: [
                         Text(noteLabel(latest.minMidi),
                             style: theme.textTheme.labelLarge?.copyWith(
-                                color: colors.onPrimaryContainer,
-                                fontWeight: FontWeight.w700)),
+                                color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Container(
@@ -299,8 +294,7 @@ class _RangeCard extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Text(noteLabel(latest.maxMidi),
                             style: theme.textTheme.labelLarge?.copyWith(
-                                color: colors.onPrimaryContainer,
-                                fontWeight: FontWeight.w700)),
+                                color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
                       ],
                     ),
                   ],
@@ -351,7 +345,8 @@ class _CustomSection extends ConsumerWidget {
                         ),
                         Text(
                           'Componi qualsiasi giro di note: pattern, vocalizzi, prove di estensione…',
-                          style: theme.textTheme.bodySmall?.copyWith(color: colors.onPrimaryContainer),
+                          style:
+                              theme.textTheme.bodySmall?.copyWith(color: colors.onPrimaryContainer),
                         ),
                       ],
                     ),
@@ -386,8 +381,7 @@ class _CustomSection extends ConsumerWidget {
                     collapsedShape: const Border(),
                     leading: const Icon(Icons.folder_outlined),
                     title: Text(name,
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700)),
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                     subtitle: Text(
                       grouped[name]!.length == 1
                           ? '1 sequenza'
@@ -430,7 +424,8 @@ class _CategoryAccordion extends StatelessWidget {
         initiallyExpanded: initiallyExpanded,
         shape: const Border(),
         collapsedShape: const Border(),
-        title: Text(category.label, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        title: Text(category.label,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         subtitle: Text(category.description, style: theme.textTheme.bodySmall),
         children: [
           for (final exercise in exercises) _ExerciseTile(exercise: exercise, dense: true),

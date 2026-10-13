@@ -97,7 +97,8 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> {
                                   ],
                                 ),
                               ),
-                              _StatusPill(isPlaying: state.isPlaying, isListening: state.isListening),
+                              _StatusPill(
+                                  isPlaying: state.isPlaying, isListening: state.isListening),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -177,7 +178,8 @@ class _BottomControlBar extends ConsumerWidget {
             if (fixedRoot != null)
               Row(
                 children: [
-                  Icon(Icons.push_pin_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                  Icon(Icons.push_pin_outlined,
+                      size: 18, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(width: 6),
                   Text(
                     'Nota di partenza: $fixedRoot',
@@ -294,8 +296,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
 
   Future<void> _calibrate() async {
     setState(() => _calibrating = true);
-    final threshold =
-        await ref.read(trainerControllerProvider.notifier).calibrateNoise();
+    final threshold = await ref.read(trainerControllerProvider.notifier).calibrateNoise();
     if (!mounted) {
       return;
     }
@@ -318,9 +319,8 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom +
-            MediaQuery.of(context).padding.bottom +
-            20,
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom + 20,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -388,9 +388,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.graphic_eq),
-            label: Text(_calibrating
-                ? 'Resta in silenzio… (3 s)'
-                : 'Calibra rumore di fondo'),
+            label: Text(_calibrating ? 'Resta in silenzio… (3 s)' : 'Calibra rumore di fondo'),
           ),
         ],
       ),

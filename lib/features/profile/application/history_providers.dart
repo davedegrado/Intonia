@@ -6,8 +6,7 @@ import '../../../services/storage/session_history_repository.dart';
 final sessionHistoryRepositoryProvider =
     Provider<SessionHistoryRepository>((ref) => SessionHistoryRepository());
 
-final sessionHistoryProvider =
-    AsyncNotifierProvider<SessionHistoryNotifier, List<SessionRecord>>(
+final sessionHistoryProvider = AsyncNotifierProvider<SessionHistoryNotifier, List<SessionRecord>>(
   SessionHistoryNotifier.new,
 );
 
@@ -26,8 +25,8 @@ class SessionHistoryNotifier extends AsyncNotifier<List<SessionRecord>> {
   /// Rimuove una singola sessione (consentito solo per esercizi custom).
   Future<void> remove(SessionRecord record) async {
     final current = List<SessionRecord>.from(state.value ?? const [])
-      ..removeWhere((item) =>
-          item.timestamp == record.timestamp && item.exerciseId == record.exerciseId);
+      ..removeWhere(
+          (item) => item.timestamp == record.timestamp && item.exerciseId == record.exerciseId);
     state = AsyncData(current);
     await ref.read(sessionHistoryRepositoryProvider).save(current);
   }

@@ -20,7 +20,8 @@ class SettingsScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text('Aspetto', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text('Aspetto',
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
             SegmentedButton<AppThemeSetting>(
               showSelectedIcon: false,
@@ -48,7 +49,8 @@ class SettingsScreen extends ConsumerWidget {
                   ref.read(notationProvider.notifier).setNotation(selection.first),
             ),
             const SizedBox(height: 28),
-            Text('Lingua', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text('Lingua',
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Text(
               'Italiano. La localizzazione inglese arriverà con l\'apertura al pubblico.',
@@ -57,7 +59,8 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 28),
             Text('Info', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            Text('Intonia 0.1.0 — allenamento di intonazione offline.\n'
+            Text(
+                'Intonia 0.1.0 — allenamento di intonazione offline.\n'
                 'Audio: SoundFont piano.sf2 (verifica la licenza prima della pubblicazione).',
                 style: theme.textTheme.bodyMedium),
           ],

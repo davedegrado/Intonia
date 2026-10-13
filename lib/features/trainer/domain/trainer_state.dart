@@ -51,7 +51,8 @@ class TrainerState {
 
   MusicalNote get currentNote => sequence[currentIndex];
 
-  bool get isFinished => currentIndex >= sequence.length - 1 &&
+  bool get isFinished =>
+      currentIndex >= sequence.length - 1 &&
       progress.where((status) => status == NoteProgressStatus.correct).length == sequence.length;
 
   TrainerState copyWith({

@@ -6,8 +6,7 @@ import '../../../services/storage/range_history_repository.dart';
 final rangeHistoryRepositoryProvider =
     Provider<RangeHistoryRepository>((ref) => RangeHistoryRepository());
 
-final rangeHistoryProvider =
-    AsyncNotifierProvider<RangeHistoryNotifier, List<RangeRecord>>(
+final rangeHistoryProvider = AsyncNotifierProvider<RangeHistoryNotifier, List<RangeRecord>>(
   RangeHistoryNotifier.new,
 );
 

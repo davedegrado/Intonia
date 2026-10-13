@@ -10,9 +10,22 @@ void main() {
     final sequence = exercise.buildSequence(key: PitchClass.c, octave: 4);
 
     expect(sequence.map((note) => note.label), [
-      'DO', 'RE', 'MI', 'FA', 'SOL', 'LA', 'SI', 'DO',
       'DO',
-      'SI', 'LA', 'SOL', 'FA', 'MI', 'RE', 'DO',
+      'RE',
+      'MI',
+      'FA',
+      'SOL',
+      'LA',
+      'SI',
+      'DO',
+      'DO',
+      'SI',
+      'LA',
+      'SOL',
+      'FA',
+      'MI',
+      'RE',
+      'DO',
     ]);
   });
 
@@ -28,7 +41,13 @@ void main() {
     final sequence = exercise.buildSequence(key: PitchClass.a, octave: 3);
 
     expect(sequence.map((note) => note.fullLabel), [
-      'LA3', 'DO4', 'MI4', 'LA4', 'MI4', 'DO4', 'LA3',
+      'LA3',
+      'DO4',
+      'MI4',
+      'LA4',
+      'MI4',
+      'DO4',
+      'LA3',
     ]);
   });
 
@@ -40,14 +59,23 @@ void main() {
     expect(sequence.length, 24);
     // I grado: DO-MI-SOL, II grado: RE-FA-LA, VII grado: SI-RE-FA.
     expect(sequence.sublist(0, 6).map((note) => note.label), [
-      'DO', 'MI', 'SOL', 'RE', 'FA', 'LA',
+      'DO',
+      'MI',
+      'SOL',
+      'RE',
+      'FA',
+      'LA',
     ]);
     expect(sequence.sublist(18, 21).map((note) => note.fullLabel), [
-      'SI4', 'RE5', 'FA5',
+      'SI4',
+      'RE5',
+      'FA5',
     ]);
     // VIII grado: DO⁺-MI⁺-SOL⁺.
     expect(sequence.sublist(21).map((note) => note.fullLabel), [
-      'DO5', 'MI5', 'SOL5',
+      'DO5',
+      'MI5',
+      'SOL5',
     ]);
   });
 

@@ -240,9 +240,7 @@ class RangeTestController extends Notifier<RangeTestState> {
   }
 
   void _advanceTarget() {
-    final next = state.phase == RangePhase.descending
-        ? state.targetMidi - 1
-        : state.targetMidi + 1;
+    final next = state.phase == RangePhase.descending ? state.targetMidi - 1 : state.targetMidi + 1;
     if (next < _minMidi || next > _maxMidi) {
       endPhase();
       return;
@@ -280,9 +278,7 @@ class RangeTestController extends Notifier<RangeTestState> {
     state = state.copyWith(
       phase: RangePhase.done,
       isListening: false,
-      message: lowest == null
-          ? 'Nessuna nota convalidata: il test non è stato salvato.'
-          : null,
+      message: lowest == null ? 'Nessuna nota convalidata: il test non è stato salvato.' : null,
     );
   }
 

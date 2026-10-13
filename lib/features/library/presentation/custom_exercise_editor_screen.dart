@@ -186,8 +186,7 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
                   ChoiceChip(
                     label: Text(option),
                     selected: _focus == option,
-                    onSelected: (selected) =>
-                        setState(() => _focus = selected ? option : null),
+                    onSelected: (selected) => setState(() => _focus = selected ? option : null),
                   ),
               ],
             ),
@@ -228,7 +227,8 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
             Row(
               children: [
                 Expanded(
-                  child: Text('Sequenza (${_midis.length} note)', style: theme.textTheme.titleMedium),
+                  child:
+                      Text('Sequenza (${_midis.length} note)', style: theme.textTheme.titleMedium),
                 ),
                 IconButton(
                   tooltip: 'Anteprima',
@@ -244,7 +244,8 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
             ),
             const SizedBox(height: 8),
             if (_midis.isEmpty)
-              Text('Tocca le note qui sopra per costruire la sequenza.', style: theme.textTheme.bodySmall)
+              Text('Tocca le note qui sopra per costruire la sequenza.',
+                  style: theme.textTheme.bodySmall)
             else
               Builder(builder: (context) {
                 final spelled = NoteSpeller.spellSequence(

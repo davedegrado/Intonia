@@ -54,7 +54,8 @@ class _SetupView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('Come funziona', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+        Text('Come funziona',
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         Text(
           'Parti da una nota comoda e scendi un semitono alla volta: si avanza '
@@ -74,7 +75,8 @@ class _SetupView extends StatelessWidget {
                 decoration: const InputDecoration(labelText: 'Nota', border: OutlineInputBorder()),
                 items: [
                   for (final pitch in PitchClass.values)
-                    DropdownMenuItem(value: pitch, child: Text(NoteSpeller.keyLabel(pitch, notation))),
+                    DropdownMenuItem(
+                        value: pitch, child: Text(NoteSpeller.keyLabel(pitch, notation))),
                 ],
                 onChanged: (value) => value == null ? null : controller.setStartNote(key: value),
               ),
@@ -83,7 +85,8 @@ class _SetupView extends StatelessWidget {
             Expanded(
               child: DropdownButtonFormField<int>(
                 initialValue: start.octave,
-                decoration: const InputDecoration(labelText: 'Ottava', border: OutlineInputBorder()),
+                decoration:
+                    const InputDecoration(labelText: 'Ottava', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem(value: 2, child: Text('2')),
                   DropdownMenuItem(value: 3, child: Text('3')),
@@ -202,7 +205,8 @@ class _TestingView extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           _noteLabel(state.targetMidi, notation),
-                          style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.w800),
+                          style:
+                              theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.w800),
                         ),
                       ],
                     ),
@@ -248,7 +252,8 @@ class _TestingView extends StatelessWidget {
                       Expanded(
                         child: FilledButton(
                           onPressed: controller.endPhase,
-                          child: Text(descending ? 'Limite grave raggiunto' : 'Limite acuto raggiunto'),
+                          child: Text(
+                              descending ? 'Limite grave raggiunto' : 'Limite acuto raggiunto'),
                         ),
                       ),
                     ],

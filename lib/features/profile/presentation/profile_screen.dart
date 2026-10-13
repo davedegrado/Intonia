@@ -53,12 +53,10 @@ class ProfileScreen extends ConsumerWidget {
     int? minMidi;
     int? maxMidi;
     for (final record in records) {
-      if (record.minCorrectMidi != null &&
-          (minMidi == null || record.minCorrectMidi! < minMidi)) {
+      if (record.minCorrectMidi != null && (minMidi == null || record.minCorrectMidi! < minMidi)) {
         minMidi = record.minCorrectMidi;
       }
-      if (record.maxCorrectMidi != null &&
-          (maxMidi == null || record.maxCorrectMidi! > maxMidi)) {
+      if (record.maxCorrectMidi != null && (maxMidi == null || record.maxCorrectMidi! > maxMidi)) {
         maxMidi = record.maxCorrectMidi;
       }
     }
@@ -328,8 +326,7 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(label, style: theme.textTheme.labelMedium),
               const SizedBox(height: 4),
-              Text(value,
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+              Text(value, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
             ],
           ),
         ),

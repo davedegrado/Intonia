@@ -26,14 +26,16 @@ class PianoAudioService {
     _soundFontId = sfId;
   }
 
-  Future<void> playNote(MusicalNote note, {Duration duration = const Duration(milliseconds: 650)}) async {
+  Future<void> playNote(MusicalNote note,
+      {Duration duration = const Duration(milliseconds: 650)}) async {
     await initialize();
     final sfId = _soundFontId;
     if (sfId == null) {
       return;
     }
 
-    await _midiPro.playNote(sfId: sfId, channel: _channel, key: note.midiNumber, velocity: _velocity);
+    await _midiPro.playNote(
+        sfId: sfId, channel: _channel, key: note.midiNumber, velocity: _velocity);
     _activeNotes.add(note.midiNumber);
     unawaited(Future<void>.delayed(duration, () => stopNote(note)));
   }
@@ -85,5 +87,4 @@ class PianoAudioService {
       _activeNotes.remove(midi);
     }
   }
-
 }

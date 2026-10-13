@@ -171,11 +171,9 @@ class MicrophonePitchService {
     final frame = List<double>.filled(_lowFrameSize, 0);
     for (var i = 0; i < _lowFrameSize; i++) {
       final base = i * _lowDecimation;
-      frame[i] = (_lowBuffer[base] +
-              _lowBuffer[base + 1] +
-              _lowBuffer[base + 2] +
-              _lowBuffer[base + 3]) /
-          4;
+      frame[i] =
+          (_lowBuffer[base] + _lowBuffer[base + 1] + _lowBuffer[base + 2] + _lowBuffer[base + 3]) /
+              4;
     }
     return frame;
   }

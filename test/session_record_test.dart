@@ -10,10 +10,14 @@ void main() {
     const g4 = MusicalNote(pitchClass: PitchClass.g, octave: 4);
     var stats = SessionStats.started();
     stats = stats
-        .addAttempt(NoteAttempt(target: c4, detected: c4, cents: 3, correct: true, timestamp: DateTime(2026)))
-        .addAttempt(NoteAttempt(target: e4, detected: g4, cents: 12, correct: false, timestamp: DateTime(2026)))
-        .addAttempt(NoteAttempt(target: e4, detected: e4, cents: -5, correct: true, timestamp: DateTime(2026)))
-        .addAttempt(NoteAttempt(target: g4, detected: g4, cents: 8, correct: true, timestamp: DateTime(2026)));
+        .addAttempt(NoteAttempt(
+            target: c4, detected: c4, cents: 3, correct: true, timestamp: DateTime(2026)))
+        .addAttempt(NoteAttempt(
+            target: e4, detected: g4, cents: 12, correct: false, timestamp: DateTime(2026)))
+        .addAttempt(NoteAttempt(
+            target: e4, detected: e4, cents: -5, correct: true, timestamp: DateTime(2026)))
+        .addAttempt(NoteAttempt(
+            target: g4, detected: g4, cents: 8, correct: true, timestamp: DateTime(2026)));
 
     final record = SessionRecord.fromStats(
       stats: stats.finish(),

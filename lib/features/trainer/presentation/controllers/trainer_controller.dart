@@ -93,9 +93,11 @@ class TrainerController extends Notifier<TrainerState> {
 
   void updateBpm(int bpm) => _updateSettings(state.settings.copyWith(bpm: bpm));
 
-  void updateTolerance(int cents) => _updateSettings(state.settings.copyWith(toleranceCents: cents));
+  void updateTolerance(int cents) =>
+      _updateSettings(state.settings.copyWith(toleranceCents: cents));
 
-  void updateStability(int milliseconds) => _updateSettings(state.settings.copyWith(stabilityMs: milliseconds));
+  void updateStability(int milliseconds) =>
+      _updateSettings(state.settings.copyWith(stabilityMs: milliseconds));
 
   void updateMode(TrainerMode mode) => _updateSettings(state.settings.copyWith(mode: mode));
 
@@ -281,7 +283,8 @@ class TrainerController extends Notifier<TrainerState> {
       );
     }
 
-    if (output.event == TrainingValidationEvent.advanced && currentIndex < state.sequence.length - 1) {
+    if (output.event == TrainingValidationEvent.advanced &&
+        currentIndex < state.sequence.length - 1) {
       currentIndex += 1;
       progress[currentIndex] = NoteProgressStatus.current;
       _stateMachine.markAdvanced();
