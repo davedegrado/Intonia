@@ -27,6 +27,8 @@ class RangeTestState {
     this.detected,
     this.message,
     this.previousRecord,
+    this.validatedCount = 0,
+    this.skippedCount = 0,
   });
 
   factory RangeTestState.initial() => const RangeTestState(
@@ -56,6 +58,11 @@ class RangeTestState {
   /// Test precedente, per il confronto a fine esercizio.
   final RangeRecord? previousRecord;
 
+  /// Note convalidate e note saltate nel test corrente: contatori di eventi
+  /// usati dall'interfaccia (reazioni della mascotte).
+  final int validatedCount;
+  final int skippedCount;
+
   MusicalNote get targetNote => MusicalNote.fromMidi(targetMidi);
 
   RangeTestState copyWith({
@@ -72,6 +79,8 @@ class RangeTestState {
     String? message,
     bool clearMessage = false,
     RangeRecord? previousRecord,
+    int? validatedCount,
+    int? skippedCount,
   }) {
     return RangeTestState(
       phase: phase ?? this.phase,
@@ -86,6 +95,8 @@ class RangeTestState {
       detected: detected ?? this.detected,
       message: clearMessage ? null : message ?? this.message,
       previousRecord: previousRecord ?? this.previousRecord,
+      validatedCount: validatedCount ?? this.validatedCount,
+      skippedCount: skippedCount ?? this.skippedCount,
     );
   }
 }
@@ -175,6 +186,8 @@ class RangeTestController extends Notifier<RangeTestState> {
       skipsInRow: 0,
       isListening: true,
       clearMessage: true,
+      validatedCount: 0,
+      skippedCount: 0,
     );
     try {
       await _playGuideNote(state.targetNote);
@@ -220,6 +233,7 @@ class RangeTestController extends Notifier<RangeTestState> {
       return;
     }
     final skips = state.skipsInRow + 1;
+    state = state.copyWith(skippedCount: state.skippedCount + 1);
     if (skips >= _maxSkipsInRow) {
       endPhase();
       return;
@@ -271,6 +285,7 @@ class RangeTestController extends Notifier<RangeTestState> {
             state.highestMidi == null || midi > state.highestMidi! ? midi : state.highestMidi,
         skipsInRow: 0,
         detected: detection,
+        validatedCount: state.validatedCount + 1,
       );
       _advanceTarget();
       return;
