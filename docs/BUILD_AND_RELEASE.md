@@ -99,26 +99,72 @@ L'artefatto è firmato con la chiave debug e **non è pubblicabile**.
 Versione: `version: X.Y.Z+N` in `pubspec.yaml` (`N` = versionCode Android /
 CFBundleVersion iOS, da incrementare a ogni upload).
 
-## 4. iOS (da eseguire su macOS)
+## 4. iOS
 
-Bundle Identifier: **`io.github.davedegrado.intonia`** (lo stesso di Android;
-da registrare in App Store Connect / Certificates, Identifiers & Profiles e non
-più modificabile dopo la prima submission). Firma: *Automatic*, senza team
-impostato nel progetto: va scelto in Xcode (*Runner → Signing &
-Capabilities*), non versionare profili o certificati.
+Bundle Identifier: **`io.github.davedegrado.intonia`** (lo stesso di Android,
+non più modificabile dopo il primo upload). Firma: *Automatic*, senza team
+impostato nel progetto: non versionare profili, certificati o chiavi.
+`Info.plist` dichiara `ITSAppUsesNonExemptEncryption = false` (l'app non usa
+crittografia), così App Store Connect non chiede l'export compliance a ogni build.
 
-Verifiche da eseguire, nessuna delle quali è stata possibile senza macOS:
+### 4.1 TestFlight dalla CI (senza Mac)
 
-1. `flutter build ios --release --no-codesign` (genera `Podfile`, esegue
-   `pod install`): deve completare senza errori; committare `ios/Podfile` e
-   `ios/Podfile.lock` generati.
-2. Avvio su simulatore e dispositivo fisico: la Home deve comparire (il
-   progetto usa il ciclo di vita UIScene, `Info.plist` + `SceneDelegate`).
-3. Prima richiesta microfono: compare il testo di `NSMicrophoneUsageDescription`;
+Il workflow `.github/workflows/ios-testflight.yml` compila su un runner macOS
+di GitHub e carica la build su TestFlight. Si avvia **solo a mano** e richiede
+l'iscrizione all'Apple Developer Program.
+
+Configurazione, una sola volta:
+
+1. **Bundle ID** — [developer.apple.com](https://developer.apple.com/account) →
+   *Certificates, Identifiers & Profiles → Identifiers → +* → *App IDs → App*:
+   Bundle ID *Explicit* `io.github.davedegrado.intonia`, nessuna capability.
+2. **App in App Store Connect** — [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
+   → *App → + → Nuova app*: piattaforma iOS, nome (es. "Intonia"; deve essere
+   libero sullo store), lingua principale Italiano, il Bundle ID del punto 1,
+   SKU a scelta (es. `intonia`). Creare l'app **non** la pubblica.
+3. **Chiave API** — App Store Connect → *Utenti e accessi → Integrazioni →
+   App Store Connect API → Chiavi del team → +*, ruolo **Admin** (necessario
+   perché Xcode crei da solo certificato e profilo di distribuzione).
+   Scaricare il file `AuthKey_XXXXXXXXXX.p8` (si può scaricare **una sola
+   volta**) e annotare *Key ID* e *Issuer ID*.
+4. **Team ID** — developer.apple.com → *Membership details → Team ID*.
+5. **Secret GitHub** — repository → *Settings → Secrets and variables →
+   Actions → New repository secret*:
+
+   | Secret | Valore |
+   |---|---|
+   | `APP_STORE_CONNECT_API_KEY_ID` | Key ID |
+   | `APP_STORE_CONNECT_ISSUER_ID` | Issuer ID |
+   | `APP_STORE_CONNECT_API_KEY_P8` | contenuto completo del file `.p8`, righe `BEGIN`/`END` comprese |
+   | `APPLE_TEAM_ID` | Team ID |
+
+   Conservare il file `.p8` in un posto sicuro fuori dal repository; se
+   compromessa, revocare la chiave da App Store Connect.
+
+Per ogni build di test:
+
+1. GitHub → *Actions → iOS TestFlight → Run workflow* (branch `main`).
+2. A fine run (circa 15–30 minuti) Apple elabora la build: compare in App
+   Store Connect → *TestFlight* dopo qualche minuto, con un'email di conferma.
+3. La prima volta: *TestFlight → Test interni → +*, creare un gruppo e
+   aggiungere il proprio Apple ID. I test interni non richiedono la revisione
+   Apple.
+4. Sull'iPhone: installare l'app **TestFlight** dall'App Store, accettare
+   l'invito e installare Intonia.
+
+Il numero di build è il numero progressivo del run del workflow; la versione
+(`0.1.0`) viene da `pubspec.yaml`. Il primo run è anche la prima build iOS in
+assoluto del progetto: eventuali errori di compilazione vanno letti nei log
+del job.
+
+### 4.2 Verifiche su dispositivo
+
+1. Avvio: la Home deve comparire (ciclo di vita UIScene, `Info.plist` +
+   `SceneDelegate`).
+2. Prima richiesta microfono: compare il testo di `NSMicrophoneUsageDescription`;
    con permesso negato il trainer mostra il messaggio di errore.
-4. Rotazione e multitasking su iPad (orientamenti iPad tutti dichiarati).
-5. *Product → Archive* in Xcode con il team corretto, poi *Validate App*.
-6. Checklist audio manuale (`docs/AUDIO_MANUAL_TEST_CHECKLIST.md`).
+3. Rotazione e multitasking su iPad (orientamenti iPad tutti dichiarati).
+4. Checklist audio manuale (`docs/AUDIO_MANUAL_TEST_CHECKLIST.md`).
 
 ## 5. Licenze degli asset
 
@@ -144,6 +190,6 @@ conservare la licenza originale in `assets/soundfonts/licenses/`, registrarla in
 | `dart format`, `flutter analyze`, `flutter test` (Flutter 3.44.3) | Superati localmente e in CI |
 | Build Android (APK release-mode, firma debug) | In CI, scaricabile come artifact |
 | Build Android release | Non eseguita: richiede la upload key |
-| Build iOS | Non eseguita: richiede macOS/Xcode |
+| Build iOS | Workflow TestFlight pronto, non ancora eseguito (richiede i secret Apple) |
 | Audio su dispositivi reali | Non eseguito: vedi checklist manuale |
 | Licenza SoundFont | Risolta: FluidR3 (MIT), notice incluso nell'app |
