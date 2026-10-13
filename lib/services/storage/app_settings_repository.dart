@@ -63,12 +63,14 @@ class AppSettingsRepository {
   }
 
   Future<void> saveThemeSetting(AppThemeSetting setting) {
-    return _write('themeMode', switch (setting) {
-      AppThemeSetting.light => 'light',
-      AppThemeSetting.dark => 'dark',
-      AppThemeSetting.neon => 'neon',
-      AppThemeSetting.system => 'system',
-    });
+    return _write(
+        'themeMode',
+        switch (setting) {
+          AppThemeSetting.light => 'light',
+          AppThemeSetting.dark => 'dark',
+          AppThemeSetting.neon => 'neon',
+          AppThemeSetting.system => 'system',
+        });
   }
 
   /// Soglia RMS di silenzio calibrata sul rumore ambientale (null = default).

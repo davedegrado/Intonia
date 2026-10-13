@@ -16,7 +16,14 @@ void main() {
     final spelled = NoteSpeller.spellSequence(sequence);
 
     expect(labels(spelled).sublist(0, 8), [
-      'FA', 'SOL', 'LA', 'SIb', 'DO', 'RE', 'MI', 'FA',
+      'FA',
+      'SOL',
+      'LA',
+      'SIb',
+      'DO',
+      'RE',
+      'MI',
+      'FA',
     ]);
   });
 
@@ -26,7 +33,14 @@ void main() {
     final spelled = NoteSpeller.spellSequence(sequence);
 
     expect(labels(spelled).sublist(0, 8), [
-      'DO', 'RE', 'MIb', 'FA', 'SOL', 'LAb', 'SIb', 'DO',
+      'DO',
+      'RE',
+      'MIb',
+      'FA',
+      'SOL',
+      'LAb',
+      'SIb',
+      'DO',
     ]);
   });
 
@@ -36,7 +50,14 @@ void main() {
     final spelled = NoteSpeller.spellSequence(sequence);
 
     expect(labels(spelled).sublist(0, 8), [
-      'LA', 'SI', 'DO', 'RE', 'MI', 'FA', 'SOL#', 'LA',
+      'LA',
+      'SI',
+      'DO',
+      'RE',
+      'MI',
+      'FA',
+      'SOL#',
+      'LA',
     ]);
   });
 
@@ -62,7 +83,14 @@ void main() {
     final spelled = NoteSpeller.spellSequence(sequence);
 
     expect(labels(spelled).sublist(0, 8), [
-      'SIb', 'DO', 'RE', 'MIb', 'FA', 'SOL', 'LA', 'SIb',
+      'SIb',
+      'DO',
+      'RE',
+      'MIb',
+      'FA',
+      'SOL',
+      'LA',
+      'SIb',
     ]);
     expect(NoteSpeller.keyLabel(PitchClass.aSharp, NoteNotation.italian), 'SIb');
     expect(NoteSpeller.keyLabel(PitchClass.aSharp, NoteNotation.english), 'Bb');
@@ -75,7 +103,14 @@ void main() {
     final spelled = NoteSpeller.spellSequence(sequence);
 
     expect(labels(spelled, NoteNotation.english).sublist(0, 8), [
-      'Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D', 'Eb',
+      'Eb',
+      'F',
+      'G',
+      'Ab',
+      'Bb',
+      'C',
+      'D',
+      'Eb',
     ]);
   });
 
@@ -90,8 +125,12 @@ void main() {
     final sequence = custom.buildSequence(key: PitchClass.c, octave: 4);
     final spelled = NoteSpeller.spellSequence(sequence);
 
-    expect([for (final note in spelled) note.fullLabel(NoteNotation.italian)], [
-      'DO4', 'SI3', 'DO3',
+    expect([
+      for (final note in spelled) note.fullLabel(NoteNotation.italian)
+    ], [
+      'DO4',
+      'SI3',
+      'DO3',
     ]);
   });
 

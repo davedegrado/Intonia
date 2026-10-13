@@ -9,11 +9,40 @@ import '../../settings/application/settings_providers.dart';
 import '../../trainer/presentation/widgets/pitch_feedback_panel.dart';
 import '../application/range_test_controller.dart';
 
-class RangeTestScreen extends ConsumerWidget {
+class RangeTestScreen extends ConsumerStatefulWidget {
   const RangeTestScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RangeTestScreen> createState() => _RangeTestScreenState();
+}
+
+class _RangeTestScreenState extends ConsumerState<RangeTestScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
+    // App in background durante il test: microfono e piano vanno rilasciati.
+    // Il test interrotto torna alla configurazione senza essere salvato.
+    if (lifecycle == AppLifecycleState.hidden || lifecycle == AppLifecycleState.paused) {
+      final phase = ref.read(rangeTestControllerProvider).phase;
+      if (phase == RangePhase.descending || phase == RangePhase.ascending) {
+        ref.read(rangeTestControllerProvider.notifier).cancel();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(rangeTestControllerProvider);
     final controller = ref.read(rangeTestControllerProvider.notifier);
     final notation = ref.watch(notationProvider);
@@ -54,7 +83,8 @@ class _SetupView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('Come funziona', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+        Text('Come funziona',
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         Text(
           'Parti da una nota comoda e scendi un semitono alla volta: si avanza '
@@ -74,7 +104,8 @@ class _SetupView extends StatelessWidget {
                 decoration: const InputDecoration(labelText: 'Nota', border: OutlineInputBorder()),
                 items: [
                   for (final pitch in PitchClass.values)
-                    DropdownMenuItem(value: pitch, child: Text(NoteSpeller.keyLabel(pitch, notation))),
+                    DropdownMenuItem(
+                        value: pitch, child: Text(NoteSpeller.keyLabel(pitch, notation))),
                 ],
                 onChanged: (value) => value == null ? null : controller.setStartNote(key: value),
               ),
@@ -83,7 +114,8 @@ class _SetupView extends StatelessWidget {
             Expanded(
               child: DropdownButtonFormField<int>(
                 initialValue: start.octave,
-                decoration: const InputDecoration(labelText: 'Ottava', border: OutlineInputBorder()),
+                decoration:
+                    const InputDecoration(labelText: 'Ottava', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem(value: 2, child: Text('2')),
                   DropdownMenuItem(value: 3, child: Text('3')),
@@ -202,7 +234,8 @@ class _TestingView extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           _noteLabel(state.targetMidi, notation),
-                          style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.w800),
+                          style:
+                              theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.w800),
                         ),
                       ],
                     ),
@@ -248,7 +281,8 @@ class _TestingView extends StatelessWidget {
                       Expanded(
                         child: FilledButton(
                           onPressed: controller.endPhase,
-                          child: Text(descending ? 'Limite grave raggiunto' : 'Limite acuto raggiunto'),
+                          child: Text(
+                              descending ? 'Limite grave raggiunto' : 'Limite acuto raggiunto'),
                         ),
                       ),
                     ],

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/music/note.dart';
 import '../../../core/pitch/pitch_detection_result.dart';
 import '../../../core/session/range_record.dart';
+import '../../../services/audio/piano_audio_service.dart';
+import '../../../services/pitch/microphone_pitch_service.dart';
 import '../../trainer/domain/training_state_machine.dart';
 import '../../trainer/presentation/controllers/trainer_controller.dart';
 import 'range_providers.dart';
@@ -103,14 +105,29 @@ class RangeTestController extends Notifier<RangeTestState> {
   StreamSubscription<PitchDetectionResult>? _subscription;
   late TrainingStateMachine _machine;
   DateTime _ignoreDetectionUntil = DateTime.fromMillisecondsSinceEpoch(0);
+  late MicrophonePitchService _microphone;
+  late PianoAudioService _audio;
+
+  /// Incrementato da avvio, annullamento, fine test e dispose: un avvio del
+  /// microfono ancora in corso non deve proseguire dopo uno di questi eventi.
+  int _generation = 0;
+
+  /// Generazione dell'ultimo avvio richiesto.
+  int _latestStart = 0;
 
   @override
   RangeTestState build() {
     _machine = TrainingStateMachine(toleranceCents: 40, stabilityMs: 150);
+    _microphone = ref.read(microphonePitchServiceProvider);
+    _audio = ref.read(pianoAudioServiceProvider);
+    // In onDispose non si possono usare ref né state: si rilasciano solo
+    // le risorse catturate.
     ref.onDispose(() {
+      _generation++;
       unawaited(_subscription?.cancel());
-      unawaited(ref.read(microphonePitchServiceProvider).stop());
-      unawaited(ref.read(pianoAudioServiceProvider).stopAll());
+      _subscription = null;
+      unawaited(_microphone.stop());
+      unawaited(_audio.stopAll());
     });
     final previous = ref.read(rangeHistoryProvider).value ?? const [];
     return RangeTestState.initial().copyWith(
@@ -144,6 +161,8 @@ class RangeTestController extends Notifier<RangeTestState> {
 
   /// Avvia il test: si parte dalla nota comoda e si scende.
   Future<void> start() async {
+    final generation = ++_generation;
+    _latestStart = generation;
     _machine = TrainingStateMachine(
       toleranceCents: state.toleranceCents,
       stabilityMs: state.stabilityMs,
@@ -159,10 +178,31 @@ class RangeTestController extends Notifier<RangeTestState> {
     );
     try {
       await _playGuideNote(state.targetNote);
-      final microphone = ref.read(microphonePitchServiceProvider);
-      await microphone.start();
-      _subscription = microphone.pitchStream.listen(_handlePitch);
+      if (generation != _generation) {
+        return;
+      }
+      final started = await _microphone.start();
+      if (generation != _generation) {
+        // Test annullato o schermata chiusa mentre il microfono si avviava.
+        // Se nel frattempo è partito un nuovo test, il microfono è suo.
+        if (_latestStart == generation) {
+          await _microphone.stop();
+        }
+        return;
+      }
+      if (!started) {
+        state = state.copyWith(
+          phase: RangePhase.setup,
+          isListening: false,
+          message: 'Permesso microfono negato: abilitalo nelle impostazioni di sistema.',
+        );
+        return;
+      }
+      _subscription = _microphone.pitchStream.listen(_handlePitch);
     } catch (_) {
+      if (generation != _generation) {
+        return;
+      }
       state = state.copyWith(
         phase: RangePhase.setup,
         isListening: false,
@@ -240,9 +280,7 @@ class RangeTestController extends Notifier<RangeTestState> {
   }
 
   void _advanceTarget() {
-    final next = state.phase == RangePhase.descending
-        ? state.targetMidi - 1
-        : state.targetMidi + 1;
+    final next = state.phase == RangePhase.descending ? state.targetMidi - 1 : state.targetMidi + 1;
     if (next < _minMidi || next > _maxMidi) {
       endPhase();
       return;
@@ -280,21 +318,20 @@ class RangeTestController extends Notifier<RangeTestState> {
     state = state.copyWith(
       phase: RangePhase.done,
       isListening: false,
-      message: lowest == null
-          ? 'Nessuna nota convalidata: il test non è stato salvato.'
-          : null,
+      message: lowest == null ? 'Nessuna nota convalidata: il test non è stato salvato.' : null,
     );
   }
 
   Future<void> _stopAudio() async {
+    _generation++;
     await _subscription?.cancel();
     _subscription = null;
-    await ref.read(microphonePitchServiceProvider).stop();
-    await ref.read(pianoAudioServiceProvider).stopAll();
+    await _microphone.stop();
+    await _audio.stopAll();
   }
 
   Future<void> _playGuideNote(MusicalNote note) async {
     _ignoreDetectionUntil = DateTime.now().add(_guideNoteDuration + _detectionMuteTail);
-    await ref.read(pianoAudioServiceProvider).playNote(note, duration: _guideNoteDuration);
+    await _audio.playNote(note, duration: _guideNoteDuration);
   }
 }

@@ -23,10 +23,11 @@ class TrainerScreen extends ConsumerStatefulWidget {
   ConsumerState<TrainerScreen> createState() => _TrainerScreenState();
 }
 
-class _TrainerScreenState extends ConsumerState<TrainerScreen> {
+class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(trainerControllerProvider.notifier).selectExercise(widget.exercise);
     });
@@ -36,6 +37,21 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> {
   void deactivate() {
     ref.read(trainerControllerProvider.notifier).stop();
     super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // App in background: si fermano microfono e piano (la sessione in corso
+    // viene chiusa e salvata come per uno Stop manuale).
+    if (state == AppLifecycleState.hidden || state == AppLifecycleState.paused) {
+      ref.read(trainerControllerProvider.notifier).stop();
+    }
   }
 
   void _openAdvancedSettings() {
@@ -97,7 +113,8 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> {
                                   ],
                                 ),
                               ),
-                              _StatusPill(isPlaying: state.isPlaying, isListening: state.isListening),
+                              _StatusPill(
+                                  isPlaying: state.isPlaying, isListening: state.isListening),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -177,7 +194,8 @@ class _BottomControlBar extends ConsumerWidget {
             if (fixedRoot != null)
               Row(
                 children: [
-                  Icon(Icons.push_pin_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                  Icon(Icons.push_pin_outlined,
+                      size: 18, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(width: 6),
                   Text(
                     'Nota di partenza: $fixedRoot',
@@ -294,8 +312,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
 
   Future<void> _calibrate() async {
     setState(() => _calibrating = true);
-    final threshold =
-        await ref.read(trainerControllerProvider.notifier).calibrateNoise();
+    final threshold = await ref.read(trainerControllerProvider.notifier).calibrateNoise();
     if (!mounted) {
       return;
     }
@@ -318,9 +335,8 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom +
-            MediaQuery.of(context).padding.bottom +
-            20,
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom + 20,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -388,9 +404,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.graphic_eq),
-            label: Text(_calibrating
-                ? 'Resta in silenzio… (3 s)'
-                : 'Calibra rumore di fondo'),
+            label: Text(_calibrating ? 'Resta in silenzio… (3 s)' : 'Calibra rumore di fondo'),
           ),
         ],
       ),

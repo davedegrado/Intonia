@@ -6,15 +6,30 @@ Voice-first, but the exercise model is instrument-agnostic.
 
 ## Run
 
-```powershell
-flutter pub get
+Requires Flutter 3.44.3 (see `docs/BUILD_AND_RELEASE.md`).
+
+```sh
+flutter pub get --enforce-lockfile
 flutter run
 ```
 
+Checks (also run in CI, `.github/workflows/ci.yml`):
+
+```sh
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test
+```
+
+Release builds, Android signing (`android/key.properties`, never committed),
+iOS checks on macOS: `docs/BUILD_AND_RELEASE.md`.
+Manual audio checks on real devices: `docs/AUDIO_MANUAL_TEST_CHECKLIST.md`.
+
 ## Audio asset
 
-The app is wired to load `assets/soundfonts/piano.sf2` through `flutter_midi_pro`.
-Use a piano SoundFont with a license that explicitly allows commercial mobile distribution.
+The app loads `assets/soundfonts/piano.sf2` through `flutter_midi_pro`.
+**Its license is not verified and it must be replaced before publishing**:
+see `assets/soundfonts/README.md`.
 
 Android builds for `flutter_midi_pro` require CMake 3.22.1 because the plugin builds FluidSynth.
 

@@ -89,10 +89,13 @@ class NoteSpeller {
   /// es. semitono 10 → 'SIb' / 'Bb', semitono 6 → 'FA#' / 'F#'.
   static String keyLabel(PitchClass key, NoteNotation notation) {
     final (letter, alt) = _preferredRoots[key.semitone]!;
-    final letters = notation == NoteNotation.english
-        ? SpelledNote.englishLetters
-        : SpelledNote.italianLetters;
-    final accidental = alt == -1 ? 'b' : alt == 1 ? '#' : '';
+    final letters =
+        notation == NoteNotation.english ? SpelledNote.englishLetters : SpelledNote.italianLetters;
+    final accidental = alt == -1
+        ? 'b'
+        : alt == 1
+            ? '#'
+            : '';
     return '${letters[letter]}$accidental';
   }
 
@@ -161,8 +164,7 @@ class NoteSpeller {
     final augmented = offsets.contains(4) && offsets.contains(8) && !offsets.contains(7);
 
     return [
-      for (final note in sequence)
-        spellNote(note, root: root, preferAugmentedFifth: augmented),
+      for (final note in sequence) spellNote(note, root: root, preferAugmentedFifth: augmented),
     ];
   }
 }

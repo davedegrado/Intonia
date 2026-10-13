@@ -1,5 +1,9 @@
 include: package:flutter_lints/flutter.yaml
 
+formatter:
+  # Larghezza coerente con lo stile esistente del codice (righe fino a ~110).
+  page_width: 100
+
 linter:
   rules:
     prefer_single_quotes: true

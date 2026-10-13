@@ -37,9 +37,8 @@ class SessionHistoryRepository {
 
   Future<void> save(List<SessionRecord> records) async {
     try {
-      final trimmed = records.length > _maxRecords
-          ? records.sublist(records.length - _maxRecords)
-          : records;
+      final trimmed =
+          records.length > _maxRecords ? records.sublist(records.length - _maxRecords) : records;
       final file = await _file();
       await file.writeAsString(
         jsonEncode([for (final record in trimmed) record.toJson()]),

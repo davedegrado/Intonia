@@ -74,7 +74,11 @@ class _StatTile extends StatelessWidget {
             children: [
               Text(label, style: Theme.of(context).textTheme.labelMedium),
               const SizedBox(height: 4),
-              Text(value, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+              Text(value,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w800)),
             ],
           ),
         ),

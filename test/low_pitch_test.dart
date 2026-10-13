@@ -5,8 +5,7 @@ import 'package:vocal_scale_trainer/core/pitch/yin_pitch_detector.dart';
 
 List<double> sine(double frequency, int sampleRate, int length, {double amplitude = 0.3}) {
   return [
-    for (var i = 0; i < length; i++)
-      amplitude * math.sin(2 * math.pi * frequency * i / sampleRate),
+    for (var i = 0; i < length; i++) amplitude * math.sin(2 * math.pi * frequency * i / sampleRate),
   ];
 }
 

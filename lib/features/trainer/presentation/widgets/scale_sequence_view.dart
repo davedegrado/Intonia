@@ -86,7 +86,8 @@ class _ScaleSequenceViewState extends ConsumerState<ScaleSequenceView> {
               ),
               segments: const [
                 ButtonSegment(value: false, icon: Icon(Icons.view_week, size: 18), tooltip: 'Note'),
-                ButtonSegment(value: true, icon: Icon(Icons.queue_music, size: 18), tooltip: 'Pentagramma'),
+                ButtonSegment(
+                    value: true, icon: Icon(Icons.queue_music, size: 18), tooltip: 'Pentagramma'),
               ],
               selected: {_staffMode},
               onSelectionChanged: (selection) {

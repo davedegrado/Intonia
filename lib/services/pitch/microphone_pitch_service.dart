@@ -83,10 +83,13 @@ class MicrophonePitchService {
       }
     });
 
-    await Future<void>.delayed(duration);
-    await subscription.cancel();
-    if (await _recorder.isRecording()) {
-      await _recorder.stop();
+    try {
+      await Future<void>.delayed(duration);
+    } finally {
+      await subscription.cancel();
+      if (await _recorder.isRecording()) {
+        await _recorder.stop();
+      }
     }
 
     if (rmsValues.isEmpty) {
@@ -97,10 +100,12 @@ class MicrophonePitchService {
     return rmsValues[index];
   }
 
-  Future<void> start() async {
+  /// Avvia l'ascolto del microfono. Ritorna false se il permesso è stato
+  /// negato: in quel caso non viene acquisito alcun audio e il chiamante deve
+  /// informare l'utente invece di mostrarsi "in ascolto".
+  Future<bool> start() async {
     if (!await _recorder.hasPermission()) {
-      _pitchController.add(PitchDetectionResult.silence);
-      return;
+      return false;
     }
 
     await stop();
@@ -118,6 +123,7 @@ class MicrophonePitchService {
     );
 
     _subscription = stream.listen(_handleBytes);
+    return true;
   }
 
   Future<void> stop() async {
@@ -171,11 +177,9 @@ class MicrophonePitchService {
     final frame = List<double>.filled(_lowFrameSize, 0);
     for (var i = 0; i < _lowFrameSize; i++) {
       final base = i * _lowDecimation;
-      frame[i] = (_lowBuffer[base] +
-              _lowBuffer[base + 1] +
-              _lowBuffer[base + 2] +
-              _lowBuffer[base + 3]) /
-          4;
+      frame[i] =
+          (_lowBuffer[base] + _lowBuffer[base + 1] + _lowBuffer[base + 2] + _lowBuffer[base + 3]) /
+              4;
     }
     return frame;
   }

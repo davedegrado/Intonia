@@ -58,7 +58,8 @@ class PitchFeedbackPanel extends ConsumerWidget {
                 Expanded(
                   child: _Metric(
                     label: 'Scostamento',
-                    value: hasPitch ? '${cents >= 0 ? '+' : ''}${cents.toStringAsFixed(0)} cent' : '-',
+                    value:
+                        hasPitch ? '${cents >= 0 ? '+' : ''}${cents.toStringAsFixed(0)} cent' : '-',
                   ),
                 ),
               ],
@@ -93,7 +94,8 @@ class PitchFeedbackPanel extends ConsumerWidget {
                 ],
               ),
             ),
-            Text(label, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.primary)),
+            Text(label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.primary)),
           ],
         ),
       ),
@@ -114,7 +116,9 @@ class _Metric extends StatelessWidget {
       children: [
         Text(label, style: Theme.of(context).textTheme.labelMedium),
         const SizedBox(height: 2),
-        Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+        Text(value,
+            style:
+                Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
       ],
     );
   }
