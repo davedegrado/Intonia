@@ -16,7 +16,11 @@ import '../../domain/trainer_state.dart';
 import '../../domain/training_settings.dart';
 import '../../domain/training_state_machine.dart';
 
-final pianoAudioServiceProvider = Provider<PianoAudioService>((ref) => PianoAudioService());
+final pianoAudioServiceProvider = Provider<PianoAudioService>((ref) {
+  final service = PianoAudioService();
+  ref.onDispose(() => unawaited(service.dispose()));
+  return service;
+});
 final microphonePitchServiceProvider = Provider<MicrophonePitchService>((ref) {
   final service = MicrophonePitchService();
   // Applica la soglia di rumore calibrata in precedenza, se presente.
@@ -39,6 +43,16 @@ class TrainerController extends Notifier<TrainerState> {
   late final PianoAudioService _audio;
   late final MicrophonePitchService _microphone;
   ExerciseDefinition _exercise = const ExerciseLibrary().builtIn.first;
+
+  /// Identifica l'esecuzione corrente: incrementato da [play] e [stop].
+  /// Le operazioni asincrone (avvio microfono, sequenza di ascolto) verificano
+  /// di appartenere ancora all'esecuzione corrente prima di aggiornare lo
+  /// stato, così uno Stop o l'uscita dalla schermata durante l'avvio non
+  /// lasciano il microfono acceso o lo stato incoerente.
+  int _runId = 0;
+
+  static const microphoneDeniedMessage =
+      'Permesso microfono negato: abilitalo nelle impostazioni di sistema per allenarti.';
 
   /// Fino a questo istante le rilevazioni del mic vengono ignorate:
   /// evita che il piano della guida venga scambiato per la voce.
@@ -65,7 +79,9 @@ class TrainerController extends Notifier<TrainerState> {
       stabilityMs: settings.stabilityMs,
     );
     ref.onDispose(() {
+      _runId++;
       unawaited(_pitchSubscription?.cancel());
+      unawaited(_microphone.stop());
       unawaited(_audio.stopAll());
     });
     return TrainerState.initial(settings: settings, sequence: sequence);
@@ -122,6 +138,7 @@ class TrainerController extends Notifier<TrainerState> {
   }
 
   Future<void> stop() async {
+    _runId++;
     await _pitchSubscription?.cancel();
     _pitchSubscription = null;
     await _microphone.stop();
@@ -211,25 +228,54 @@ class TrainerController extends Notifier<TrainerState> {
   }
 
   Future<void> _playListeningMode() async {
+    final runId = _runId;
     try {
-      await _audio.playSequence(
+      final completed = await _audio.playSequence(
         notes: state.sequence,
         bpm: state.settings.bpm,
         loop: state.settings.loop,
-        onNote: _markCurrentIndex,
+        onNote: (index) {
+          if (runId == _runId) {
+            _markCurrentIndex(index);
+          }
+        },
       );
-      state = state.copyWith(isPlaying: false, sessionStats: state.sessionStats.finish());
+      if (completed && runId == _runId) {
+        state = state.copyWith(isPlaying: false, sessionStats: state.sessionStats.finish());
+      }
     } catch (error) {
-      state = state.copyWith(isPlaying: false, message: _friendlyAudioError(error));
+      if (runId == _runId) {
+        state = state.copyWith(isPlaying: false, message: _friendlyAudioError(error));
+      }
     }
   }
 
   Future<void> _startTrainingMode() async {
+    final runId = _runId;
     try {
       await _playGuideNote(state.currentNote);
-      await _microphone.start();
+      if (runId != _runId) {
+        return;
+      }
+      final started = await _microphone.start();
+      if (runId != _runId) {
+        // Fermato (o schermata chiusa) mentre il microfono si avviava.
+        await _microphone.stop();
+        return;
+      }
+      if (!started) {
+        state = state.copyWith(
+          isPlaying: false,
+          isListening: false,
+          message: microphoneDeniedMessage,
+        );
+        return;
+      }
       _pitchSubscription = _microphone.pitchStream.listen(_handlePitch);
     } catch (error) {
+      if (runId != _runId) {
+        return;
+      }
       state = state.copyWith(
         isPlaying: false,
         isListening: false,

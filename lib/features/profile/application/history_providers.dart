@@ -17,7 +17,9 @@ class SessionHistoryNotifier extends AsyncNotifier<List<SessionRecord>> {
   }
 
   Future<void> add(SessionRecord record) async {
-    final current = List<SessionRecord>.from(state.value ?? const [])..add(record);
+    // Attende il caricamento dal disco: aggiungere a uno stato ancora vuoto
+    // sovrascriverebbe lo storico salvato con il solo nuovo record.
+    final current = List<SessionRecord>.from(await future)..add(record);
     state = AsyncData(current);
     await ref.read(sessionHistoryRepositoryProvider).save(current);
   }

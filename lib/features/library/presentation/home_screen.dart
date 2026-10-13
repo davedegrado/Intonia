@@ -111,7 +111,9 @@ class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObser
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    // Solo hidden/paused (app in background): "inactive" scatta anche mentre
+    // è aperto il dialog del permesso microfono e annullerebbe l'avvio.
+    if (state == AppLifecycleState.hidden || state == AppLifecycleState.paused) {
       ref.read(tunerControllerProvider.notifier).stop();
     }
   }
@@ -144,8 +146,14 @@ class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObser
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: !tuner.active
-                          ? Text('Canta o suona una nota: ti dico qual è.',
-                              style: theme.textTheme.bodySmall)
+                          ? Text(
+                              tuner.permissionDenied
+                                  ? 'Permesso microfono negato: abilitalo nelle impostazioni.'
+                                  : 'Canta o suona una nota: ti dico qual è.',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: tuner.permissionDenied ? theme.colorScheme.error : null,
+                              ),
+                            )
                           : hasPitch
                               ? Row(
                                   crossAxisAlignment: CrossAxisAlignment.end,

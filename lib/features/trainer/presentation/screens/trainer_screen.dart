@@ -23,10 +23,11 @@ class TrainerScreen extends ConsumerStatefulWidget {
   ConsumerState<TrainerScreen> createState() => _TrainerScreenState();
 }
 
-class _TrainerScreenState extends ConsumerState<TrainerScreen> {
+class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(trainerControllerProvider.notifier).selectExercise(widget.exercise);
     });
@@ -36,6 +37,21 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> {
   void deactivate() {
     ref.read(trainerControllerProvider.notifier).stop();
     super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // App in background: si fermano microfono e piano (la sessione in corso
+    // viene chiusa e salvata come per uno Stop manuale).
+    if (state == AppLifecycleState.hidden || state == AppLifecycleState.paused) {
+      ref.read(trainerControllerProvider.notifier).stop();
+    }
   }
 
   void _openAdvancedSettings() {

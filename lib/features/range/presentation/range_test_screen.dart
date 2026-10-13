@@ -9,11 +9,40 @@ import '../../settings/application/settings_providers.dart';
 import '../../trainer/presentation/widgets/pitch_feedback_panel.dart';
 import '../application/range_test_controller.dart';
 
-class RangeTestScreen extends ConsumerWidget {
+class RangeTestScreen extends ConsumerStatefulWidget {
   const RangeTestScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RangeTestScreen> createState() => _RangeTestScreenState();
+}
+
+class _RangeTestScreenState extends ConsumerState<RangeTestScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
+    // App in background durante il test: microfono e piano vanno rilasciati.
+    // Il test interrotto torna alla configurazione senza essere salvato.
+    if (lifecycle == AppLifecycleState.hidden || lifecycle == AppLifecycleState.paused) {
+      final phase = ref.read(rangeTestControllerProvider).phase;
+      if (phase == RangePhase.descending || phase == RangePhase.ascending) {
+        ref.read(rangeTestControllerProvider.notifier).cancel();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(rangeTestControllerProvider);
     final controller = ref.read(rangeTestControllerProvider.notifier);
     final notation = ref.watch(notationProvider);

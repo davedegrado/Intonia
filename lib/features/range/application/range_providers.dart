@@ -17,7 +17,9 @@ class RangeHistoryNotifier extends AsyncNotifier<List<RangeRecord>> {
   }
 
   Future<void> add(RangeRecord record) async {
-    final current = List<RangeRecord>.from(state.value ?? const [])..add(record);
+    // Attende il caricamento dal disco: aggiungere a uno stato ancora vuoto
+    // sovrascriverebbe lo storico salvato con il solo nuovo record.
+    final current = List<RangeRecord>.from(await future)..add(record);
     state = AsyncData(current);
     await ref.read(rangeHistoryRepositoryProvider).save(current);
   }
