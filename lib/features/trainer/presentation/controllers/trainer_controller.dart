@@ -51,6 +51,12 @@ class TrainerController extends Notifier<TrainerState> {
   /// lasciano il microfono acceso o lo stato incoerente.
   int _runId = 0;
 
+  /// Con la guida su ogni nota si avanza subito alla nota corretta (e la
+  /// guida suona la successiva): la macchina a stati resta però in attesa di
+  /// un cambio di nota, così la nota precedente ancora tenuta non conta come
+  /// errore. Il primo evento `advanced` successivo serve solo a riallinearla.
+  bool _advancedOnCorrect = false;
+
   /// Run id dell'ultimo avvio del microfono richiesto.
   int _latestMicrophoneStart = 0;
 
@@ -210,6 +216,7 @@ class TrainerController extends Notifier<TrainerState> {
       toleranceCents: settings.toleranceCents,
       stabilityMs: settings.stabilityMs,
     );
+    _advancedOnCorrect = false;
     state = TrainerState.initial(settings: settings, sequence: sequence);
   }
 
@@ -219,6 +226,7 @@ class TrainerController extends Notifier<TrainerState> {
         i == 0 ? NoteProgressStatus.current : NoteProgressStatus.pending,
     ];
     _stateMachine.reset();
+    _advancedOnCorrect = false;
     return state.copyWith(
       progress: progress,
       currentIndex: 0,
@@ -321,6 +329,12 @@ class TrainerController extends Notifier<TrainerState> {
           timestamp: DateTime.now(),
         ),
       );
+      if (state.settings.guideEveryNote && currentIndex < state.sequence.length - 1) {
+        currentIndex += 1;
+        progress[currentIndex] = NoteProgressStatus.current;
+        _advancedOnCorrect = true;
+        unawaited(_playGuideNote(state.sequence[currentIndex]));
+      }
     }
 
     if (output.event == TrainingValidationEvent.wrong) {
@@ -336,7 +350,12 @@ class TrainerController extends Notifier<TrainerState> {
       );
     }
 
-    if (output.event == TrainingValidationEvent.advanced &&
+    if (output.event == TrainingValidationEvent.advanced && _advancedOnCorrect) {
+      // Già avanzati alla convalida: la nota è cambiata, la macchina torna a
+      // valutare la nota corrente.
+      _advancedOnCorrect = false;
+      _stateMachine.markAdvanced();
+    } else if (output.event == TrainingValidationEvent.advanced &&
         currentIndex < state.sequence.length - 1) {
       currentIndex += 1;
       progress[currentIndex] = NoteProgressStatus.current;
