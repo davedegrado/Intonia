@@ -37,10 +37,10 @@ insieme alla build di un APK di test. La CI non usa segreti e non pubblica nulla
 lo scaricato è uno zip che contiene l'APK). È compilato in modalità release
 (prestazioni realistiche per il riconoscimento del pitch) ma firmato con la
 chiave debug: si installa sul telefono abilitando l'installazione da origini
-sconosciute, **non è pubblicabile** su Google Play. Ogni APK firmato con la
-chiave debug della CI può aggiornare il precedente solo se firmato con la
-stessa chiave: in caso di errore di installazione, disinstallare prima la
-versione già presente.
+sconosciute, **non è pubblicabile** su Google Play. Ogni run della CI genera
+una chiave debug nuova, quindi un APK non può aggiornare quello di un run
+precedente: disinstallare prima la versione presente (si perdono storico e
+impostazioni salvati nell'app).
 
 ## 3. Build Android
 
