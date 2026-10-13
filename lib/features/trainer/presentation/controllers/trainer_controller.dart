@@ -51,6 +51,9 @@ class TrainerController extends Notifier<TrainerState> {
   /// lasciano il microfono acceso o lo stato incoerente.
   int _runId = 0;
 
+  /// Run id dell'ultimo avvio del microfono richiesto.
+  int _latestMicrophoneStart = 0;
+
   static const microphoneDeniedMessage =
       'Permesso microfono negato: abilitalo nelle impostazioni di sistema per allenarti.';
 
@@ -257,10 +260,14 @@ class TrainerController extends Notifier<TrainerState> {
       if (runId != _runId) {
         return;
       }
+      _latestMicrophoneStart = runId;
       final started = await _microphone.start();
       if (runId != _runId) {
-        // Fermato (o schermata chiusa) mentre il microfono si avviava.
-        await _microphone.stop();
+        // Fermato (o schermata chiusa) mentre il microfono si avviava. Se nel
+        // frattempo è partita una nuova esecuzione, il microfono è suo.
+        if (_latestMicrophoneStart == runId) {
+          await _microphone.stop();
+        }
         return;
       }
       if (!started) {

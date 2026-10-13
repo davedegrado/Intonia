@@ -96,6 +96,35 @@ void main() {
       expect(container.read(trainerControllerProvider).isListening, isFalse);
     });
 
+    test('a cancelled start does not switch off the microphone of a newer run', () async {
+      final firstGate = Completer<void>();
+      final secondGate = Completer<void>();
+      final mic = FakeMicrophonePitchService()..perCallGates.addAll([firstGate, secondGate]);
+      final container = _container(mic, FakeMidiPro());
+      addTearDown(container.dispose);
+      final controller = container.read(trainerControllerProvider.notifier);
+
+      final first = controller.play();
+      while (mic.startCalls == 0) {
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+      }
+      // Stop e nuovo Play mentre il primo avvio è ancora pendente.
+      final second = controller.play();
+      while (mic.startCalls < 2) {
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+      }
+      // Il nuovo avvio termina per primo, quello annullato dopo.
+      secondGate.complete();
+      await second;
+      firstGate.complete();
+      await first;
+
+      expect(mic.isRecording, isTrue);
+      expect(container.read(trainerControllerProvider).isListening, isTrue);
+      await controller.stop();
+      expect(mic.isRecording, isFalse);
+    });
+
     test('a stopped listening sequence does not reset a newly started one', () async {
       final mic = FakeMicrophonePitchService();
       final container = _container(mic, FakeMidiPro());

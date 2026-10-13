@@ -30,6 +30,9 @@ class TunerController extends Notifier<TunerState> {
   /// permesso aperto) non deve accendere il microfono dopo uno stop.
   int _generation = 0;
 
+  /// Generazione dell'ultimo avvio richiesto.
+  int _latestStart = 0;
+
   @override
   TunerState build() {
     _microphone = ref.read(microphonePitchServiceProvider);
@@ -49,10 +52,13 @@ class TunerController extends Notifier<TunerState> {
       return;
     }
     final generation = ++_generation;
+    _latestStart = generation;
     try {
       final started = await _microphone.start();
       if (generation != _generation) {
-        if (started) {
+        // Fermato durante l'avvio. Se nel frattempo è partito un nuovo avvio,
+        // il microfono è suo e non va spento.
+        if (started && _latestStart == generation) {
           await _microphone.stop();
         }
         return;

@@ -112,6 +112,9 @@ class RangeTestController extends Notifier<RangeTestState> {
   /// microfono ancora in corso non deve proseguire dopo uno di questi eventi.
   int _generation = 0;
 
+  /// Generazione dell'ultimo avvio richiesto.
+  int _latestStart = 0;
+
   @override
   RangeTestState build() {
     _machine = TrainingStateMachine(toleranceCents: 40, stabilityMs: 150);
@@ -159,6 +162,7 @@ class RangeTestController extends Notifier<RangeTestState> {
   /// Avvia il test: si parte dalla nota comoda e si scende.
   Future<void> start() async {
     final generation = ++_generation;
+    _latestStart = generation;
     _machine = TrainingStateMachine(
       toleranceCents: state.toleranceCents,
       stabilityMs: state.stabilityMs,
@@ -180,7 +184,10 @@ class RangeTestController extends Notifier<RangeTestState> {
       final started = await _microphone.start();
       if (generation != _generation) {
         // Test annullato o schermata chiusa mentre il microfono si avviava.
-        await _microphone.stop();
+        // Se nel frattempo è partito un nuovo test, il microfono è suo.
+        if (_latestStart == generation) {
+          await _microphone.stop();
+        }
         return;
       }
       if (!started) {

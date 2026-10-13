@@ -66,6 +66,11 @@ class FakeMicrophonePitchService implements MicrophonePitchService {
   /// permesso o l'avvio lento del registratore).
   Completer<void>? startGate;
 
+  /// Gate per singola chiamata (in ordine di chiamata), per controllare
+  /// l'ordine in cui avvii concorrenti si completano. Ha precedenza su
+  /// [startGate].
+  final List<Completer<void>> perCallGates = [];
+
   bool isRecording = false;
   int startCalls = 0;
   int stopCalls = 0;
@@ -95,8 +100,8 @@ class FakeMicrophonePitchService implements MicrophonePitchService {
 
   @override
   Future<bool> start() async {
-    startCalls++;
-    final gate = startGate;
+    final index = startCalls++;
+    final gate = index < perCallGates.length ? perCallGates[index] : startGate;
     if (gate != null) {
       await gate.future;
     }
