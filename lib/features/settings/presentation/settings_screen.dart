@@ -61,8 +61,22 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             Text(
                 'Intonia 0.1.0 — allenamento di intonazione offline.\n'
-                'Audio: SoundFont piano.sf2 (verifica la licenza prima della pubblicazione).',
+                'Suono di pianoforte: Fluid (R3) SoundFont, © 2000–2002, 2008 Frank Wen, '
+                'licenza MIT.',
                 style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => showLicensePage(
+                  context: context,
+                  applicationName: 'Intonia',
+                  applicationVersion: '0.1.0',
+                ),
+                icon: const Icon(Icons.description_outlined),
+                label: const Text('Licenze'),
+              ),
+            ),
           ],
         ),
       ),

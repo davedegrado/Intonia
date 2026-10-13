@@ -25,4 +25,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/soundfonts/
+    # Piano FluidR3 (licenza MIT, vedi assets/soundfonts/soundfont-info.txt).
+    # intonia_piano_bright.sf2 resta nel repository ma non viene incluso nell'app.
+    - assets/soundfonts/intonia_piano_classic.sf2
+    - assets/soundfonts/licenses/FLUIDR3-COPYING.txt

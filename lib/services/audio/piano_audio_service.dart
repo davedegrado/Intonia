@@ -7,7 +7,8 @@ import '../../core/music/note.dart';
 class PianoAudioService {
   PianoAudioService({MidiPro? midiPro}) : _midiPro = midiPro ?? MidiPro();
 
-  static const _assetPath = 'assets/soundfonts/piano.sf2';
+  /// Piano FluidR3 "Yamaha Grand Piano" (banco 0, programma 0), licenza MIT.
+  static const assetPath = 'assets/soundfonts/intonia_piano_classic.sf2';
   static const _channel = 0;
   static const _velocity = 104;
 
@@ -34,7 +35,7 @@ class PianoAudioService {
   }
 
   Future<void> _load() async {
-    final sfId = await _midiPro.loadSoundfontAsset(assetPath: _assetPath, bank: 0, program: 0);
+    final sfId = await _midiPro.loadSoundfontAsset(assetPath: assetPath, bank: 0, program: 0);
     await _midiPro.selectInstrument(sfId: sfId, channel: _channel, bank: 0, program: 0);
     _soundFontId = sfId;
   }
