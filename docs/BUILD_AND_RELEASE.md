@@ -1,0 +1,126 @@
+# Build, test e preparazione al rilascio
+
+Guida operativa per sviluppare, verificare e preparare le build di Intonia.
+Lo stato delle verifiche ancora aperte è riassunto in fondo.
+
+## 1. Ambiente di sviluppo
+
+- **Flutter 3.44.3** (stable, Dart 3.12.2): è la versione con cui è stato creato
+  il progetto (`.metadata`), generato `pubspec.lock` e configurata la CI.
+- **Android**: Android SDK con la piattaforma indicata da Flutter, JDK 17+ e
+  CMake 3.22.1 (richiesto da `flutter_midi_pro`, che compila FluidSynth).
+- **iOS**: macOS con Xcode e CocoaPods (`flutter_midi_pro` non supporta Swift
+  Package Manager, quindi Flutter genera il `Podfile` al primo build iOS).
+
+```sh
+flutter --version          # deve riportare 3.44.3
+flutter pub get --enforce-lockfile
+```
+
+`pubspec.lock` è versionato: aggiornare le dipendenze solo intenzionalmente
+(`flutter pub upgrade`) e committare il lockfile risultante.
+
+## 2. Analisi e test
+
+```sh
+dart format --output=none --set-exit-if-changed lib test   # page_width: 100 da analysis_options.yaml
+flutter analyze
+flutter test
+```
+
+Gli stessi controlli girano in CI (`.github/workflows/ci.yml`) su push a
+`main`, sulle pull request e manualmente (*Actions → CI → Run workflow*),
+insieme a una build Android debug. La CI non usa segreti e non pubblica nulla.
+
+## 3. Build Android
+
+### Debug / profile
+
+```sh
+flutter run                 # debug su dispositivo/emulatore
+flutter build apk --debug
+```
+
+Non richiedono credenziali.
+
+### Release (firma di produzione)
+
+L'identificativo Android è **`com.vocalscaletrainer.app`**: non modificarlo se
+l'app è già registrata su Google Play.
+
+La build release viene firmata solo con la upload key fornita localmente;
+**senza credenziali fallisce** (task `checkReleaseSigning`) invece di usare la
+chiave debug.
+
+1. Procurarsi la upload key (keystore `.jks`) dal proprietario dell'account
+   Google Play, oppure crearne una nuova *solo* se l'app non è ancora stata
+   caricata su Play (con Play App Signing la upload key può essere
+   reimpostata dalla Play Console). Conservarla **fuori dal repository**.
+2. Copiare `android/key.properties.example` in `android/key.properties`
+   (ignorato da Git) e compilarlo:
+
+   ```properties
+   storeFile=/percorso/sicuro/intonia-upload-keystore.jks
+   storePassword=...
+   keyAlias=upload
+   keyPassword=...
+   ```
+
+   In alternativa (es. CI privata) impostare le variabili d'ambiente
+   `INTONIA_UPLOAD_STORE_FILE`, `INTONIA_UPLOAD_STORE_PASSWORD`,
+   `INTONIA_UPLOAD_KEY_ALIAS`, `INTONIA_UPLOAD_KEY_PASSWORD`.
+   `key.properties` ha la precedenza sulle variabili.
+3. Compilare:
+
+   ```sh
+   flutter build appbundle --release   # AAB per Google Play
+   flutter build apk --release         # APK per test interni
+   ```
+
+4. Verificare la firma:
+   `keytool -printcert -jarfile build/app/outputs/flutter-apk/app-release.apk`.
+
+Solo per prove locali su dispositivo, senza upload key:
+`INTONIA_ALLOW_DEBUG_SIGNED_RELEASE=true flutter build apk --release`.
+L'artefatto è firmato con la chiave debug e **non è pubblicabile**.
+
+Versione: `version: X.Y.Z+N` in `pubspec.yaml` (`N` = versionCode Android /
+CFBundleVersion iOS, da incrementare a ogni upload).
+
+## 4. iOS (da eseguire su macOS)
+
+Bundle Identifier: **`com.vocalscaletrainer.vocalScaleTrainer`** (non
+modificarlo se già registrato su App Store Connect). Firma: *Automatic*, senza
+team impostato nel progetto: va scelto in Xcode (*Runner → Signing &
+Capabilities*), non versionare profili o certificati.
+
+Verifiche da eseguire, nessuna delle quali è stata possibile senza macOS:
+
+1. `flutter build ios --release --no-codesign` (genera `Podfile`, esegue
+   `pod install`): deve completare senza errori; committare `ios/Podfile` e
+   `ios/Podfile.lock` generati.
+2. Avvio su simulatore e dispositivo fisico: la Home deve comparire (il
+   progetto usa il ciclo di vita UIScene, `Info.plist` + `SceneDelegate`).
+3. Prima richiesta microfono: compare il testo di `NSMicrophoneUsageDescription`;
+   con permesso negato il trainer mostra il messaggio di errore.
+4. Rotazione e multitasking su iPad (orientamenti iPad tutti dichiarati).
+5. *Product → Archive* in Xcode con il team corretto, poi *Validate App*.
+6. Checklist audio manuale (`docs/AUDIO_MANUAL_TEST_CHECKLIST.md`).
+
+## 5. Licenze degli asset
+
+Ogni asset distribuito con l'app deve avere origine e licenza documentate.
+Stato attuale e istruzioni di sostituzione del SoundFont:
+`assets/soundfonts/README.md`. **Il SoundFont attuale non ha licenza
+verificata ed è un blocco per la pubblicazione.**
+
+## 6. Stato delle verifiche (ottobre 2026)
+
+| Verifica | Stato |
+|---|---|
+| `dart format`, `flutter analyze`, `flutter test` (Linux, Flutter 3.44.3) | Superati localmente |
+| Workflow CI | Aggiunto, non ancora eseguito su GitHub |
+| Build Android debug/release | Non eseguita: Android SDK e repository Google Maven non raggiungibili dall'ambiente usato |
+| Build iOS | Non eseguita: richiede macOS/Xcode |
+| Audio su dispositivi reali | Non eseguito: vedi checklist manuale |
+| Licenza SoundFont | **Bloccante** |
