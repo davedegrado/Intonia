@@ -1,4 +1,4 @@
-package com.vocalscaletrainer.app
+package io.github.davedegrado.intonia
 
 import io.flutter.embedding.android.FlutterActivity
 

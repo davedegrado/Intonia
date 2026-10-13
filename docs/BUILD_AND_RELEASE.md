@@ -45,17 +45,19 @@ Non richiedono credenziali.
 
 ### Release (firma di produzione)
 
-L'identificativo Android è **`com.vocalscaletrainer.app`**: non modificarlo se
-l'app è già registrata su Google Play.
+L'identificativo Android è **`io.github.davedegrado.intonia`**, identico al
+Bundle ID iOS. L'app non è ancora registrata sugli store: dopo il primo upload
+su Google Play l'applicationId non potrà più essere cambiato.
 
 La build release viene firmata solo con la upload key fornita localmente;
 **senza credenziali fallisce** (task `checkReleaseSigning`) invece di usare la
 chiave debug.
 
-1. Procurarsi la upload key (keystore `.jks`) dal proprietario dell'account
-   Google Play, oppure crearne una nuova *solo* se l'app non è ancora stata
-   caricata su Play (con Play App Signing la upload key può essere
-   reimpostata dalla Play Console). Conservarla **fuori dal repository**.
+1. Creare la upload key (l'app non è ancora su Play), ad esempio:
+   `keytool -genkeypair -v -keystore intonia-upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`.
+   Con Play App Signing Google conserva la chiave di distribuzione; la upload
+   key, se persa, può essere reimpostata dalla Play Console. Conservarla
+   **fuori dal repository** insieme alle password (es. password manager).
 2. Copiare `android/key.properties.example` in `android/key.properties`
    (ignorato da Git) e compilarlo:
 
@@ -89,9 +91,10 @@ CFBundleVersion iOS, da incrementare a ogni upload).
 
 ## 4. iOS (da eseguire su macOS)
 
-Bundle Identifier: **`com.vocalscaletrainer.vocalScaleTrainer`** (non
-modificarlo se già registrato su App Store Connect). Firma: *Automatic*, senza
-team impostato nel progetto: va scelto in Xcode (*Runner → Signing &
+Bundle Identifier: **`io.github.davedegrado.intonia`** (lo stesso di Android;
+da registrare in App Store Connect / Certificates, Identifiers & Profiles e non
+più modificabile dopo la prima submission). Firma: *Automatic*, senza team
+impostato nel progetto: va scelto in Xcode (*Runner → Signing &
 Capabilities*), non versionare profili o certificati.
 
 Verifiche da eseguire, nessuna delle quali è stata possibile senza macOS:

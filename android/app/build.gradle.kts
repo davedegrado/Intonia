@@ -34,10 +34,9 @@ val hasReleaseSigning =
 val allowDebugSignedRelease = System.getenv("INTONIA_ALLOW_DEBUG_SIGNED_RELEASE") == "true"
 
 android {
-    // Identità Android effettivamente usata dalle build finora (la configurazione
-    // Groovy, che Gradle sceglieva in presenza di entrambi i file). Non cambiarla:
-    // l'applicationId identifica l'app su Google Play.
-    namespace = "com.vocalscaletrainer.app"
+    // Stesso identificativo del Bundle ID iOS. Dopo il primo upload su Google Play
+    // l'applicationId non può più essere cambiato.
+    namespace = "io.github.davedegrado.intonia"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -47,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.vocalscaletrainer.app"
+        applicationId = "io.github.davedegrado.intonia"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
