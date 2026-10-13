@@ -30,7 +30,17 @@ flutter test
 
 Gli stessi controlli girano in CI (`.github/workflows/ci.yml`) su push a
 `main`, sulle pull request e manualmente (*Actions → CI → Run workflow*),
-insieme a una build Android debug. La CI non usa segreti e non pubblica nulla.
+insieme alla build di un APK di test. La CI non usa segreti e non pubblica nulla.
+
+**APK di test**: ogni run produce `intonia-test-<commit>.apk`, scaricabile da
+*Actions → CI → (run) → Artifacts → intonia-test-apk* (conservato 14 giorni;
+lo scaricato è uno zip che contiene l'APK). È compilato in modalità release
+(prestazioni realistiche per il riconoscimento del pitch) ma firmato con la
+chiave debug: si installa sul telefono abilitando l'installazione da origini
+sconosciute, **non è pubblicabile** su Google Play. Ogni APK firmato con la
+chiave debug della CI può aggiornare il precedente solo se firmato con la
+stessa chiave: in caso di errore di installazione, disinstallare prima la
+versione già presente.
 
 ## 3. Build Android
 
@@ -132,7 +142,7 @@ conservare la licenza originale in `assets/soundfonts/licenses/`, registrarla in
 | Verifica | Stato |
 |---|---|
 | `dart format`, `flutter analyze`, `flutter test` (Flutter 3.44.3) | Superati localmente e in CI |
-| Build Android debug | Superata in CI |
+| Build Android (APK release-mode, firma debug) | In CI, scaricabile come artifact |
 | Build Android release | Non eseguita: richiede la upload key |
 | Build iOS | Non eseguita: richiede macOS/Xcode |
 | Audio su dispositivi reali | Non eseguito: vedi checklist manuale |
