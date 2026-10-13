@@ -3,17 +3,25 @@
 .flutter-plugins-dependencies
 .packages
 build/
-pubspec.lock
 
 android/.gradle/
+android/.kotlin/
 android/local.properties
 android/app/.cxx/
 android/app/build/
 
-ios/Flutter/
+# Signing release Android: mai versionare keystore e credenziali.
+android/key.properties
+*.jks
+*.keystore
+
+# iOS: i file generati in ios/Flutter/ (Generated.xcconfig, ephemeral/, ...)
+# sono già esclusi da ios/.gitignore; Debug.xcconfig, Release.xcconfig e
+# AppFrameworkInfo.plist sono referenziati dal progetto Xcode e vanno versionati.
 ios/Pods/
-ios/Runner.xcworkspace/
-ios/Podfile.lock
+
+# Dipendenze Node generate localmente (es. script della roadmap in outputs/).
+node_modules/
 
 *.iml
 .idea/
