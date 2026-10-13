@@ -72,9 +72,11 @@ jobs:
           chmod 600 "$RUNNER_TEMP/asc/AuthKey.p8"
 
       # Genera la configurazione Xcode (Generated.xcconfig, Podfile, pod install)
-      # con il numero di build di questo run.
+      # con il numero di build di questo run. --no-codesign: Flutter non deve
+      # cercare certificati nel portachiavi del runner; la firma avviene dopo,
+      # in xcodebuild, con la chiave API di App Store Connect.
       - name: Configurazione Flutter per iOS
-        run: flutter build ios --release --config-only --build-number="$BUILD_NUMBER"
+        run: flutter build ios --release --config-only --no-codesign --build-number="$BUILD_NUMBER"
 
       - name: Archive
         run: |
