@@ -177,8 +177,17 @@ class TrainerController extends Notifier<TrainerState> {
         ));
   }
 
-  Future<void> listenCurrentNote() async {
-    await _playGuideNote(state.currentNote);
+  Future<void> listenCurrentNote() => listenNote(state.currentIndex);
+
+  /// Suona la nota [index] della sequenza (per ritrovarla), anche senza la
+  /// guida su ogni nota. Durante l'esercizio l'ascolto si sospende come per
+  /// la guida, così il piano non viene convalidato come voce; l'esercizio
+  /// non avanza.
+  Future<void> listenNote(int index) async {
+    if (index < 0 || index >= state.sequence.length) {
+      return;
+    }
+    await _playGuideNote(state.sequence[index]);
   }
 
   /// Suona una nota guida ignorando il microfono per la sua durata,
