@@ -10,6 +10,11 @@ name: iOS TestFlight
 #   APP_STORE_CONNECT_API_KEY_P8, APPLE_TEAM_ID
 on:
   workflow_dispatch:
+    inputs:
+      dev_pro:
+        description: "Pro sviluppatore (solo per uso personale: NON inviare questa build in revisione)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -76,7 +81,15 @@ jobs:
       # cercare certificati nel portachiavi del runner; la firma avviene dopo,
       # in xcodebuild, con la chiave API di App Store Connect.
       - name: Configurazione Flutter per iOS
-        run: flutter build ios --release --config-only --no-codesign --build-number="$BUILD_NUMBER"
+        env:
+          DEV_PRO: ${{ inputs.dev_pro }}
+        run: |
+          flutter build ios --release --config-only --no-codesign --build-number="$BUILD_NUMBER" \
+            --dart-define=INTONIA_DEV_PRO="$DEV_PRO"
+          if [ "$DEV_PRO" = "true" ]; then
+            echo "::warning::Build $BUILD_NUMBER con Pro sviluppatore: non inviarla in revisione su App Store."
+            echo "Build $BUILD_NUMBER con **Pro sviluppatore**: non inviarla in revisione." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       # Archive non firmato: con la firma automatica l'archive userebbe un
       # profilo di sviluppo, che richiede dispositivi registrati. La firma di

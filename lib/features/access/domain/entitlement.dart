@@ -16,14 +16,20 @@ enum ProFeature {
 }
 
 class Entitlement {
-  const Entitlement({required this.plan, this.expiresAt});
+  const Entitlement({required this.plan, this.expiresAt, this.developer = false});
 
   static const free = Entitlement(plan: Plan.free);
+
+  /// Pro della build sviluppatore (vedi [DeveloperProEntitlementSource]).
+  static const developerPro = Entitlement(plan: Plan.pro, developer: true);
 
   final Plan plan;
 
   /// Scadenza dell'abbonamento, quando nota (dagli store).
   final DateTime? expiresAt;
+
+  /// Pro concesso dalla build sviluppatore, non da un abbonamento.
+  final bool developer;
 
   bool get isPro => plan == Plan.pro;
 
@@ -43,4 +49,17 @@ class NoPurchasesEntitlementSource implements EntitlementSource {
 
   @override
   Future<Entitlement> load() async => Entitlement.free;
+}
+
+/// Pro per le build dello sviluppatore, attivato solo in compilazione con
+/// `--dart-define=INTONIA_DEV_PRO=true` (nessun pulsante o codice nell'app).
+/// Le build compilate così non vanno inviate in revisione agli store.
+class DeveloperProEntitlementSource implements EntitlementSource {
+  const DeveloperProEntitlementSource();
+
+  /// Vero solo nelle build compilate con il flag.
+  static const enabled = bool.fromEnvironment('INTONIA_DEV_PRO');
+
+  @override
+  Future<Entitlement> load() async => Entitlement.developerPro;
 }

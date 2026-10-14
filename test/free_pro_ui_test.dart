@@ -45,6 +45,18 @@ void main() {
     await tester.pump();
     expect(find.text('Intonia Pro'), findsOneWidget);
     expect(find.textContaining('/7'), findsNothing);
+    expect(find.textContaining('build sviluppatore'), findsNothing);
+  });
+
+  testWidgets('developer Pro build: unlimited and labelled as such', (tester) async {
+    expect(DeveloperProEntitlementSource.enabled, isFalse,
+        reason: 'i test e le build normali non sono Pro sviluppatore');
+    final entitlement = await const DeveloperProEntitlementSource().load();
+    expect(entitlement.allows(ProFeature.unlimitedExercises), isTrue);
+    await tester.pumpWidget(_app(const ChargesCard(),
+        overrides: overrides(ChargeLedger.full, entitlement: entitlement)));
+    await tester.pump();
+    expect(find.text('Esercizi illimitati · build sviluppatore'), findsOneWidget);
   });
 
   testWidgets('exhausted sheet: wait time, free features and Pro', (tester) async {

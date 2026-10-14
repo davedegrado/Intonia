@@ -77,7 +77,11 @@ class ChargesCard extends ConsumerWidget {
         child: ListTile(
           leading: const Icon(Icons.workspace_premium, color: chargeColor),
           title: const Text('Intonia Pro'),
-          subtitle: const Text('Esercizi illimitati'),
+          subtitle: Text(
+            entitlement.developer
+                ? 'Esercizi illimitati · build sviluppatore'
+                : 'Esercizi illimitati',
+          ),
           onTap: () => context.push('/pro'),
         ),
       );

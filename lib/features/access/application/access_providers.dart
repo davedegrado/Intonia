@@ -11,8 +11,11 @@ final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
 final chargesRepositoryProvider = Provider<ChargesRepository>((ref) => ChargesRepository());
 
-final entitlementSourceProvider =
-    Provider<EntitlementSource>((ref) => const NoPurchasesEntitlementSource());
+final entitlementSourceProvider = Provider<EntitlementSource>(
+  (ref) => DeveloperProEntitlementSource.enabled
+      ? const DeveloperProEntitlementSource()
+      : const NoPurchasesEntitlementSource(),
+);
 
 /// Piano corrente (Free finché non sono integrati gli acquisti).
 final entitlementProvider = NotifierProvider<EntitlementNotifier, Entitlement>(

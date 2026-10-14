@@ -96,10 +96,11 @@ jobs:
       # APK in modalità release (il riconoscimento del pitch in debug è troppo
       # lento per prove realistiche), firmato con la chiave debug perché la
       # upload key non è in CI: installabile per i test, NON pubblicabile.
+      # Con Pro sviluppatore attivo (INTONIA_DEV_PRO), vedi docs/BUILD_AND_RELEASE.md.
       - name: Build APK di test
         env:
           INTONIA_ALLOW_DEBUG_SIGNED_RELEASE: 'true'
-        run: flutter build apk --release
+        run: flutter build apk --release --dart-define=INTONIA_DEV_PRO=true
 
       - name: Rinomina APK
         run: mv build/app/outputs/flutter-apk/app-release.apk "intonia-test-${GITHUB_SHA::7}.apk"
