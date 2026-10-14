@@ -2,7 +2,10 @@
 
 File sorgente (non inclusi nell'app Flutter, non dichiarati in `pubspec.yaml`):
 
-- `splash_full.png` — splash completa (852×1846) fornita per Intonia.
+- `splash_full.png` — splash completa (941×1672) fornita per Intonia.
+- `app_icon_source.png` — icona (1254×1254) fornita per Intonia: riquadro
+  arrotondato su fondo scuro; viene ritagliata appena dentro il bordo
+  luminoso perché iOS e Android applicano la propria maschera.
 - `splash_logo.png` — logo ritagliato da `splash_full.png` (senza scritte),
   bordi sfumati nel colore di sfondo.
 
@@ -24,11 +27,19 @@ Colore di sfondo della splash: **`#03011A`** (bordi di `splash_full.png`).
 `splash_icon.png` è un quadrato da 288 dp (1152 px in xxxhdpi) con il logo
 entro il cerchio centrale da 192 dp che Android 12+ lascia visibile.
 
-## Sostituire la splash
+## Sostituire splash o icona
 
-Per una resa più nitida sugli iPhone più grandi conviene una sorgente di
-almeno 1290×2796 px. Dopo aver sostituito `splash_full.png`/`splash_logo.png`
-vanno rigenerate le immagini iOS (1x = 1/3, 2x = 2/3, 3x = originale) e le
-`splash_icon.png` Android (288/432/576/864/1152 px per mdpi…xxxhdpi).
+Sostituire `splash_full.png` e/o `app_icon_source.png` e rigenerare tutto con
+
+```sh
+python3 tool/generate_branding.py   # richiede Pillow
+```
+
+Lo script produce `splash.jpg`, `splash_logo.png`, le LaunchImage iOS
+(1x/2x/3x), le `splash_icon.png` Android, le icone iOS (`AppIcon.appiconset`)
+e quelle Android (icona adattiva `drawable/ic_launcher_foreground.png` e
+icone legacy `mipmap-*/ic_launcher.png`). Se cambiano le proporzioni della
+splash, aggiornare la dimensione di `LaunchImage` in
+`ios/Runner/Base.lproj/LaunchScreen.storyboard` (dimensione 1x).
 Su iOS la launch screen viene messa in cache: per vedere la nuova versione
 può servire riavviare il telefono o reinstallare l'app.
