@@ -145,6 +145,17 @@ void main() {
       expect(stabilizer.current, isNull);
     });
 
+    test('stale frames from before a long gap are discarded', () {
+      final stabilizer = PitchStabilizer();
+      for (var t = Duration.zero; t < const Duration(milliseconds: 200); t += frame) {
+        stabilizer.process(sung(at(c4, 0)), start.add(t));
+      }
+      // Analisi sospesa (nota guida), poi la voce è già sulla nota nuova.
+      final out =
+          stabilizer.process(sung(at(cSharp4, 0)), start.add(const Duration(milliseconds: 1300)));
+      expect(out.note, cSharp4);
+    });
+
     test('cents are measured from the recognized note, detection precision is kept', () {
       final stabilizer = PitchStabilizer();
       final out = stabilizer.process(sung(at(c4, 23)), start);
@@ -155,9 +166,11 @@ void main() {
 
   group('exercise tolerance', () {
     test('default exercise tolerance is suited to the human voice', () {
-      expect(TrainingSettings.defaults().toleranceCents,
-          PitchRecognitionConfig.defaultExerciseToleranceCents);
-      expect(PitchRecognitionConfig.defaultExerciseToleranceCents, inInclusiveRange(35, 40));
+      final defaults = TrainingSettings.defaults();
+      expect(defaults.toleranceCents, PitchRecognitionConfig.defaultExerciseToleranceCents);
+      expect(defaults.toleranceCents, 45);
+      expect(defaults.stabilityMs, PitchRecognitionConfig.defaultStabilityMs);
+      expect(defaults.stabilityMs, 100);
     });
 
     TrainingValidationEvent judge(double cents, {int tolerance = 35}) {
@@ -173,7 +186,7 @@ void main() {
       return event;
     }
 
-    test('boundaries of the default tolerance', () {
+    test('boundaries of a ±35 cent tolerance', () {
       expect(judge(0), TrainingValidationEvent.correct);
       expect(judge(34), TrainingValidationEvent.correct);
       expect(judge(-35), TrainingValidationEvent.correct);
@@ -224,6 +237,36 @@ void main() {
 
     test('the wrong adjacent note is not accepted as the target', () {
       expect(judge(100), TrainingValidationEvent.wrong); // DO#4 pieno
+      expect(judge(100, tolerance: 45), TrainingValidationEvent.wrong);
+      expect(judge(44, tolerance: 45), TrainingValidationEvent.correct);
+    });
+
+    test('the next note is validated within one stability window', () {
+      const d4 = MusicalNote(pitchClass: PitchClass.d, octave: 4);
+      final machine = TrainingStateMachine(toleranceCents: 45, stabilityMs: 100);
+      var t = Duration.zero;
+      TrainingValidationEvent event = TrainingValidationEvent.none;
+      for (; event != TrainingValidationEvent.correct; t += frame) {
+        event = machine.evaluate(target: c4, detected: sung(at(c4, 0)), now: start.add(t)).event;
+      }
+      // Il cantante passa alla nota successiva: il cambio fa avanzare e la
+      // nota viene subito valutata contro il nuovo obiettivo.
+      final changeAt = t;
+      var target = c4;
+      Duration? correctAt;
+      for (; t < changeAt + const Duration(milliseconds: 600); t += frame) {
+        final out = machine.evaluate(target: target, detected: sung(at(d4, 0)), now: start.add(t));
+        if (out.event == TrainingValidationEvent.advanced) {
+          machine.markAdvanced();
+          target = d4;
+        } else if (out.event == TrainingValidationEvent.correct) {
+          correctAt = t - changeAt;
+          break;
+        }
+      }
+      expect(correctAt, isNotNull);
+      expect(correctAt!.inMilliseconds, lessThan(100 + 4 * frame.inMilliseconds),
+          reason: 'una sola finestra di stabilità, non due');
     });
   });
 }

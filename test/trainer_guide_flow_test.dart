@@ -16,7 +16,7 @@ PitchDetectionResult _sung(MusicalNote note) => PitchDetectionResult(
       isStable: true,
     );
 
-/// Mantiene [note] stabile oltre la durata di stabilità (default 200 ms),
+/// Mantiene [note] stabile oltre la durata di stabilità (default 100 ms),
 /// con un frame ogni ~25 ms come il rilevatore reale.
 Future<void> _hold(FakeMicrophonePitchService mic, MusicalNote note) async {
   for (var i = 0; i < 12; i++) {
@@ -69,9 +69,8 @@ void main() {
     expect(state.currentIndex, 1);
     expect(state.progress[1], NoteProgressStatus.current);
 
-    // La nota successiva viene convalidata e si avanza di nuovo.
-    await _hold(mic, sequence[1]); // cambio nota: riallinea la macchina a stati
-    await _hold(mic, sequence[1]); // convalida
+    // La nota successiva viene convalidata (una sola tenuta) e si avanza di nuovo.
+    await _hold(mic, sequence[1]);
     state = container.read(trainerControllerProvider);
     expect(state.progress[1], NoteProgressStatus.correct);
     expect(state.currentIndex, 2);

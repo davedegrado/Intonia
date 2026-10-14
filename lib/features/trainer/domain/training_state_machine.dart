@@ -111,9 +111,12 @@ class TrainingStateMachine {
     };
   }
 
+  /// Chiamato dopo l'evento [TrainingValidationEvent.advanced]: la nota che
+  /// ha fatto avanzare è già stabile e viene valutata al frame successivo
+  /// contro la nuova nota richiesta, senza attendere un'altra finestra di
+  /// stabilità.
   void markAdvanced() {
     _state = TrainingValidationState.waitNote;
-    _clearCandidate();
     _breakSinceAccept = false;
   }
 
