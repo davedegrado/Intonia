@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
+import 'package:vocal_scale_trainer/features/access/application/access_providers.dart';
 import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
 import 'package:vocal_scale_trainer/features/range/application/range_test_controller.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/training_settings.dart';
@@ -10,6 +11,7 @@ import 'package:vocal_scale_trainer/features/trainer/presentation/controllers/tr
 import 'package:vocal_scale_trainer/features/tuner/application/tuner_controller.dart';
 import 'package:vocal_scale_trainer/services/audio/piano_audio_service.dart';
 
+import 'support/access_fakes.dart';
 import 'support/audio_fakes.dart';
 
 ProviderContainer _container(FakeMicrophonePitchService mic, FakeMidiPro midi) {
@@ -17,6 +19,7 @@ ProviderContainer _container(FakeMicrophonePitchService mic, FakeMidiPro midi) {
     overrides: [
       microphonePitchServiceProvider.overrideWithValue(mic),
       pianoAudioServiceProvider.overrideWithValue(PianoAudioService(midiPro: midi)),
+      chargesRepositoryProvider.overrideWithValue(InMemoryChargesRepository()),
     ],
   );
 }

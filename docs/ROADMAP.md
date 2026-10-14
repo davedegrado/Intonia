@@ -35,3 +35,44 @@ distingue dalla voce. La cancellazione dell'eco di sistema è già attiva
 3. *(Esplorativo)* Distinguere piano e voce dal timbro (decadimento del piano
    contro voce sostenuta/vibrato). Complesso e a rischio di falsi positivi:
    solo se 1 e 2 non bastano.
+
+### Intonia Pro: acquisti reali
+
+**Stato:** architettura pronta, acquisti non integrati.
+
+Oggi `entitlementSourceProvider` usa `NoPurchasesEntitlementSource`, che
+restituisce sempre il piano Free. Il paywall (`ProScreen`) mostra i prezzi
+(Mensile €4,99, Annuale €39,99) con i pulsanti disattivati
+(`ProScreen.purchasesAvailable = false`): nessun acquisto è simulato.
+
+Per attivare gli abbonamenti:
+
+1. Creare i prodotti in abbonamento su App Store Connect e Google Play Console
+   (stesso gruppo, piani mensile e annuale) e aggiornare i prezzi per paese.
+2. Aggiungere un plugin di acquisti in-app (`in_app_purchase` o RevenueCat) e
+   un `EntitlementSource` che legga lo stato dell'abbonamento, con
+   `Entitlement.expiresAt` e la cache offline dell'ultimo stato verificato.
+3. Verificare le ricevute lato server (App Store Server API / Google Play
+   Developer API) o tramite RevenueCat; senza verifica l'abbonamento resta
+   aggirabile.
+4. Collegare "Abbonati" e "Ripristina acquisti", chiamare
+   `EntitlementNotifier.refresh()` dopo acquisto e ripristino, aggiungere
+   termini d'uso e informativa privacy richiesti dagli store.
+
+Il sistema delle cariche non cambia: un utente Pro semplicemente non le consuma.
+
+### Funzioni Pro in arrivo
+
+- **Statistiche avanzate e grafici dei progressi**: non esistono ancora; oggi il
+  profilo mostra solo le statistiche essenziali (gratuite) e lo storico
+  (completo per Pro, ultime 8 sessioni per Free).
+- **Percorsi personalizzati**: richiedono un modello di "percorso" (sequenza di
+  esercizi con obiettivi) che l'app non ha ancora.
+
+Quando esisteranno, si aggiungono a `ProFeature` e si controllano con
+`Entitlement.allows`.
+
+**Limite noto delle cariche:** senza backend, un orologio di sistema portato
+avanti offline non è rilevabile; al massimo riempie le cariche fino a 7. Un
+orologio portato indietro non fa guadagnare cariche (il riferimento si
+riallinea a "adesso").

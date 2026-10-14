@@ -142,6 +142,7 @@ Future<void> showChargesInfo(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
+    isScrollControlled: true,
     builder: (context) => const _ChargesSheet(exhausted: false),
   );
 }
@@ -151,6 +152,7 @@ Future<void> showChargesExhausted(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
+    isScrollControlled: true,
     builder: (context) => const _ChargesSheet(exhausted: true),
   );
 }
@@ -170,59 +172,61 @@ class _ChargesSheet extends StatelessWidget {
         child: _ChargesTicker(
           builder: (context, ledger, now) {
             final wait = ledger.timeToNext(now);
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.bolt, color: chargeColor, size: 30),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        exhausted ? 'Cariche esaurite' : 'Cariche esercizi',
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.bolt, color: chargeColor, size: 30),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          exhausted ? 'Cariche esaurite' : 'Cariche esercizi',
+                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      Text(
+                        '${ledger.charges}/${ChargeLedger.max}',
                         style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                       ),
-                    ),
-                    Text(
-                      '${ledger.charges}/${ChargeLedger.max}',
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                if (wait != null)
-                  Text(
-                    'Prossima carica tra ${formatWait(wait)}.',
-                    key: const ValueKey('charges-wait'),
-                    style: theme.textTheme.titleSmall,
+                    ],
                   ),
-                const SizedBox(height: 8),
-                Text(
-                  'Ogni sessione di esercizio usa una carica. Se ne ricarica una ogni '
-                  '$hours ore, anche ad app chiusa, fino a ${ChargeLedger.max}.',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Il riconoscimento in tempo reale e il test di estensione vocale sono '
-                  'sempre gratuiti e illimitati.',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 20),
-                FilledButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    context.push('/pro');
-                  },
-                  icon: const Icon(Icons.workspace_premium),
-                  label: const Text('Scopri Intonia Pro'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(exhausted ? 'Aspetto la ricarica' : 'Chiudi'),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  if (wait != null)
+                    Text(
+                      'Prossima carica tra ${formatWait(wait)}.',
+                      key: const ValueKey('charges-wait'),
+                      style: theme.textTheme.titleSmall,
+                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Ogni sessione di esercizio usa una carica. Se ne ricarica una ogni '
+                    '$hours ore, anche ad app chiusa, fino a ${ChargeLedger.max}.',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Il riconoscimento in tempo reale e il test di estensione vocale sono '
+                    'sempre gratuiti e illimitati.',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context.push('/pro');
+                    },
+                    icon: const Icon(Icons.workspace_premium),
+                    label: const Text('Scopri Intonia Pro'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(exhausted ? 'Aspetto la ricarica' : 'Chiudi'),
+                  ),
+                ],
+              ),
             );
           },
         ),
