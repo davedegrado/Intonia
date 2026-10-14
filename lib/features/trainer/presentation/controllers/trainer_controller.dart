@@ -313,6 +313,8 @@ class TrainerController extends Notifier<TrainerState> {
       detected: detection,
       now: DateTime.now(),
     );
+    // Nota riconosciuta (stabilizzata), non il frame grezzo del rilevatore.
+    final recognized = output.detected ?? detection;
 
     var progress = List<NoteProgressStatus>.from(state.progress);
     var stats = state.sessionStats;
@@ -323,8 +325,8 @@ class TrainerController extends Notifier<TrainerState> {
       stats = stats.addAttempt(
         NoteAttempt(
           target: state.currentNote,
-          detected: detection.note,
-          cents: detection.cents,
+          detected: recognized.note,
+          cents: recognized.cents,
           correct: true,
           timestamp: DateTime.now(),
         ),
@@ -342,8 +344,8 @@ class TrainerController extends Notifier<TrainerState> {
       stats = stats.addAttempt(
         NoteAttempt(
           target: state.currentNote,
-          detected: detection.note,
-          cents: detection.cents,
+          detected: recognized.note,
+          cents: recognized.cents,
           correct: false,
           timestamp: DateTime.now(),
         ),
@@ -375,7 +377,7 @@ class TrainerController extends Notifier<TrainerState> {
     state = state.copyWith(
       progress: progress,
       currentIndex: currentIndex,
-      detectedPitch: detection,
+      detectedPitch: recognized,
       validationState: _stateMachine.state,
       sessionStats: finished ? stats.finish() : stats,
       isPlaying: !finished,

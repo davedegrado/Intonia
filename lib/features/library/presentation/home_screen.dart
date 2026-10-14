@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/music/exercise.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
+import '../../../core/pitch/pitch_recognition_config.dart';
 import '../../../core/session/range_record.dart';
 import '../../../core/session/session_record.dart';
 import '../../mascot/domain/mascot_mood.dart';
@@ -13,6 +14,7 @@ import '../../profile/application/history_providers.dart';
 import '../../range/application/range_providers.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../tuner/application/tuner_controller.dart';
+import '../../tuner/presentation/detected_note_label.dart';
 import '../application/exercise_providers.dart';
 
 /// Naviga fermando prima il riconoscimento in tempo reale, se attivo.
@@ -165,25 +167,21 @@ class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObser
                             )
                           : hasPitch
                               ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
                                   children: [
-                                    Text(
-                                      NoteSpeller.spellRoot(detection.note).fullLabel(notation),
-                                      style: theme.textTheme.headlineSmall?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                        color: theme.colorScheme.primary,
-                                      ),
+                                    DetectedNoteLabel(
+                                      note: NoteSpeller.spellRoot(detection.note),
+                                      notation: notation,
                                     ),
                                     const SizedBox(width: 10),
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 3),
-                                      child: Text(
-                                        '${detection.cents >= 0 ? '+' : ''}${detection.cents.toStringAsFixed(0)} cent',
-                                        style: theme.textTheme.labelLarge?.copyWith(
-                                          color: detection.cents.abs() <= 20
-                                              ? const Color(0xFF1F8A5B)
-                                              : theme.colorScheme.error,
-                                        ),
+                                    Text(
+                                      '${detection.cents >= 0 ? '+' : ''}${detection.cents.toStringAsFixed(0)} cent',
+                                      style: theme.textTheme.labelLarge?.copyWith(
+                                        color: detection.cents.abs() <=
+                                                PitchRecognitionConfig.inTuneCents
+                                            ? const Color(0xFF1F8A5B)
+                                            : theme.colorScheme.error,
                                       ),
                                     ),
                                   ],

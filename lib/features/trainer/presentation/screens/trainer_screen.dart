@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/music/exercise.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
+import '../../../../core/pitch/pitch_recognition_config.dart';
 import '../../../settings/application/settings_providers.dart';
 import '../../../mascot/presentation/mascot_coach.dart';
 import '../../domain/trainer_mascot_mood.dart';
@@ -365,9 +366,9 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
           _SliderRow(
             label: 'Tolleranza',
             value: state.settings.toleranceCents,
-            min: 10,
-            max: 40,
-            divisions: 3,
+            min: PitchRecognitionConfig.minExerciseToleranceCents.toDouble(),
+            max: PitchRecognitionConfig.maxExerciseToleranceCents.toDouble(),
+            divisions: 8,
             format: (value) => '± $value cent',
             onChanged: disabled ? null : controller.updateTolerance,
           ),

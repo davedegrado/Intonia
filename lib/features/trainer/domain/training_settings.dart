@@ -1,4 +1,5 @@
 import '../../../core/music/note.dart';
+import '../../../core/pitch/pitch_recognition_config.dart';
 
 enum TrainerMode { listen, train }
 
@@ -19,7 +20,7 @@ class TrainingSettings {
       key: PitchClass.c,
       octave: 4,
       bpm: 72,
-      toleranceCents: 20,
+      toleranceCents: PitchRecognitionConfig.defaultExerciseToleranceCents,
       stabilityMs: 200,
       mode: TrainerMode.train,
       loop: false,
@@ -30,6 +31,8 @@ class TrainingSettings {
   final PitchClass key;
   final int octave;
   final int bpm;
+
+  /// Tolleranza dell'esercizio in cent (vedi [PitchRecognitionConfig]).
   final int toleranceCents;
   final int stabilityMs;
   final TrainerMode mode;
