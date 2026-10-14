@@ -6,6 +6,11 @@ File sorgente (non inclusi nell'app Flutter, non dichiarati in `pubspec.yaml`):
 - `splash_logo.png` — logo ritagliato da `splash_full.png` (senza scritte),
   bordi sfumati nel colore di sfondo.
 
+`splash.jpg` (JPEG ~160 KB ricavato da `splash_full.png`) è invece incluso
+nell'app: dopo la splash di sistema l'app mostra l'immagine completa per 2
+secondi e poi sfuma verso la Home (`lib/app/splash_overlay.dart`; un tocco la
+salta).
+
 Colore di sfondo della splash: **`#03011A`** (bordi di `splash_full.png`).
 
 ## Dove vengono usati

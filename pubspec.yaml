@@ -30,3 +30,5 @@ flutter:
     # intonia_piano_bright.sf2 resta nel repository ma non viene incluso nell'app.
     - assets/soundfonts/intonia_piano_classic.sf2
     - assets/soundfonts/licenses/FLUIDR3-COPYING.txt
+    # Splash mostrata dall'app per 2 secondi (vedi assets/branding/README.md).
+    - assets/branding/splash.jpg

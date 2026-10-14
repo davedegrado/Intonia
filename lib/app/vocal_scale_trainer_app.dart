@@ -6,6 +6,7 @@ import '../features/home_widget/application/home_widget_sync.dart';
 import '../features/settings/application/settings_providers.dart';
 import 'app_router.dart';
 import 'app_theme.dart';
+import 'splash_overlay.dart';
 
 class VocalScaleTrainerApp extends ConsumerWidget {
   const VocalScaleTrainerApp({super.key});
@@ -28,6 +29,7 @@ class VocalScaleTrainerApp extends ConsumerWidget {
         AppThemeSetting.system => ThemeMode.system,
       },
       routerConfig: appRouter,
+      builder: (context, child) => SplashOverlay(child: child ?? const SizedBox.shrink()),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('it'), Locale('en')],
     );
