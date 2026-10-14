@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vocal_scale_trainer/core/music/note.dart';
 import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
 import 'package:vocal_scale_trainer/features/range/application/range_test_controller.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/training_settings.dart';
@@ -18,6 +19,21 @@ ProviderContainer _container(FakeMicrophonePitchService mic, FakeMidiPro midi) {
       pianoAudioServiceProvider.overrideWithValue(PianoAudioService(midiPro: midi)),
     ],
   );
+}
+
+/// Canta [note] per [duration], con un frame ogni ~25 ms come il rilevatore.
+Future<void> _sing(FakeMicrophonePitchService mic, MusicalNote note, Duration duration) async {
+  final frames = duration.inMilliseconds ~/ 25;
+  for (var i = 0; i < frames; i++) {
+    mic.emit(PitchDetectionResult(
+      frequency: note.frequency,
+      note: note,
+      cents: 0,
+      confidence: 1,
+      isStable: true,
+    ));
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+  }
 }
 
 void main() {
@@ -148,6 +164,54 @@ void main() {
   });
 
   group('RangeTestController', () {
+    test('the comfortable note sung at the start becomes the starting note', () async {
+      final mic = FakeMicrophonePitchService();
+      final container = _container(mic, FakeMidiPro());
+      addTearDown(container.dispose);
+      final sub = container.listen(rangeTestControllerProvider, (previous, next) {});
+      addTearDown(sub.close);
+      final controller = container.read(rangeTestControllerProvider.notifier);
+
+      await controller.start();
+      expect(container.read(rangeTestControllerProvider).phase, RangePhase.findingStart);
+
+      // Il cantante tiene un MI3 (frame ogni ~25 ms) oltre la durata richiesta.
+      const e3 = MusicalNote(pitchClass: PitchClass.e, octave: 3);
+      await _sing(mic, e3, RangeTestController.startHold + const Duration(milliseconds: 150));
+
+      final state = container.read(rangeTestControllerProvider);
+      expect(state.phase, RangePhase.descending);
+      expect(state.startMidi, e3.midiNumber);
+      expect(state.lowestMidi, e3.midiNumber, reason: 'la nota di partenza vale come convalidata');
+      expect(state.highestMidi, e3.midiNumber);
+      expect(state.validatedCount, 1);
+      expect(state.targetMidi, e3.midiNumber - 1, reason: 'si scende dal semitono sotto');
+    });
+
+    test('a short note or a change of note does not set the starting note', () async {
+      final mic = FakeMicrophonePitchService();
+      final container = _container(mic, FakeMidiPro());
+      addTearDown(container.dispose);
+      final sub = container.listen(rangeTestControllerProvider, (previous, next) {});
+      addTearDown(sub.close);
+      final controller = container.read(rangeTestControllerProvider.notifier);
+
+      await controller.start();
+      const g3 = MusicalNote(pitchClass: PitchClass.g, octave: 3);
+      const c4 = MusicalNote(pitchClass: PitchClass.c, octave: 4);
+      await _sing(mic, g3, const Duration(milliseconds: 500));
+      var state = container.read(rangeTestControllerProvider);
+      expect(state.phase, RangePhase.findingStart);
+      expect(state.startHoldProgress, inExclusiveRange(0.3, 1));
+
+      // Cambia nota: il conteggio riparte.
+      await _sing(mic, c4, const Duration(milliseconds: 400));
+      state = container.read(rangeTestControllerProvider);
+      expect(state.phase, RangePhase.findingStart);
+      await _sing(mic, c4, const Duration(milliseconds: 550));
+      expect(container.read(rangeTestControllerProvider).startMidi, c4.midiNumber);
+    });
+
     test('counts validated and skipped notes for the UI', () async {
       final mic = FakeMicrophonePitchService();
       final container = _container(mic, FakeMidiPro());
@@ -157,28 +221,23 @@ void main() {
       final controller = container.read(rangeTestControllerProvider.notifier);
 
       await controller.start();
-      final target = container.read(rangeTestControllerProvider).targetNote;
-      await Future<void>.delayed(const Duration(milliseconds: 1150)); // mute della guida
-      final sung = PitchDetectionResult(
-        frequency: target.frequency,
-        note: target,
-        cents: 0,
-        confidence: 1,
-        isStable: true,
-      );
-      mic.emit(sung);
-      await Future<void>.delayed(const Duration(milliseconds: 200));
-      mic.emit(sung);
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-
+      const c4 = MusicalNote(pitchClass: PitchClass.c, octave: 4);
+      await _sing(mic, c4, RangeTestController.startHold + const Duration(milliseconds: 150));
       var state = container.read(rangeTestControllerProvider);
       expect(state.validatedCount, 1);
+
+      // Nota guida del SI3, poi il cantante la becca.
+      await Future<void>.delayed(const Duration(milliseconds: 1150));
+      await _sing(mic, state.targetNote, const Duration(milliseconds: 300));
+      state = container.read(rangeTestControllerProvider);
+      expect(state.validatedCount, 2);
       expect(state.skippedCount, 0);
+      expect(state.lowestMidi, c4.midiNumber - 1);
 
       controller.skipNote();
       state = container.read(rangeTestControllerProvider);
       expect(state.skippedCount, 1);
-      expect(state.validatedCount, 1);
+      expect(state.validatedCount, 2);
     });
 
     test('permission denied returns to setup with a message', () async {

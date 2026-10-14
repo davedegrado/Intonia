@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/note_text.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
 import '../../../core/session/range_record.dart';
@@ -60,15 +61,10 @@ class ProfileScreen extends ConsumerWidget {
         maxMidi = record.maxCorrectMidi;
       }
     }
-    String noteLabel(int midi) =>
-        NoteSpeller.spellRoot(MusicalNote.fromMidi(midi)).fullLabel(notation);
     // Estensione: il test dedicato ha priorità sulle note delle sessioni.
     final latestRange = ranges.isNotEmpty ? ranges.last : null;
-    final extension = latestRange != null
-        ? '${noteLabel(latestRange.minMidi)} – ${noteLabel(latestRange.maxMidi)}'
-        : minMidi != null && maxMidi != null
-            ? '${noteLabel(minMidi)} – ${noteLabel(maxMidi)}'
-            : '—';
+    final (lowMidi, highMidi) =
+        latestRange != null ? (latestRange.minMidi, latestRange.maxMidi) : (minMidi, maxMidi);
 
     // Accuratezza per pitch class (min 5 tentativi).
     final byPitch = <int, List<int>>{};
@@ -140,7 +136,18 @@ class ProfileScreen extends ConsumerWidget {
                 _StatCard(
                     label: 'Accuratezza media',
                     value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
-                _StatCard(label: 'Estensione', value: extension),
+                _StatCard(
+                  label: 'Estensione',
+                  value: '—',
+                  valueWidget: lowMidi != null && highMidi != null
+                      ? NoteRangeText(
+                          low: spelledMidi(lowMidi),
+                          high: spelledMidi(highMidi),
+                          notation: notation,
+                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                        )
+                      : null,
+                ),
               ],
             ),
             if (rated.isNotEmpty) ...[
@@ -188,9 +195,11 @@ class ProfileScreen extends ConsumerWidget {
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                   leading: const Icon(Icons.height),
-                  title: Text(
-                    '${noteLabel(ranges[i].minMidi)} – ${noteLabel(ranges[i].maxMidi)}'
-                    '  (${formatSpan(ranges[i].spanSemitones)})',
+                  title: NoteRangeText(
+                    low: spelledMidi(ranges[i].minMidi),
+                    high: spelledMidi(ranges[i].maxMidi),
+                    notation: notation,
+                    suffix: '  (${formatSpan(ranges[i].spanSemitones)})',
                   ),
                   subtitle: Text(_formatDate(ranges[i].timestamp) +
                       (i > 0
@@ -308,10 +317,13 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.label, required this.value});
+  const _StatCard({required this.label, required this.value, this.valueWidget});
 
   final String label;
   final String value;
+
+  /// Sostituisce [value] quando serve un testo composto (es. note con ottava).
+  final Widget? valueWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +338,9 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(label, style: theme.textTheme.labelMedium),
               const SizedBox(height: 4),
-              Text(value, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+              valueWidget ??
+                  Text(value,
+                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
             ],
           ),
         ),
