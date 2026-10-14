@@ -173,6 +173,24 @@ Il numero di build è il numero progressivo del run del workflow; la versione
 assoluto del progetto: eventuali errori di compilazione vanno letti nei log
 del job.
 
+### 4.1.1 Pro sviluppatore
+
+Le build compilate con `--dart-define=INTONIA_DEV_PRO=true` sono Pro senza
+abbonamento (in Home: "Intonia Pro · build sviluppatore"). Nell'app non c'è
+alcun pulsante o codice per attivarlo: decide solo la compilazione.
+
+- **APK di test della CI**: sempre con Pro sviluppatore (non pubblicabile).
+- **TestFlight**: *Run workflow* → spunta **Pro sviluppatore**. Spenta di
+  default. Una build TestFlight è la stessa che si invia in revisione: le build
+  con Pro sviluppatore **non vanno mai inviate** (il run lo segnala con un
+  avviso e nel riepilogo). Per la pubblicazione, rilanciare il workflow senza
+  la spunta.
+- **In locale**: `flutter run --dart-define=INTONIA_DEV_PRO=true`.
+
+Con l'app pubblicata e gli acquisti integrati: codici promozionali / offer code
+(App Store Connect) e tester delle licenze (Play Console) danno Pro gratis
+sull'app dello store.
+
 ### 4.2 Verifiche su dispositivo
 
 1. Avvio: la Home deve comparire (ciclo di vita UIScene, `Info.plist` +
