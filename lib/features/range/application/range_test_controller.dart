@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/music/note.dart';
 import '../../../core/pitch/pitch_detection_result.dart';
+import '../../../core/pitch/pitch_recognition_config.dart';
 import '../../../core/session/range_record.dart';
 import '../../../services/audio/piano_audio_service.dart';
 import '../../../services/pitch/microphone_pitch_service.dart';
@@ -39,7 +40,7 @@ class RangeTestState {
         highestMidi: null,
         skipsInRow: 0,
         isListening: false,
-        toleranceCents: 40,
+        toleranceCents: PitchRecognitionConfig.rangeTestToleranceCents,
         stabilityMs: 150,
       );
 
@@ -128,7 +129,10 @@ class RangeTestController extends Notifier<RangeTestState> {
 
   @override
   RangeTestState build() {
-    _machine = TrainingStateMachine(toleranceCents: 40, stabilityMs: 150);
+    _machine = TrainingStateMachine(
+      toleranceCents: PitchRecognitionConfig.rangeTestToleranceCents,
+      stabilityMs: 150,
+    );
     _microphone = ref.read(microphonePitchServiceProvider);
     _audio = ref.read(pianoAudioServiceProvider);
     // In onDispose non si possono usare ref né state: si rilasciano solo
@@ -275,6 +279,7 @@ class RangeTestController extends Notifier<RangeTestState> {
       detected: detection,
       now: DateTime.now(),
     );
+    final recognized = output.detected ?? detection;
 
     if (output.event == TrainingValidationEvent.correct) {
       final midi = state.targetMidi;
@@ -284,14 +289,14 @@ class RangeTestController extends Notifier<RangeTestState> {
         highestMidi: () =>
             state.highestMidi == null || midi > state.highestMidi! ? midi : state.highestMidi,
         skipsInRow: 0,
-        detected: detection,
+        detected: recognized,
         validatedCount: state.validatedCount + 1,
       );
       _advanceTarget();
       return;
     }
 
-    state = state.copyWith(detected: detection);
+    state = state.copyWith(detected: recognized);
   }
 
   void _advanceTarget() {

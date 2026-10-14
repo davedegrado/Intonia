@@ -16,12 +16,13 @@ PitchDetectionResult _sung(MusicalNote note) => PitchDetectionResult(
       isStable: true,
     );
 
-/// Mantiene [note] stabile oltre la durata di stabilità (default 200 ms).
+/// Mantiene [note] stabile oltre la durata di stabilità (default 200 ms),
+/// con un frame ogni ~25 ms come il rilevatore reale.
 Future<void> _hold(FakeMicrophonePitchService mic, MusicalNote note) async {
-  mic.emit(_sung(note));
-  await Future<void>.delayed(const Duration(milliseconds: 260));
-  mic.emit(_sung(note));
-  await Future<void>.delayed(const Duration(milliseconds: 20));
+  for (var i = 0; i < 12; i++) {
+    mic.emit(_sung(note));
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+  }
 }
 
 /// Attende la fine del mute dopo una nota guida (650 ms + 450 ms).

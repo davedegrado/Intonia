@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/pitch/pitch_detection_result.dart';
+import '../../../core/pitch/pitch_stabilizer.dart';
 import '../../../services/pitch/microphone_pitch_service.dart';
 import '../../trainer/presentation/controllers/trainer_controller.dart';
 
@@ -12,6 +13,8 @@ class TunerState {
   const TunerState({required this.active, this.detection, this.permissionDenied = false});
 
   final bool active;
+
+  /// Nota riconosciuta (stabilizzata); null o non stabile se non c'è voce.
   final PitchDetectionResult? detection;
 
   /// True se l'ultimo avvio è fallito per permesso microfono negato.
@@ -25,6 +28,10 @@ final tunerControllerProvider = NotifierProvider<TunerController, TunerState>(
 class TunerController extends Notifier<TunerState> {
   StreamSubscription<PitchDetectionResult>? _subscription;
   late MicrophonePitchService _microphone;
+
+  /// Riconoscimento della nota: niente salti per vibrato o frame anomali,
+  /// e la nota resta visibile durante le brevi cadute di segnale.
+  final _stabilizer = PitchStabilizer();
 
   /// Incrementato da [stop]: un avvio ancora in corso (es. dialog del
   /// permesso aperto) non deve accendere il microfono dopo uno stop.
@@ -67,8 +74,10 @@ class TunerController extends Notifier<TunerState> {
         state = const TunerState(active: false, permissionDenied: true);
         return;
       }
+      _stabilizer.reset();
       _subscription = _microphone.pitchStream.listen((detection) {
-        state = TunerState(active: true, detection: detection);
+        final recognized = _stabilizer.process(detection, DateTime.now());
+        state = TunerState(active: true, detection: _stabilizer.current ?? recognized);
       });
       state = const TunerState(active: true);
     } catch (_) {

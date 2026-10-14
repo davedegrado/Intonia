@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
 import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
@@ -114,7 +116,7 @@ void main() {
 
 PitchDetectionResult _result(MusicalNote note, double cents) {
   return PitchDetectionResult(
-    frequency: note.frequency,
+    frequency: note.frequency * math.pow(2, cents / 1200),
     note: note,
     cents: cents,
     confidence: 0.95,

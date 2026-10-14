@@ -45,6 +45,27 @@ Annotare per ogni prova: dispositivo, versione OS, build, esito, note.
 12. Errori d'ottava: cantare la nota giusta un'ottava sopra/sotto → segnata
     come errore (non corretta).
 
+### Voce reale: tolleranza e stabilità
+
+Parametri in `lib/core/pitch/pitch_recognition_config.dart` (tolleranza
+esercizi ±35 cent, test di estensione ±40, cambio al semitono vicino dopo
+80 ms, cadute di segnale fino a 100 ms ignorate). Da provare con più voci
+(maschile/femminile, con e senza vibrato):
+
+- 12a. Nota tenuta con vibrato naturale: nella Home la nota mostrata non
+  cambia; negli esercizi viene convalidata.
+- 12b. Nota leggermente calante/crescente (circa 25–30 cent): negli esercizi
+  è convalidata con la tolleranza predefinita; con tolleranza ±10 no.
+- 12c. Passaggio legato tra due note vicine (DO→DO#, MI→FA): la nota mostrata
+  segue la voce senza ritardo fastidioso e non resta "attaccata" alla
+  precedente.
+- 12d. Scala cantata a tempo sostenuto (72–100 BPM): ogni nota viene convalidata
+  e non si saltano note.
+- 12e. Consonanti e attacchi (cantare su "da", "la", "ma"): la nota non sparisce
+  a ogni consonante.
+- 12f. Nella Home il nome della nota (DO, RE…) è l'elemento principale;
+  l'ottava è leggibile ma secondaria.
+
 ## Allenamento e ciclo di vita
 
 13. Allenamento con "Suona la guida su ogni nota" attivo: la guida suonata
