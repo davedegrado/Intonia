@@ -81,8 +81,11 @@ esercizi ±45 cent con stabilità 100 ms, test di estensione ±40, cambio al sem
     l'interruzione *Play* riparte normalmente.
 18. Cuffie cablate/Bluetooth collegate e scollegate durante l'uso: nessun
     crash; annotare eventuale latenza percepita (Bluetooth).
-19. Test estensione: completare discesa e salita; uscire a metà test o
-    mandare l'app in background → microfono spento, test non salvato.
+19. Test estensione: cantare una nota comoda e tenerla → dopo ~0,8 s diventa la
+    nota di partenza (anche con vibrato; una nota breve o cambiata non conta);
+    completare discesa e salita → riepilogo a schermo intero con il range;
+    uscire a metà test o mandare l'app in background → microfono spento, test
+    non salvato.
 
 ## Prestazioni
 

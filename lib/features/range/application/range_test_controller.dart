@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/music/note.dart';
 import '../../../core/pitch/pitch_detection_result.dart';
 import '../../../core/pitch/pitch_recognition_config.dart';
+import '../../../core/pitch/pitch_stabilizer.dart';
 import '../../../core/session/range_record.dart';
 import '../../../services/audio/piano_audio_service.dart';
 import '../../../services/pitch/microphone_pitch_service.dart';
@@ -12,7 +13,15 @@ import '../../trainer/domain/training_state_machine.dart';
 import '../../trainer/presentation/controllers/trainer_controller.dart';
 import 'range_providers.dart';
 
-enum RangePhase { setup, descending, ascending, done }
+enum RangePhase {
+  setup,
+
+  /// Il cantante tiene una nota comoda: diventa la nota di partenza.
+  findingStart,
+  descending,
+  ascending,
+  done,
+}
 
 class RangeTestState {
   const RangeTestState({
@@ -30,6 +39,7 @@ class RangeTestState {
     this.previousRecord,
     this.validatedCount = 0,
     this.skippedCount = 0,
+    this.startHoldProgress = 0,
   });
 
   factory RangeTestState.initial() => const RangeTestState(
@@ -64,6 +74,9 @@ class RangeTestState {
   final int validatedCount;
   final int skippedCount;
 
+  /// Avanzamento (0–1) della nota di partenza tenuta in [RangePhase.findingStart].
+  final double startHoldProgress;
+
   MusicalNote get targetNote => MusicalNote.fromMidi(targetMidi);
 
   RangeTestState copyWith({
@@ -82,6 +95,8 @@ class RangeTestState {
     RangeRecord? previousRecord,
     int? validatedCount,
     int? skippedCount,
+    double? startHoldProgress,
+    bool clearDetected = false,
   }) {
     return RangeTestState(
       phase: phase ?? this.phase,
@@ -93,11 +108,12 @@ class RangeTestState {
       isListening: isListening ?? this.isListening,
       toleranceCents: toleranceCents ?? this.toleranceCents,
       stabilityMs: stabilityMs ?? this.stabilityMs,
-      detected: detected ?? this.detected,
+      detected: clearDetected ? null : detected ?? this.detected,
       message: clearMessage ? null : message ?? this.message,
       previousRecord: previousRecord ?? this.previousRecord,
       validatedCount: validatedCount ?? this.validatedCount,
       skippedCount: skippedCount ?? this.skippedCount,
+      startHoldProgress: startHoldProgress ?? this.startHoldProgress,
     );
   }
 }
@@ -113,6 +129,15 @@ class RangeTestController extends Notifier<RangeTestState> {
   static const _maxSkipsInRow = 3;
   static const _guideNoteDuration = Duration(milliseconds: 650);
   static const _detectionMuteTail = Duration(milliseconds: 450);
+
+  /// Per quanto il cantante deve tenere la nota comoda perché diventi la nota
+  /// di partenza: abbastanza da escludere un attacco o una nota di passaggio.
+  static const startHold = Duration(milliseconds: 800);
+
+  /// Riconoscimento della nota di partenza (vibrato e cadute brevi inclusi).
+  final _startStabilizer = PitchStabilizer();
+  MusicalNote? _startCandidate;
+  DateTime? _startCandidateSince;
 
   StreamSubscription<PitchDetectionResult>? _subscription;
   late TrainingStateMachine _machine;
@@ -150,18 +175,6 @@ class RangeTestController extends Notifier<RangeTestState> {
     );
   }
 
-  void setStartNote({PitchClass? key, int? octave}) {
-    if (state.phase != RangePhase.setup) {
-      return;
-    }
-    final current = MusicalNote.fromMidi(state.startMidi);
-    final note = MusicalNote(
-      pitchClass: key ?? current.pitchClass,
-      octave: octave ?? current.octave,
-    );
-    state = state.copyWith(startMidi: note.midiNumber, targetMidi: note.midiNumber);
-  }
-
   void setTolerance(int cents) {
     if (state.phase == RangePhase.setup || state.phase == RangePhase.done) {
       state = state.copyWith(toleranceCents: cents);
@@ -174,7 +187,8 @@ class RangeTestController extends Notifier<RangeTestState> {
     }
   }
 
-  /// Avvia il test: si parte dalla nota comoda e si scende.
+  /// Avvia il test: il cantante tiene una nota comoda, che diventa la nota
+  /// di partenza; poi si scende verso il grave e si sale verso l'acuto.
   Future<void> start() async {
     final generation = ++_generation;
     _latestStart = generation;
@@ -182,22 +196,23 @@ class RangeTestController extends Notifier<RangeTestState> {
       toleranceCents: state.toleranceCents,
       stabilityMs: state.stabilityMs,
     );
+    _startStabilizer.reset();
+    _startCandidate = null;
+    _startCandidateSince = null;
+    _ignoreDetectionUntil = DateTime.fromMillisecondsSinceEpoch(0);
     state = state.copyWith(
-      phase: RangePhase.descending,
-      targetMidi: state.startMidi,
+      phase: RangePhase.findingStart,
       lowestMidi: () => null,
       highestMidi: () => null,
       skipsInRow: 0,
       isListening: true,
       clearMessage: true,
+      clearDetected: true,
       validatedCount: 0,
       skippedCount: 0,
+      startHoldProgress: 0,
     );
     try {
-      await _playGuideNote(state.targetNote);
-      if (generation != _generation) {
-        return;
-      }
       final started = await _microphone.start();
       if (generation != _generation) {
         // Test annullato o schermata chiusa mentre il microfono si avviava.
@@ -226,6 +241,47 @@ class RangeTestController extends Notifier<RangeTestState> {
         message: 'Audio non inizializzato: verifica microfono e SoundFont.',
       );
     }
+  }
+
+  /// Nota comoda: quando resta la stessa per [startHold] diventa la nota di
+  /// partenza (già convalidata) e il test scende dal semitono sotto.
+  void _handleStartPitch(PitchDetectionResult detection, DateTime now) {
+    final recognized = _startStabilizer.process(detection, now);
+    final current = _startStabilizer.current;
+    if (!recognized.isStable) {
+      if (current == null) {
+        // Silenzio: si ricomincia ad aspettare la nota.
+        _startCandidate = null;
+        _startCandidateSince = null;
+        state = state.copyWith(startHoldProgress: 0, clearDetected: true);
+      }
+      return;
+    }
+    if (_startCandidate != recognized.note) {
+      _startCandidate = recognized.note;
+      _startCandidateSince = now;
+    }
+    final held = now.difference(_startCandidateSince!);
+    final progress = (held.inMilliseconds / startHold.inMilliseconds).clamp(0.0, 1.0);
+    state = state.copyWith(detected: recognized, startHoldProgress: progress);
+    if (held >= startHold) {
+      _beginFrom(recognized.note);
+    }
+  }
+
+  void _beginFrom(MusicalNote note) {
+    final midi = note.midiNumber.clamp(_minMidi, _maxMidi);
+    _machine.reset();
+    state = state.copyWith(
+      phase: RangePhase.descending,
+      startMidi: midi,
+      targetMidi: midi,
+      lowestMidi: () => midi,
+      highestMidi: () => midi,
+      validatedCount: state.validatedCount + 1,
+      startHoldProgress: 1,
+    );
+    _advanceTarget();
   }
 
   Future<void> replayTarget() => _playGuideNote(state.targetNote);
@@ -267,6 +323,10 @@ class RangeTestController extends Notifier<RangeTestState> {
       state.phase == RangePhase.descending || state.phase == RangePhase.ascending;
 
   void _handlePitch(PitchDetectionResult detection) {
+    if (state.phase == RangePhase.findingStart) {
+      _handleStartPitch(detection, DateTime.now());
+      return;
+    }
     if (!_isTesting) {
       return;
     }
