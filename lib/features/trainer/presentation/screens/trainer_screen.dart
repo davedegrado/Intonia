@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/note_text.dart';
 import '../../../../core/music/exercise.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
@@ -89,9 +90,9 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
     final notation = ref.watch(notationProvider);
     final theme = Theme.of(context);
     final spelled = NoteSpeller.spellSequence(state.sequence);
-    final currentLabel = state.currentIndex < spelled.length
-        ? spelled[state.currentIndex].fullLabel(notation)
-        : state.currentNote.fullLabelFor(notation);
+    final currentNote = state.currentIndex < spelled.length
+        ? spelled[state.currentIndex]
+        : NoteSpeller.spellRoot(state.currentNote);
 
     return Scaffold(
       appBar: AppBar(
@@ -124,8 +125,9 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text('Nota corrente', style: theme.textTheme.labelLarge),
-                                    Text(
-                                      currentLabel,
+                                    NoteText(
+                                      currentNote,
+                                      notation: notation,
                                       style: theme.textTheme.displaySmall
                                           ?.copyWith(fontWeight: FontWeight.w800),
                                     ),
@@ -212,7 +214,7 @@ class _BottomControlBar extends ConsumerWidget {
     // Le sequenze custom sono costruite su note assolute: niente selettori
     // di tonalità/ottava, si parte dalla nota con cui sono state create.
     final fixedRoot = exercise.isCustom && exercise.rootMidi != null
-        ? NoteSpeller.spellRoot(MusicalNote.fromMidi(exercise.rootMidi!)).fullLabel(notation)
+        ? NoteSpeller.spellRoot(MusicalNote.fromMidi(exercise.rootMidi!))
         : null;
 
     return Material(
@@ -229,8 +231,12 @@ class _BottomControlBar extends ConsumerWidget {
                   Icon(Icons.push_pin_outlined,
                       size: 18, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(width: 6),
-                  Text(
-                    'Nota di partenza: $fixedRoot',
+                  Text.rich(
+                    TextSpan(children: [
+                      const TextSpan(text: 'Nota di partenza: '),
+                      noteSpan(fixedRoot, notation,
+                          style: theme.textTheme.labelLarge ?? const TextStyle()),
+                    ]),
                     style: theme.textTheme.labelLarge,
                   ),
                 ],

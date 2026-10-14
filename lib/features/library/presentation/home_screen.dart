@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../app/note_text.dart';
 
 import '../../../core/music/exercise.dart';
-import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
 import '../../../core/pitch/pitch_recognition_config.dart';
 import '../../../core/session/range_record.dart';
@@ -14,7 +14,6 @@ import '../../profile/application/history_providers.dart';
 import '../../range/application/range_providers.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../tuner/application/tuner_controller.dart';
-import '../../tuner/presentation/detected_note_label.dart';
 import '../application/exercise_providers.dart';
 
 /// Naviga fermando prima il riconoscimento in tempo reale, se attivo.
@@ -170,9 +169,15 @@ class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObser
                                   crossAxisAlignment: CrossAxisAlignment.baseline,
                                   textBaseline: TextBaseline.alphabetic,
                                   children: [
-                                    DetectedNoteLabel(
-                                      note: NoteSpeller.spellRoot(detection.note),
+                                    NoteText(
+                                      NoteSpeller.spellRoot(detection.note),
                                       notation: notation,
+                                      style: theme.textTheme.headlineMedium?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        color: theme.colorScheme.primary,
+                                        height: 1,
+                                      ),
+                                      octaveColor: theme.colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
@@ -228,9 +233,6 @@ class _RangeCard extends ConsumerWidget {
     final notation = ref.watch(notationProvider);
     final ranges = ref.watch(rangeHistoryProvider).value ?? const <RangeRecord>[];
     final latest = ranges.isNotEmpty ? ranges.last : null;
-
-    String noteLabel(int midi) =>
-        NoteSpeller.spellRoot(MusicalNote.fromMidi(midi)).fullLabel(notation);
 
     return Card(
       elevation: 0,
@@ -291,7 +293,8 @@ class _RangeCard extends ConsumerWidget {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Text(noteLabel(latest.minMidi),
+                        NoteText(spelledMidi(latest.minMidi),
+                            notation: notation,
                             style: theme.textTheme.labelLarge?.copyWith(
                                 color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
                         const SizedBox(width: 10),
@@ -307,7 +310,8 @@ class _RangeCard extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Text(noteLabel(latest.maxMidi),
+                        NoteText(spelledMidi(latest.maxMidi),
+                            notation: notation,
                             style: theme.textTheme.labelLarge?.copyWith(
                                 color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
                       ],

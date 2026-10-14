@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/note_text.dart';
 import '../../../core/music/exercise.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
@@ -257,7 +258,7 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
                   children: [
                     for (var i = 0; i < spelled.length; i++)
                       InputChip(
-                        label: Text(spelled[i].fullLabel(notation)),
+                        label: NoteText(spelled[i], notation: notation),
                         onDeleted: () => setState(() => _midis.removeAt(i)),
                       ),
                   ],
