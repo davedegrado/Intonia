@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 
 import '../core/music/exercise.dart';
+import '../features/access/presentation/pro_screen.dart';
 import '../features/library/presentation/custom_exercise_editor_screen.dart';
 import '../features/library/presentation/home_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
@@ -33,6 +34,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/range-test',
       builder: (context, state) => const RangeTestScreen(),
+    ),
+    GoRoute(
+      path: '/pro',
+      builder: (context, state) => const ProScreen(),
     ),
     GoRoute(
       path: '/settings',

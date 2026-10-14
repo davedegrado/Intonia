@@ -8,6 +8,9 @@ import '../../../core/music/note_spelling.dart';
 import '../../../core/pitch/pitch_recognition_config.dart';
 import '../../../core/session/range_record.dart';
 import '../../../core/session/session_record.dart';
+import '../../access/application/access_providers.dart';
+import '../../access/domain/entitlement.dart';
+import '../../access/presentation/charges_widgets.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
 import '../../profile/application/history_providers.dart';
@@ -73,6 +76,9 @@ class HomeScreen extends ConsumerWidget {
             const _TunerCard(),
             const SizedBox(height: 8),
             const _RangeCard(),
+            const SizedBox(height: 8),
+            // Cariche degli esercizi (sotto: le sezioni che le consumano).
+            const ChargesCard(),
             const SizedBox(height: 8),
             _CustomSection(exercises: sections[ExerciseCategory.custom]!),
             const SizedBox(height: 8),
@@ -335,6 +341,7 @@ class _CustomSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final canCreate = ref.watch(entitlementProvider).allows(ProFeature.customSequences);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -355,12 +362,20 @@ class _CustomSection extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Crea la tua sequenza',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colors.onPrimaryContainer,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              'Crea la tua sequenza',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: colors.onPrimaryContainer,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            if (!canCreate) ...[
+                              const SizedBox(width: 8),
+                              const _ProBadge(),
+                            ],
+                          ],
                         ),
                         Text(
                           'Componi qualsiasi giro di note: pattern, vocalizzi, prove di estensione…',
@@ -451,6 +466,25 @@ class _CategoryAccordion extends StatelessWidget {
           const SizedBox(height: 4),
         ],
       ),
+    );
+  }
+}
+
+/// Etichetta delle funzioni Intonia Pro.
+class _ProBadge extends StatelessWidget {
+  const _ProBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(6)),
+      child: Text('PRO',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colors.onPrimary,
+                fontWeight: FontWeight.w800,
+              )),
     );
   }
 }

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../access/application/access_providers.dart';
+import '../../../access/domain/entitlement.dart';
 import '../../../../core/music/exercise.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/pitch/pitch_detection_result.dart';
@@ -56,6 +58,10 @@ class TrainerController extends Notifier<TrainerState> {
   /// un cambio di nota, così la nota precedente ancora tenuta non conta come
   /// errore. Il primo evento `advanced` successivo serve solo a riallinearla.
   bool _advancedOnCorrect = false;
+
+  /// Distingue le sessioni di questo controller da quelle di istanze
+  /// precedenti negli identificativi di addebito delle cariche.
+  final _instanceId = DateTime.now().microsecondsSinceEpoch;
 
   /// Run id dell'ultimo avvio del microfono richiesto.
   int _latestMicrophoneStart = 0;
@@ -131,19 +137,45 @@ class TrainerController extends Notifier<TrainerState> {
   void updateGuideEveryNote(bool value) =>
       _updateSettings(state.settings.copyWith(guideEveryNote: value));
 
-  Future<void> play() async {
-    await stop();
-    state = _resetRunState(isPlaying: true, isListening: state.settings.mode == TrainerMode.train);
-
-    if (state.settings.mode == TrainerMode.listen) {
-      await _playListeningMode();
-    } else {
-      await _startTrainingMode();
+  /// Avvia una sessione. In allenamento gli utenti Free hanno bisogno di una
+  /// carica: se sono esaurite non parte nulla e ritorna false. La carica è
+  /// consumata solo quando la sessione inizia davvero (microfono attivo): un
+  /// errore prima dell'inizio non la fa perdere. L'ascolto della sequenza
+  /// (modalità Ascolto) e delle singole note non consuma cariche.
+  Future<bool> play() async {
+    final training = state.settings.mode == TrainerMode.train;
+    if (training && !await _hasExerciseAccess()) {
+      return false;
     }
+    await stop();
+    state = _resetRunState(isPlaying: true, isListening: training);
+
+    if (!training) {
+      await _playListeningMode();
+      return true;
+    }
+    return _startTrainingMode();
   }
 
-  Future<void> replay() async {
-    await play();
+  Future<bool> replay() => play();
+
+  /// Pro, oppure Free con almeno una carica (aggiornata all'orologio attuale).
+  Future<bool> _hasExerciseAccess() async {
+    final entitlement = await ref.read(entitlementProvider.notifier).resolve();
+    if (entitlement.allows(ProFeature.unlimitedExercises)) {
+      return true;
+    }
+    final charges = await ref.read(chargesProvider.notifier).refresh();
+    return charges.charges > 0;
+  }
+
+  /// Addebita la sessione [runId] (una sola volta) per gli utenti Free.
+  Future<bool> _chargeSession(int runId) async {
+    final entitlement = await ref.read(entitlementProvider.notifier).resolve();
+    if (entitlement.allows(ProFeature.unlimitedExercises)) {
+      return true;
+    }
+    return ref.read(chargesProvider.notifier).tryConsume('trainer-$_instanceId-$runId');
   }
 
   Future<void> stop() async {
@@ -272,12 +304,13 @@ class TrainerController extends Notifier<TrainerState> {
     }
   }
 
-  Future<void> _startTrainingMode() async {
+  /// Ritorna false solo se la sessione non è partita per cariche esaurite.
+  Future<bool> _startTrainingMode() async {
     final runId = _runId;
     try {
       await _playGuideNote(state.currentNote);
       if (runId != _runId) {
-        return;
+        return true;
       }
       _latestMicrophoneStart = runId;
       final started = await _microphone.start();
@@ -287,7 +320,7 @@ class TrainerController extends Notifier<TrainerState> {
         if (_latestMicrophoneStart == runId) {
           await _microphone.stop();
         }
-        return;
+        return true;
       }
       if (!started) {
         state = state.copyWith(
@@ -295,12 +328,21 @@ class TrainerController extends Notifier<TrainerState> {
           isListening: false,
           message: microphoneDeniedMessage,
         );
-        return;
+        return true;
+      }
+      // La sessione parte ora: per gli utenti Free costa una carica.
+      final charged = await _chargeSession(runId);
+      if (runId != _runId) {
+        return true;
+      }
+      if (!charged) {
+        await stop();
+        return false;
       }
       _pitchSubscription = _microphone.pitchStream.listen(_handlePitch);
     } catch (error) {
       if (runId != _runId) {
-        return;
+        return true;
       }
       state = state.copyWith(
         isPlaying: false,
@@ -308,6 +350,7 @@ class TrainerController extends Notifier<TrainerState> {
         message: _friendlyAudioError(error),
       );
     }
+    return true;
   }
 
   void _handlePitch(PitchDetectionResult detection) {

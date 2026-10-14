@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/note_text.dart';
+import '../../../access/presentation/charges_widgets.dart';
 import '../../../../core/music/exercise.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
@@ -73,7 +74,7 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
   Future<void> _showResult(SessionRecord record) async {
     final action = await Navigator.of(context).push(SessionResultScreen.route(record));
     if (action == SessionResultAction.repeat && mounted) {
-      await ref.read(trainerControllerProvider.notifier).play();
+      await startTrainerSession(context, ref);
     }
   }
 
@@ -324,13 +325,14 @@ class _BottomControlBar extends ConsumerWidget {
                         )
                       : FilledButton.icon(
                           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-                          onPressed: controller.play,
+                          onPressed: () => startTrainerSession(context, ref),
                           icon: const Icon(Icons.play_arrow),
                           label: const Text('Play'),
                         ),
                 ),
               ],
             ),
+            if (state.settings.mode == TrainerMode.train && !state.isPlaying) const ChargesHint(),
           ],
         ),
       ),
@@ -366,7 +368,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
   Future<void> _showResult(SessionRecord record) async {
     final action = await Navigator.of(context).push(SessionResultScreen.route(record));
     if (action == SessionResultAction.repeat && mounted) {
-      await ref.read(trainerControllerProvider.notifier).play();
+      await startTrainerSession(context, ref);
     }
   }
 
@@ -521,5 +523,13 @@ class _StatusPill extends StatelessWidget {
         child: Text(label, style: Theme.of(context).textTheme.labelLarge),
       ),
     );
+  }
+}
+
+/// Avvia una sessione; con le cariche esaurite spiega come continuare.
+Future<void> startTrainerSession(BuildContext context, WidgetRef ref) async {
+  final started = await ref.read(trainerControllerProvider.notifier).play();
+  if (!started && context.mounted) {
+    await showChargesExhausted(context);
   }
 }

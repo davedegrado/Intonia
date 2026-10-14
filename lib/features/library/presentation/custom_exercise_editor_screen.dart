@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/note_text.dart';
 import '../../../core/music/exercise.dart';
+import '../../access/application/access_providers.dart';
+import '../../access/domain/entitlement.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
 import '../../settings/application/settings_providers.dart';
@@ -107,8 +109,8 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
       focus: _focus,
       group: group.isEmpty ? null : group,
     );
-    await ref.read(customExercisesProvider.notifier).upsert(exercise);
-    if (mounted) {
+    final saved = await ref.read(customExercisesProvider.notifier).upsert(exercise);
+    if (mounted && saved) {
       context.pop();
     }
   }
@@ -117,6 +119,9 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final notation = ref.watch(notationProvider);
+    if (!ref.watch(entitlementProvider).allows(ProFeature.customSequences)) {
+      return const _CustomSequencesPro();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -285,6 +290,56 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
         ),
         onPressed: () => setState(() => _midis.add(note.midiNumber)),
         child: Text('${NoteSpeller.keyLabel(pitch, notation)}$_pickerOctave'),
+      ),
+    );
+  }
+}
+
+/// "Crea la tua sequenza" per gli utenti Free: spiega la funzione Pro senza
+/// permettere di creare o salvare sequenze.
+class _CustomSequencesPro extends StatelessWidget {
+  const _CustomSequencesPro();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Crea la tua sequenza')),
+      body: SafeArea(
+        child: ListView(
+          key: const ValueKey('custom-sequences-pro'),
+          padding: const EdgeInsets.all(24),
+          children: [
+            Icon(Icons.edit_note, size: 64, color: theme.colorScheme.primary),
+            const SizedBox(height: 12),
+            Text(
+              'Le tue sequenze, su misura',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Componi qualsiasi giro di note partendo dalla nota che vuoi: vocalizzi, '
+              'pattern, salti, prove di estensione. Le sequenze si salvano nella Home, '
+              'raggruppate come preferisci, e si allenano come gli esercizi predefiniti.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Creare, modificare e salvare sequenze è una funzione di Intonia Pro. '
+              'Le sequenze che hai già salvato restano disponibili.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => context.push('/pro'),
+              icon: const Icon(Icons.workspace_premium),
+              label: const Text('Scopri Intonia Pro'),
+            ),
+          ],
+        ),
       ),
     );
   }
