@@ -69,6 +69,30 @@ jobs:
       - name: Dipendenze
         run: flutter pub get --enforce-lockfile
 
+      # Chiave debug stabile tra i run: senza, ogni APK è firmato con una
+      # chiave diversa e Android rifiuta di installarlo sopra il precedente
+      # ("App non installata"). La chiave nasce al primo build ed è riusata
+      # dai run successivi (le PR leggono quella salvata da main).
+      - name: Chiave debug persistente
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/android-user-home/debug.keystore
+          key: android-debug-keystore-v1
+
+      # ANDROID_USER_HOME indica ad AGP dove cercare debug.keystore; se la
+      # cache è vuota la chiave viene creata qui con i parametri standard.
+      - name: Prepara chiave debug
+        run: |
+          echo "ANDROID_USER_HOME=$RUNNER_TEMP/android-user-home" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/android-user-home"
+          ks="$RUNNER_TEMP/android-user-home/debug.keystore"
+          if [ ! -f "$ks" ]; then
+            keytool -genkeypair -keystore "$ks" -storepass android -keypass android \
+              -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          keytool -list -v -keystore "$ks" -storepass android | grep -m1 'SHA256:'
+
       # APK in modalità release (il riconoscimento del pitch in debug è troppo
       # lento per prove realistiche), firmato con la chiave debug perché la
       # upload key non è in CI: installabile per i test, NON pubblicabile.

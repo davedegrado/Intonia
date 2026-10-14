@@ -8,6 +8,15 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: VocalScaleTrainerApp()));
     await tester.pump();
 
+    // Splash per 2 secondi, poi dissolvenza verso la Home.
+    expect(find.byKey(const ValueKey('splash')), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2));
+    // La Home ha animazioni continue (mascotte): niente pumpAndSettle.
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.byKey(const ValueKey('splash')), findsNothing);
+
     // Parte alta: titolo, tuner e invito custom.
     expect(find.text('Intonia'), findsOneWidget);
     expect(find.text('Riconoscimento in tempo reale'), findsOneWidget);
