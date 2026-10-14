@@ -116,6 +116,12 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                                   ],
                                 ),
                               ),
+                              IconButton.filledTonal(
+                                tooltip: 'Ascolta la nota corrente',
+                                onPressed: controller.listenCurrentNote,
+                                icon: const Icon(Icons.volume_up),
+                              ),
+                              const SizedBox(width: 8),
                               _StatusPill(
                                   isPlaying: state.isPlaying, isListening: state.isListening),
                             ],
@@ -125,7 +131,7 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                             sequence: state.sequence,
                             progress: state.progress,
                             currentIndex: state.currentIndex,
-                            onTapCurrent: controller.listenCurrentNote,
+                            onTapNote: controller.listenNote,
                           ),
                         ],
                       ),
@@ -387,7 +393,8 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
                 ? controller.updateGuideEveryNote
                 : null,
             title: const Text('Suona la guida su ogni nota'),
-            subtitle: const Text('Se disattivo, senti solo la prima nota'),
+            subtitle: const Text(
+                'Se disattivo, senti solo la prima nota: tocca una nota per riascoltarla'),
             contentPadding: EdgeInsets.zero,
           ),
           SwitchListTile.adaptive(
@@ -399,12 +406,6 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
             contentPadding: EdgeInsets.zero,
           ),
           const SizedBox(height: 4),
-          OutlinedButton.icon(
-            onPressed: controller.listenCurrentNote,
-            icon: const Icon(Icons.volume_up),
-            label: const Text('Ascolta nota corrente'),
-          ),
-          const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: disabled || _calibrating ? null : _calibrate,
             icon: _calibrating

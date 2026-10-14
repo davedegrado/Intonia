@@ -98,4 +98,40 @@ void main() {
 
     await controller.stop();
   });
+
+  test('tapping a note plays it once and pauses listening, without the guide on every note',
+      () async {
+    final controller = container.read(trainerControllerProvider.notifier)
+      ..updateGuideEveryNote(false);
+    final sequence = container.read(trainerControllerProvider).sequence;
+
+    await controller.play();
+    await _waitGuideMute();
+    final playedBefore = midi.played.length;
+
+    // Il cantante si è perso: tocca la nota corrente per riascoltarla.
+    await controller.listenNote(0);
+    expect(midi.played.length, playedBefore + 1, reason: 'una sola nota');
+    expect(midi.played.last, sequence[0].midiNumber);
+
+    // Mentre suona il piano l'ascolto è sospeso: il suono captato non conta.
+    await _hold(mic, sequence[0]);
+    var state = container.read(trainerControllerProvider);
+    expect(state.progress[0], NoteProgressStatus.current);
+    expect(state.sessionStats.attempts, isEmpty);
+
+    // Finita la pausa si torna ad ascoltare normalmente.
+    await _waitGuideMute();
+    await _hold(mic, sequence[0]);
+    state = container.read(trainerControllerProvider);
+    expect(state.progress[0], NoteProgressStatus.correct);
+
+    // Anche una nota diversa dalla corrente si può ascoltare.
+    await controller.listenNote(2);
+    expect(midi.played.last, sequence[2].midiNumber);
+    expect(container.read(trainerControllerProvider).currentIndex, 0,
+        reason: "ascoltare non fa avanzare l'esercizio");
+
+    await controller.stop();
+  });
 }

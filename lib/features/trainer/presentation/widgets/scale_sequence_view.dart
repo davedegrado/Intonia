@@ -13,7 +13,7 @@ class ScaleSequenceView extends ConsumerStatefulWidget {
     required this.sequence,
     required this.progress,
     required this.currentIndex,
-    this.onTapCurrent,
+    this.onTapNote,
     super.key,
   });
 
@@ -21,8 +21,8 @@ class ScaleSequenceView extends ConsumerStatefulWidget {
   final List<NoteProgressStatus> progress;
   final int currentIndex;
 
-  /// Chiamato quando l'utente tocca la nota corrente (per riascoltarla).
-  final VoidCallback? onTapCurrent;
+  /// Chiamato con l'indice della nota toccata (per ascoltarla).
+  final ValueChanged<int>? onTapNote;
 
   @override
   ConsumerState<ScaleSequenceView> createState() => _ScaleSequenceViewState();
@@ -99,16 +99,14 @@ class _ScaleSequenceViewState extends ConsumerState<ScaleSequenceView> {
         ),
         const SizedBox(height: 8),
         if (_staffMode)
-          GestureDetector(
-            // Toccando il pentagramma si riascolta la nota corrente.
-            onTap: widget.onTapCurrent,
-            child: _StaffView(
-              spelled: spelled,
-              progress: widget.progress,
-              controller: _scrollController,
-              noteExtent: _staffNoteExtent,
-              leadWidth: _staffLeadWidth,
-            ),
+          _StaffView(
+            spelled: spelled,
+            progress: widget.progress,
+            controller: _scrollController,
+            noteExtent: _staffNoteExtent,
+            leadWidth: _staffLeadWidth,
+            currentIndex: widget.currentIndex,
+            onTapNote: widget.onTapNote,
           )
         else
           _ChipsRow(
@@ -117,7 +115,7 @@ class _ScaleSequenceViewState extends ConsumerState<ScaleSequenceView> {
             controller: _scrollController,
             notation: notation,
             extent: _chipExtent,
-            onTapCurrent: widget.onTapCurrent,
+            onTapNote: widget.onTapNote,
           ),
       ],
     );
@@ -131,7 +129,7 @@ class _ChipsRow extends StatelessWidget {
     required this.controller,
     required this.notation,
     required this.extent,
-    this.onTapCurrent,
+    this.onTapNote,
   });
 
   final List<SpelledNote> spelled;
@@ -139,7 +137,7 @@ class _ChipsRow extends StatelessWidget {
   final ScrollController controller;
   final NoteNotation notation;
   final double extent;
-  final VoidCallback? onTapCurrent;
+  final ValueChanged<int>? onTapNote;
 
   @override
   Widget build(BuildContext context) {
@@ -154,11 +152,11 @@ class _ChipsRow extends StatelessWidget {
         itemExtent: extent,
         itemBuilder: (context, i) {
           final status = progress[i];
-          final isCurrent = status == NoteProgressStatus.current;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: GestureDetector(
-              onTap: isCurrent ? onTapCurrent : null,
+              key: ValueKey('sequence-note-$i'),
+              onTap: onTapNote == null ? null : () => onTapNote!(i),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOut,
@@ -193,6 +191,8 @@ class _StaffView extends StatelessWidget {
     required this.controller,
     required this.noteExtent,
     required this.leadWidth,
+    required this.currentIndex,
+    this.onTapNote,
   });
 
   final List<SpelledNote> spelled;
@@ -200,6 +200,15 @@ class _StaffView extends StatelessWidget {
   final ScrollController controller;
   final double noteExtent;
   final double leadWidth;
+  final int currentIndex;
+  final ValueChanged<int>? onTapNote;
+
+  /// Nota sotto il punto toccato; sulla chiave (o oltre l'ultima nota) la
+  /// nota corrente.
+  int _indexAt(double x) {
+    final index = ((x - leadWidth) / noteExtent).floor();
+    return index >= 0 && index < spelled.length ? index : currentIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,14 +220,20 @@ class _StaffView extends StatelessWidget {
       child: SingleChildScrollView(
         controller: controller,
         scrollDirection: Axis.horizontal,
-        child: CustomPaint(
-          size: Size(width, 130),
-          painter: _StaffPainter(
-            spelled: spelled,
-            progress: progress,
-            colors: colors,
-            noteExtent: noteExtent,
-            leadWidth: leadWidth,
+        child: GestureDetector(
+          key: const ValueKey('sequence-staff'),
+          onTapUp: onTapNote == null
+              ? null
+              : (details) => onTapNote!(_indexAt(details.localPosition.dx)),
+          child: CustomPaint(
+            size: Size(width, 130),
+            painter: _StaffPainter(
+              spelled: spelled,
+              progress: progress,
+              colors: colors,
+              noteExtent: noteExtent,
+              leadWidth: leadWidth,
+            ),
           ),
         ),
       ),
