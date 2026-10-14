@@ -83,6 +83,10 @@ class SessionRecord {
 
   double get accuracy => totalAttempts == 0 ? 0 : correct / totalAttempts;
 
+  /// Precisione in percentuale intera, come mostrata nel profilo e a fine
+  /// esercizio.
+  int get accuracyPercent => (accuracy * 100).round();
+
   /// True se la sessione riguarda una sequenza creata dall'utente.
   bool get isCustomExercise => exerciseId.startsWith('custom_');
 

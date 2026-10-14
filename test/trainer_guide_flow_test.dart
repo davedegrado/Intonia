@@ -134,4 +134,29 @@ void main() {
 
     await controller.stop();
   });
+
+  test('completing the exercise produces the result shown at the end', () async {
+    final controller = container.read(trainerControllerProvider.notifier)
+      ..updateGuideEveryNote(false);
+    final sequence = container.read(trainerControllerProvider).sequence;
+
+    await controller.play();
+    await _waitGuideMute();
+    expect(container.read(trainerControllerProvider).completedSession, isNull);
+    for (final note in sequence) {
+      await _hold(mic, note);
+    }
+
+    final state = container.read(trainerControllerProvider);
+    final record = state.completedSession;
+    expect(record, isNotNull);
+    expect(record!.correct, sequence.length);
+    expect(record.accuracyPercent, 100);
+    expect(state.isPlaying, isFalse);
+
+    // Un nuovo giro azzera il risultato.
+    await controller.play();
+    expect(container.read(trainerControllerProvider).completedSession, isNull);
+    await controller.stop();
+  });
 }

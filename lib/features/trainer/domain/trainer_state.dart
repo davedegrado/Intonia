@@ -1,5 +1,6 @@
 import '../../../core/music/note.dart';
 import '../../../core/pitch/pitch_detection_result.dart';
+import '../../../core/session/session_record.dart';
 import '../../../core/session/session_stats.dart';
 import 'note_progress.dart';
 import 'training_settings.dart';
@@ -17,6 +18,7 @@ class TrainerState {
     required this.sessionStats,
     this.detectedPitch,
     this.message,
+    this.completedSession,
   });
 
   factory TrainerState.initial({
@@ -49,6 +51,10 @@ class TrainerState {
   final SessionStats sessionStats;
   final String? message;
 
+  /// Riepilogo dell'esercizio appena completato (tutte le note convalidate);
+  /// null durante l'esercizio o se interrotto.
+  final SessionRecord? completedSession;
+
   MusicalNote get currentNote => sequence[currentIndex];
 
   bool get isFinished =>
@@ -67,6 +73,8 @@ class TrainerState {
     SessionStats? sessionStats,
     String? message,
     bool clearMessage = false,
+    SessionRecord? completedSession,
+    bool clearCompletedSession = false,
   }) {
     return TrainerState(
       settings: settings ?? this.settings,
@@ -79,6 +87,7 @@ class TrainerState {
       detectedPitch: detectedPitch ?? this.detectedPitch,
       sessionStats: sessionStats ?? this.sessionStats,
       message: clearMessage ? null : message ?? this.message,
+      completedSession: clearCompletedSession ? null : completedSession ?? this.completedSession,
     );
   }
 }

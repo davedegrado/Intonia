@@ -218,7 +218,7 @@ class ProfileScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${(record.accuracy * 100).toStringAsFixed(0)}%',
+                      '${record.accuracyPercent}%',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: record.accuracy >= 0.8
