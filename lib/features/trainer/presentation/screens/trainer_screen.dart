@@ -5,6 +5,7 @@ import '../../../../core/music/exercise.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
 import '../../../../core/pitch/pitch_recognition_config.dart';
+import '../../../../core/session/session_record.dart';
 import '../../../settings/application/settings_providers.dart';
 import '../../../mascot/presentation/mascot_coach.dart';
 import '../../domain/trainer_mascot_mood.dart';
@@ -12,6 +13,7 @@ import '../../domain/trainer_state.dart';
 import '../../domain/training_settings.dart';
 import '../controllers/trainer_controller.dart';
 import '../widgets/pitch_feedback_panel.dart';
+import 'session_result_screen.dart';
 import '../widgets/scale_sequence_view.dart';
 import '../widgets/session_stats_panel.dart';
 
@@ -66,8 +68,22 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
     );
   }
 
+  /// A esercizio completato mostra il risultato a schermo intero.
+  Future<void> _showResult(SessionRecord record) async {
+    final action = await Navigator.of(context).push(SessionResultScreen.route(record));
+    if (action == SessionResultAction.repeat && mounted) {
+      await ref.read(trainerControllerProvider.notifier).play();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen(trainerControllerProvider.select((state) => state.completedSession),
+        (previous, next) {
+      if (next != null && next != previous) {
+        _showResult(next);
+      }
+    });
     final state = ref.watch(trainerControllerProvider);
     final controller = ref.read(trainerControllerProvider.notifier);
     final notation = ref.watch(notationProvider);
@@ -340,8 +356,22 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
     ));
   }
 
+  /// A esercizio completato mostra il risultato a schermo intero.
+  Future<void> _showResult(SessionRecord record) async {
+    final action = await Navigator.of(context).push(SessionResultScreen.route(record));
+    if (action == SessionResultAction.repeat && mounted) {
+      await ref.read(trainerControllerProvider.notifier).play();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen(trainerControllerProvider.select((state) => state.completedSession),
+        (previous, next) {
+      if (next != null && next != previous) {
+        _showResult(next);
+      }
+    });
     final state = ref.watch(trainerControllerProvider);
     final controller = ref.read(trainerControllerProvider.notifier);
     final theme = Theme.of(context);
