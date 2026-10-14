@@ -55,6 +55,14 @@ class PitchStabilizer {
       return detected;
     }
 
+    final last = _lastVoiced;
+    if (last != null && now.difference(last).inMilliseconds > config.dropoutGraceMs) {
+      // Nessun frame da tempo (es. analisi sospesa durante la nota guida):
+      // i dati precedenti non descrivono più la voce attuale.
+      _recentMidi.clear();
+      _heldNote = null;
+      _otherSideSince = null;
+    }
     _lastVoiced = now;
     _recentMidi.add(_midiOf(detected.frequency));
     while (_recentMidi.length > config.smoothingFrames) {

@@ -42,9 +42,14 @@ class PitchRecognitionConfig {
   final int dropoutGraceMs;
 
   /// Tolleranza predefinita degli esercizi: distanza massima dal centro della
-  /// nota richiesta perché sia considerata corretta. Adatta alla voce reale;
-  /// per esercizi di precisione l'utente può ridurla nelle impostazioni.
-  static const defaultExerciseToleranceCents = 35;
+  /// nota richiesta perché sia considerata corretta. Larga, adatta alla voce
+  /// reale: in pratica basta cantare la nota giusta; per esercizi di
+  /// precisione l'utente può ridurla nelle impostazioni.
+  static const defaultExerciseToleranceCents = 45;
+
+  /// Durata predefinita per cui la nota riconosciuta deve restare la stessa
+  /// prima di essere valutata negli esercizi.
+  static const defaultStabilityMs = 100;
 
   /// Valori selezionabili per la tolleranza degli esercizi.
   static const minExerciseToleranceCents = 10;

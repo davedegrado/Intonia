@@ -48,13 +48,13 @@ Annotare per ogni prova: dispositivo, versione OS, build, esito, note.
 ### Voce reale: tolleranza e stabilità
 
 Parametri in `lib/core/pitch/pitch_recognition_config.dart` (tolleranza
-esercizi ±35 cent, test di estensione ±40, cambio al semitono vicino dopo
+esercizi ±45 cent con stabilità 100 ms, test di estensione ±40, cambio al semitono vicino dopo
 80 ms, cadute di segnale fino a 100 ms ignorate). Da provare con più voci
 (maschile/femminile, con e senza vibrato):
 
 - 12a. Nota tenuta con vibrato naturale: nella Home la nota mostrata non
   cambia; negli esercizi viene convalidata.
-- 12b. Nota leggermente calante/crescente (circa 25–30 cent): negli esercizi
+- 12b. Nota calante/crescente (circa 30–40 cent): negli esercizi
   è convalidata con la tolleranza predefinita; con tolleranza ±10 no.
 - 12c. Passaggio legato tra due note vicine (DO→DO#, MI→FA): la nota mostrata
   segue la voce senza ritardo fastidioso e non resta "attaccata" alla

@@ -21,7 +21,7 @@ class TrainingSettings {
       octave: 4,
       bpm: 72,
       toleranceCents: PitchRecognitionConfig.defaultExerciseToleranceCents,
-      stabilityMs: 200,
+      stabilityMs: PitchRecognitionConfig.defaultStabilityMs,
       mode: TrainerMode.train,
       loop: false,
       guideEveryNote: true,
