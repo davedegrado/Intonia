@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../access/application/access_providers.dart';
+import '../../access/domain/entitlement.dart';
 import '../../../app/note_text.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
@@ -85,7 +88,11 @@ class ProfileScreen extends ConsumerWidget {
           ),
     ]..sort((a, b) => b.accuracy.compareTo(a.accuracy));
 
-    final recent = records.reversed.take(8).toList();
+    // Free: ultime sessioni; Pro: storico completo.
+    final fullHistory = ref.watch(entitlementProvider).allows(ProFeature.fullHistory);
+    final recent = fullHistory
+        ? records.reversed.toList()
+        : records.reversed.take(freeRecentSessions).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Profilo')),
@@ -213,7 +220,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
             ],
             const SizedBox(height: 20),
-            Text('Ultime sessioni',
+            Text(fullHistory ? 'Tutte le sessioni' : 'Ultime sessioni',
                 style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
             for (final record in recent)
@@ -249,11 +256,21 @@ class ProfileScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+            if (!fullHistory && records.length > freeRecentSessions)
+              TextButton.icon(
+                key: const ValueKey('full-history-pro'),
+                onPressed: () => context.push('/pro'),
+                icon: const Icon(Icons.workspace_premium, size: 18),
+                label: Text('Storico completo (${records.length} sessioni) con Intonia Pro'),
+              ),
           ],
         ),
       ),
     );
   }
+
+  /// Sessioni mostrate agli utenti Free.
+  static const freeRecentSessions = 8;
 
   String _deltaLabel(int delta) {
     if (delta > 0) {
