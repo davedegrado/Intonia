@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/l10n.dart';
 import '../../../app/note_text.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
-import '../../../core/session/range_record.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/mascot_coach.dart';
 import '../../settings/application/settings_providers.dart';
@@ -83,7 +83,7 @@ class _RangeTestScreenState extends ConsumerState<RangeTestScreen> with WidgetsB
     // Il provider è autoDispose: uscendo dalla schermata microfono e audio
     // vengono fermati automaticamente in onDispose.
     return Scaffold(
-      appBar: AppBar(title: const Text('Test estensione vocale')),
+      appBar: AppBar(title: Text(context.l10n.rangeTestTitle)),
       body: SafeArea(
         child: switch (state.phase) {
           RangePhase.setup => _SetupView(state: state, controller: controller, notation: notation),
@@ -109,25 +109,22 @@ class _SetupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         _RangeCoach(state: state),
         const SizedBox(height: 16),
-        Text('Come funziona',
+        Text(l10n.rangeHowItWorks,
             style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         Text(
-          'Premi "Inizia" e canta una nota comoda, tenendola per un momento: '
-          'la riconosco e da lì scendiamo un semitono alla volta. Si avanza '
-          'solo quando becchi la nota; quando proprio non ci arrivi, premi '
-          '"Limite raggiunto" (o salta la singola nota). Poi si sale verso '
-          'l\'acuto allo stesso modo. Alla fine l\'estensione viene salvata nel profilo.',
+          l10n.rangeHowItWorksBody,
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 24),
-        Text('Sensibilità', style: theme.textTheme.titleMedium),
+        Text(l10n.rangeSensitivity, style: theme.textTheme.titleMedium),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -135,15 +132,13 @@ class _SetupView extends StatelessWidget {
               child: DropdownButtonFormField<int>(
                 isExpanded: true,
                 initialValue: state.toleranceCents,
-                decoration: const InputDecoration(
-                  labelText: 'Tolleranza',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.rangeTolerance,
+                  border: const OutlineInputBorder(),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 20, child: Text('± 20 cent')),
-                  DropdownMenuItem(value: 30, child: Text('± 30 cent')),
-                  DropdownMenuItem(value: 40, child: Text('± 40 cent')),
-                  DropdownMenuItem(value: 50, child: Text('± 50 cent')),
+                items: [
+                  for (final cents in const [20, 30, 40, 50])
+                    DropdownMenuItem(value: cents, child: Text(l10n.rangeCents(cents))),
                 ],
                 onChanged: (value) => value == null ? null : controller.setTolerance(value),
               ),
@@ -153,9 +148,9 @@ class _SetupView extends StatelessWidget {
               child: DropdownButtonFormField<int>(
                 isExpanded: true,
                 initialValue: state.stabilityMs,
-                decoration: const InputDecoration(
-                  labelText: 'Durata stabilità',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.rangeStabilityTime,
+                  border: const OutlineInputBorder(),
                 ),
                 items: const [
                   DropdownMenuItem(value: 100, child: Text('100 ms')),
@@ -174,8 +169,8 @@ class _SetupView extends StatelessWidget {
             low: spelledMidi(state.previousRecord!.minMidi),
             high: spelledMidi(state.previousRecord!.maxMidi),
             notation: notation,
-            prefix: 'Ultimo test: ',
-            suffix: ' (${formatSpan(state.previousRecord!.spanSemitones)})',
+            prefix: l10n.rangeLastTestPrefix,
+            suffix: ' (${l10n.span(state.previousRecord!.spanSemitones)})',
             style: theme.textTheme.bodySmall,
           ),
         ],
@@ -188,7 +183,7 @@ class _SetupView extends StatelessWidget {
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           onPressed: controller.start,
           icon: const Icon(Icons.play_arrow),
-          label: const Text('Inizia il test'),
+          label: Text(l10n.rangeStartButton),
         ),
       ],
     );
@@ -206,6 +201,7 @@ class _TestingView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final descending = state.phase == RangePhase.descending;
+    final l10n = context.l10n;
 
     return Column(
       children: [
@@ -220,7 +216,7 @@ class _TestingView extends StatelessWidget {
                   Icon(descending ? Icons.south : Icons.north, color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                    descending ? 'Verso il grave' : 'Verso l\'acuto',
+                    descending ? l10n.rangeTowardLow : l10n.rangeTowardHigh,
                     style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                   ),
                 ],
@@ -234,8 +230,7 @@ class _TestingView extends StatelessWidget {
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        Text('Canta questa nota (tocca per risentirla)',
-                            style: theme.textTheme.labelLarge),
+                        Text(l10n.rangeSingThisNote, style: theme.textTheme.labelLarge),
                         const SizedBox(height: 8),
                         NoteText(
                           spelledMidi(state.targetMidi),
@@ -260,7 +255,7 @@ class _TestingView extends StatelessWidget {
                   low: spelledMidi(state.lowestMidi!),
                   high: spelledMidi(state.highestMidi!),
                   notation: notation,
-                  prefix: 'Range convalidato finora: ',
+                  prefix: l10n.rangeValidatedSoFar,
                   style: theme.textTheme.bodySmall,
                 ),
             ],
@@ -281,7 +276,7 @@ class _TestingView extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: controller.skipNote,
-                          child: const Text('Salta questa nota'),
+                          child: Text(l10n.rangeSkipNote),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -289,7 +284,7 @@ class _TestingView extends StatelessWidget {
                         child: FilledButton(
                           onPressed: controller.endPhase,
                           child: Text(
-                              descending ? 'Limite grave raggiunto' : 'Limite acuto raggiunto'),
+                              descending ? l10n.rangeLowLimitReached : l10n.rangeHighLimitReached),
                         ),
                       ),
                     ],
@@ -297,7 +292,7 @@ class _TestingView extends StatelessWidget {
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: controller.cancel,
-                    child: const Text('Annulla il test'),
+                    child: Text(l10n.rangeCancelTest),
                   ),
                 ],
               ),
@@ -334,7 +329,7 @@ class _FindingStartView extends StatelessWidget {
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
-                      Text('Canta una nota comoda e tienila', style: theme.textTheme.labelLarge),
+                      Text(context.l10n.rangeSingComfortable, style: theme.textTheme.labelLarge),
                       const SizedBox(height: 8),
                       SizedBox(
                         height: 64,
@@ -346,7 +341,7 @@ class _FindingStartView extends StatelessWidget {
                                   style: theme.textTheme.displayMedium
                                       ?.copyWith(fontWeight: FontWeight.w800),
                                 )
-                              : Text('In ascolto…',
+                              : Text(context.l10n.rangeListening,
                                   style: theme.textTheme.titleMedium
                                       ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
                         ),
@@ -362,7 +357,7 @@ class _FindingStartView extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Quando la barra è piena, quella è la tua nota di partenza.',
+                        context.l10n.rangeStartHoldHint,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodySmall,
                       ),
@@ -379,7 +374,7 @@ class _FindingStartView extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: TextButton(
               onPressed: controller.cancel,
-              child: const Text('Annulla il test'),
+              child: Text(context.l10n.rangeCancelTest),
             ),
           ),
         ),
@@ -401,15 +396,16 @@ class _ResultView extends StatelessWidget {
     final lowest = state.lowestMidi;
     final highest = state.highestMidi;
     final previous = state.previousRecord;
+    final l10n = context.l10n;
 
     String? progressText;
     if (lowest != null && highest != null && previous != null) {
       final delta = (highest - lowest) - previous.spanSemitones;
       progressText = delta > 0
-          ? '+$delta semitoni rispetto all\'ultimo test 🎉'
+          ? '${l10n.rangeProgressBetter(delta)} 🎉'
           : delta == 0
-              ? 'Stessa ampiezza dell\'ultimo test'
-              : '$delta semitoni rispetto all\'ultimo test';
+              ? l10n.rangeProgressSame
+              : l10n.rangeProgressWorse(-delta);
     }
 
     return ListView(
@@ -423,7 +419,7 @@ class _ResultView extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                Text('La tua estensione',
+                Text(l10n.rangeYourRange,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(color: theme.colorScheme.onPrimaryContainer)),
                 const SizedBox(height: 8),
@@ -443,7 +439,7 @@ class _ResultView extends StatelessWidget {
                           ?.copyWith(color: theme.colorScheme.onPrimaryContainer)),
                 if (lowest != null && highest != null)
                   Text(
-                    '${formatSpan(highest - lowest)} (${highest - lowest} semitoni)',
+                    l10n.rangeSpanDetail(l10n.span(highest - lowest), highest - lowest),
                     style: theme.textTheme.titleMedium
                         ?.copyWith(color: theme.colorScheme.onPrimaryContainer),
                   ),
@@ -459,9 +455,7 @@ class _ResultView extends StatelessWidget {
               textAlign: TextAlign.center, style: TextStyle(color: theme.colorScheme.error)),
         const SizedBox(height: 20),
         Text(
-          lowest != null
-              ? 'Risultato salvato nel profilo: lo storico dei test ti mostra i progressi nel tempo.'
-              : '',
+          lowest != null ? l10n.rangeSavedToProfile : '',
           textAlign: TextAlign.center,
           style: theme.textTheme.bodySmall,
         ),
@@ -470,12 +464,12 @@ class _ResultView extends StatelessWidget {
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           onPressed: controller.start,
           icon: const Icon(Icons.refresh),
-          label: const Text('Riprova il test'),
+          label: Text(l10n.rangeRetryTest),
         ),
         const SizedBox(height: 10),
         OutlinedButton(
           onPressed: () => context.pop(),
-          child: const Text('Chiudi'),
+          child: Text(l10n.commonClose),
         ),
       ],
     );
@@ -507,9 +501,9 @@ class _RangeCoachState extends State<_RangeCoach> {
     final now = widget.state;
     final before = oldWidget.state;
     if (now.validatedCount > before.validatedCount) {
-      _flash(MascotMood.success, 'Bravo! Prossima nota.');
+      _flash(MascotMood.success, context.l10n.rangeCoachValidated);
     } else if (now.skippedCount > before.skippedCount) {
-      _flash(MascotMood.retry, 'Nessun problema, proviamo la prossima.');
+      _flash(MascotMood.retry, context.l10n.rangeCoachSkipped);
     }
   }
 
@@ -534,20 +528,15 @@ class _RangeCoachState extends State<_RangeCoach> {
   @override
   Widget build(BuildContext context) {
     final state = widget.state;
+    final l10n = context.l10n;
     final (mood, message) = switch (state.phase) {
-      RangePhase.setup => (
-          MascotMood.idle,
-          'Parti da una nota comoda: scendiamo insieme verso il grave.',
-        ),
-      RangePhase.findingStart => (
-          MascotMood.listening,
-          'Canta una nota comoda e tienila: la riconosco io.',
-        ),
-      RangePhase.descending => (MascotMood.listening, 'Canta la nota: andiamo verso il grave.'),
-      RangePhase.ascending => (MascotMood.listening, 'Ora saliamo verso l\'acuto!'),
+      RangePhase.setup => (MascotMood.idle, l10n.rangeCoachSetup),
+      RangePhase.findingStart => (MascotMood.listening, l10n.rangeCoachFindingStart),
+      RangePhase.descending => (MascotMood.listening, l10n.rangeCoachDescending),
+      RangePhase.ascending => (MascotMood.listening, l10n.rangeCoachAscending),
       RangePhase.done => state.lowestMidi != null
-          ? (MascotMood.success, 'Ecco la tua estensione! Ottimo lavoro.')
-          : (MascotMood.retry, 'Riproviamo partendo da una nota più comoda.'),
+          ? (MascotMood.success, l10n.rangeCoachDone)
+          : (MascotMood.retry, l10n.rangeCoachRetry),
     };
     return MascotCoach(
       mood: mood,

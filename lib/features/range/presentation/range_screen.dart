@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/app_theme.dart';
 import '../../../app/date_format.dart';
+import '../../../app/l10n.dart';
 import '../../../app/main_shell.dart';
 import '../../../app/neon_scene.dart';
 import '../../../app/note_text.dart';
@@ -27,6 +28,7 @@ class RangeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final notation = ref.watch(notationProvider);
     final ranges = ref.watch(rangeHistoryProvider).value ?? const <RangeRecord>[];
     final latest = ranges.isNotEmpty ? ranges.last : null;
@@ -36,7 +38,7 @@ class RangeScreen extends ConsumerWidget {
     ];
 
     return SectionScaffold(
-      title: 'Estensione vocale',
+      title: l10n.rangeSectionTitle,
       actions: const [StatusChips()],
       variant: SceneVariant.range,
       body: ListView(
@@ -51,15 +53,13 @@ class RangeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 22),
           Text(
-            'Scopri la tua estensione vocale',
+            l10n.rangeHeadline,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
           Text(
-            'Parti da una nota comoda: scendiamo fino alla più grave e saliamo fino '
-            'alla più acuta che riesci a cantare. Il risultato resta nel profilo per '
-            'seguire i progressi.',
+            l10n.rangeIntro,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -70,13 +70,13 @@ class RangeScreen extends ConsumerWidget {
           HeroButton(
             key: const ValueKey('range-start'),
             icon: Icons.graphic_eq_rounded,
-            label: latest == null ? 'Avvia test' : 'Rifai il test',
+            label: latest == null ? l10n.rangeStartTest : l10n.rangeRetakeTest,
             onPressed: () => pushFullScreen(context, ref, '/range-test'),
           ),
           const SizedBox(height: 22),
           if (latest == null)
             Text(
-              'Nessun test ancora: il tuo risultato comparirà qui.',
+              l10n.rangeNoTestsYet,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall,
             )
@@ -84,7 +84,7 @@ class RangeScreen extends ConsumerWidget {
             _LatestResult(record: latest, notation: notation),
           if (previous.isNotEmpty) ...[
             const SizedBox(height: 22),
-            Text('Test precedenti',
+            Text(l10n.rangePreviousTests,
                 style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
             const SizedBox(height: 8),
             Card(
@@ -105,7 +105,7 @@ class RangeScreen extends ConsumerWidget {
                 key: const ValueKey('range-history'),
                 onPressed: () => goToSection(context, ref, '/profile'),
                 icon: const Icon(Icons.history, size: 18),
-                label: const Text('Storico dei test nel profilo'),
+                label: Text(l10n.rangeHistoryInProfile),
               ),
             ),
         ],
@@ -127,6 +127,7 @@ class _LatestResult extends StatelessWidget {
     final colors = theme.colorScheme;
     final noteStyle = theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800);
     final caption = theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant);
+    final l10n = context.l10n;
 
     return Card(
       key: const ValueKey('range-latest'),
@@ -138,7 +139,7 @@ class _LatestResult extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text('Ultimo risultato',
+                  child: Text(l10n.rangeLatestResult,
                       style: theme.textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant)),
                 ),
                 Text(formatShortDate(record.timestamp), style: caption),
@@ -154,7 +155,7 @@ class _LatestResult extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              '${formatSpan(record.spanSemitones)} (${record.spanSemitones} semitoni)',
+              l10n.rangeSpanDetail(l10n.span(record.spanSemitones), record.spanSemitones),
               style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
             ),
             const SizedBox(height: 16),
@@ -165,7 +166,7 @@ class _LatestResult extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Più grave', style: caption),
+                    Text(l10n.rangeLowest, style: caption),
                     NoteText(spelledMidi(record.minMidi), notation: notation, style: noteStyle),
                   ],
                 ),
@@ -173,7 +174,7 @@ class _LatestResult extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('Più acuta', style: caption),
+                    Text(l10n.rangeHighest, style: caption),
                     NoteText(spelledMidi(record.maxMidi), notation: notation, style: noteStyle),
                   ],
                 ),
@@ -288,13 +289,13 @@ class _HistoryTile extends StatelessWidget {
         high: spelledMidi(record.maxMidi),
         notation: notation,
         style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-        suffix: '  (${formatSpan(record.spanSemitones)})',
+        suffix: '  (${context.l10n.span(record.spanSemitones)})',
       ),
       subtitle: Text(formatShortDate(record.timestamp)),
       trailing: delta == null || delta == 0
           ? null
           : Text(
-              '${delta > 0 ? '+' : ''}$delta st',
+              context.l10n.rangeDeltaShort('${delta > 0 ? '+' : ''}$delta'),
               style: theme.textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: delta > 0 ? decor.success : colors.error,
