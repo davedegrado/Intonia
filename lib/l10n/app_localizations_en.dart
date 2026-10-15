@@ -1168,4 +1168,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exercisesCreateFromExerciseHint => 'Copy an exercise and edit it freely';
+
+  @override
+  String profileSessionKeyOctave(String key, int octave) {
+    return '$key · Octave $octave';
+  }
+
+  @override
+  String get profileSessionTopRepeated => 'top note repeated';
 }

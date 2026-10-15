@@ -319,5 +319,7 @@
   "trainerRepeatTopHint": "Ripete la nota più alta prima di scendere",
   "exercisesCreateFromScratch": "Crea da zero",
   "exercisesCreateFromExercise": "Parti da un esercizio",
-  "exercisesCreateFromExerciseHint": "Copia un esercizio e modificalo liberamente"
+  "exercisesCreateFromExerciseHint": "Copia un esercizio e modificalo liberamente",
+  "profileSessionKeyOctave": "{key} · Ottava {octave}",
+  "profileSessionTopRepeated": "vertice ripetuto"
 }

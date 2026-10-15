@@ -209,6 +209,10 @@ class TrainerController extends Notifier<TrainerState> {
       stats: stats,
       exerciseId: _exercise.id,
       exerciseName: _exercise.name,
+      keySemitone: state.settings.key.semitone,
+      octave: state.settings.octave,
+      direction: (state.settings.direction ?? _exercise.defaultDirection).name,
+      repeatTop: state.settings.repeatTop,
     );
     unawaited(ref.read(sessionHistoryProvider.notifier).add(record));
     return record;

@@ -70,4 +70,36 @@ void main() {
       expect(computeStreak(const [], now), 0);
     });
   });
+
+  test('saves key, octave and mode; old records without them still load', () {
+    final record = SessionRecord(
+      timestamp: DateTime(2026, 10, 15, 9),
+      exerciseId: 'major',
+      exerciseName: 'Scala maggiore',
+      correct: 8,
+      errors: 2,
+      durationSeconds: 60,
+      perNote: const {},
+      keySemitone: 2,
+      octave: 3,
+      direction: 'complete',
+      repeatTop: true,
+    );
+    final copy = SessionRecord.fromJson(record.toJson());
+    expect(copy.keySemitone, 2);
+    expect(copy.octave, 3);
+    expect(copy.direction, 'complete');
+    expect(copy.repeatTop, isTrue);
+
+    final legacy = Map<String, dynamic>.from(record.toJson())
+      ..remove('keySemitone')
+      ..remove('octave')
+      ..remove('direction')
+      ..remove('repeatTop');
+    final old = SessionRecord.fromJson(legacy);
+    expect(old.keySemitone, isNull);
+    expect(old.octave, isNull);
+    expect(old.direction, isNull);
+    expect(old.correct, 8);
+  });
 }

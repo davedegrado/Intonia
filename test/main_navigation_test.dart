@@ -392,6 +392,31 @@ void main() {
     }
   });
 
+  testWidgets('history shows the saved key, octave and mode, and nothing invented for old sessions',
+      (tester) async {
+    final now = DateTime.now();
+    await _launch(tester, sessions: [
+      _session(now.subtract(const Duration(days: 1)), 'Vecchia sessione', 5, 5),
+      SessionRecord(
+        timestamp: now,
+        exerciseId: 'major',
+        exerciseName: 'Scala maggiore',
+        correct: 9,
+        errors: 1,
+        durationSeconds: 60,
+        perNote: const {},
+        keySemitone: 2,
+        octave: 3,
+        direction: 'complete',
+      ),
+    ]);
+    await _openTab(tester, 'Profilo');
+    await tester.scrollUntilVisible(find.text('Vecchia sessione'), 150,
+        scrollable: find.byType(Scrollable).first);
+    expect(find.textContaining('RE · Ottava 3 · Completo'), findsOneWidget);
+    expect(find.textContaining('Ottava'), findsOneWidget, reason: 'la sessione vecchia non ne ha');
+  });
+
   for (final (size, scale) in [
     (const Size(320, 568), 1.0),
     (const Size(360, 640), 1.3),

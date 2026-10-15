@@ -688,5 +688,17 @@
   "trainerRepeatTopHint": "Repeats the highest note before going down",
   "exercisesCreateFromScratch": "Start from scratch",
   "exercisesCreateFromExercise": "Start from an exercise",
-  "exercisesCreateFromExerciseHint": "Copy an exercise and edit it freely"
+  "exercisesCreateFromExerciseHint": "Copy an exercise and edit it freely",
+  "profileSessionKeyOctave": "{key} · Octave {octave}",
+  "@profileSessionKeyOctave": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      },
+      "octave": {
+        "type": "int"
+      }
+    }
+  },
+  "profileSessionTopRepeated": "top note repeated"
 }

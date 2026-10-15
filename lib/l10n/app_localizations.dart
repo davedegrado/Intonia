@@ -2012,6 +2012,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy an exercise and edit it freely'**
   String get exercisesCreateFromExerciseHint;
+
+  /// No description provided for @profileSessionKeyOctave.
+  ///
+  /// In en, this message translates to:
+  /// **'{key} · Octave {octave}'**
+  String profileSessionKeyOctave(String key, int octave);
+
+  /// No description provided for @profileSessionTopRepeated.
+  ///
+  /// In en, this message translates to:
+  /// **'top note repeated'**
+  String get profileSessionTopRepeated;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
