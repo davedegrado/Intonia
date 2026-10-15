@@ -2024,6 +2024,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'top note repeated'**
   String get profileSessionTopRepeated;
+
+  /// No description provided for @guideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Intonia guide'**
+  String get guideTitle;
+
+  /// No description provided for @guideOpenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Replay the tour of the app\'s features'**
+  String get guideOpenHint;
+
+  /// No description provided for @guideNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get guideNext;
+
+  /// No description provided for @guideDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get guideDone;
+
+  /// No description provided for @guideSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get guideSkip;
+
+  /// No description provided for @guideProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {total}'**
+  String guideProgress(int current, int total);
+
+  /// No description provided for @guideHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the microphone and sing or play a note: I\'ll tell you which note it is and how many cents off you are. At the top you\'ll find your streak and your exercise charges; at the bottom, quick access to note names, theme and settings.'**
+  String get guideHome;
+
+  /// No description provided for @guideExercises.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a category (triads, arpeggios, scales and more), open an exercise and press Play to train with your voice. Each session uses one charge. With Create your sequence you can write your own (Intonia Pro).'**
+  String get guideExercises;
+
+  /// No description provided for @guideExerciseSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise settings'**
+  String get guideExerciseSettingsTitle;
+
+  /// No description provided for @guideExerciseSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'In an exercise you choose the key and octave, the mode (Straight, Reverse or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.'**
+  String get guideExerciseSettings;
+
+  /// No description provided for @guideRange.
+  ///
+  /// In en, this message translates to:
+  /// **'The range test starts from a comfortable note, goes down to your lowest note and then up to your highest. The result shows the two extreme notes and the span in octaves and semitones; past tests are listed here and in your profile.'**
+  String get guideRange;
+
+  /// No description provided for @guideProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Your streak, sessions, total minutes, average accuracy, vocal range, best and worst notes, range tests and your recent sessions with key and octave.'**
+  String get guideProfile;
+
+  /// No description provided for @guideSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get guideSettingsTitle;
+
+  /// No description provided for @guideSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the language, the theme (System, Light, Dark or Neon) and the note names (C D E or DO RE MI). You can reopen this guide from here at any time.'**
+  String get guideSettings;
+
+  /// No description provided for @guideKey.
+  ///
+  /// In en, this message translates to:
+  /// **'The note the exercise starts from.'**
+  String get guideKey;
+
+  /// No description provided for @guideOctave.
+  ///
+  /// In en, this message translates to:
+  /// **'How high or low the exercise is: pick one that\'s comfortable for your voice.'**
+  String get guideOctave;
+
+  /// No description provided for @guideDirectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode'**
+  String get guideDirectionTitle;
+
+  /// No description provided for @guideDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'Straight plays the sequence forwards, Reverse plays it backwards, Full goes forwards and then comes back.'**
+  String get guideDirection;
+
+  /// No description provided for @guideRepeatTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Only in Full mode: you sing the highest note twice before going down.'**
+  String get guideRepeatTop;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

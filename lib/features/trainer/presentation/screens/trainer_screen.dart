@@ -10,6 +10,7 @@ import '../../../../core/music/note_spelling.dart';
 import '../../../../core/pitch/pitch_recognition_config.dart';
 import '../../../../core/session/session_record.dart';
 import '../../../../l10n/exercise_l10n.dart';
+import '../../../guide/guide.dart';
 import '../../../settings/application/settings_providers.dart';
 import '../../../mascot/presentation/mascot_coach.dart';
 import '../../domain/trainer_mascot_mood.dart';
@@ -102,6 +103,24 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
       appBar: AppBar(
         title: Text(l10n.exerciseName(widget.exercise)),
         actions: [
+          IconButton(
+            key: const ValueKey('trainer-guide'),
+            tooltip: l10n.guideTitle,
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              final exercise = widget.exercise;
+              final direction = state.settings.direction ?? exercise.defaultDirection;
+              showGuide(
+                context,
+                exerciseGuideSteps(
+                  l10n,
+                  // Le sequenze con nota di partenza fissa non hanno i selettori.
+                  hasKeyAndOctave: !(exercise.isCustom && exercise.rootMidi != null),
+                  hasRepeatTop: direction == PlaybackDirection.complete && exercise.hasApex,
+                ),
+              );
+            },
+          ),
           IconButton(
             tooltip: l10n.trainerAdvancedSettings,
             icon: const Icon(Icons.tune),

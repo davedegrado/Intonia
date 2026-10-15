@@ -32,6 +32,20 @@ class AppSettingsRepository {
     }
   }
 
+  /// Come [_read], ma null se le preferenze non sono leggibili (es. archivio
+  /// non disponibile): serve a non scambiare un errore per "mai visto".
+  Future<Map<String, dynamic>?> _readOrNull() async {
+    try {
+      final file = await _file();
+      if (!await file.exists()) {
+        return {};
+      }
+      return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _write(String key, Object? value) async {
     try {
       final json = await _read();
@@ -86,6 +100,15 @@ class AppSettingsRepository {
   Future<void> saveLanguage(String? languageCode) {
     return _write('language', languageCode);
   }
+
+  /// True se la guida è già stata vista (completata, saltata o chiusa);
+  /// null se le preferenze non sono leggibili.
+  Future<bool?> loadGuideSeen() async {
+    final json = await _readOrNull();
+    return json == null ? null : json['guideSeen'] == true;
+  }
+
+  Future<void> saveGuideSeen() => _write('guideSeen', true);
 
   /// Soglia RMS di silenzio calibrata sul rumore ambientale (null = default).
   Future<double?> loadNoiseThreshold() async {

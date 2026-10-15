@@ -13,6 +13,7 @@ import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
 import '../../../core/pitch/pitch_detection_result.dart';
 import '../../../core/pitch/pitch_recognition_config.dart';
+import '../../guide/guide.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
 import '../../settings/application/settings_providers.dart';
@@ -43,6 +44,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showGuideOnce());
+  }
+
+  /// Al primo avvio la mascotte presenta l'app una sola volta: completata,
+  /// saltata o chiusa, la guida non si ripropone (si riapre dalle Impostazioni).
+  Future<void> _showGuideOnce() async {
+    final repository = ref.read(appSettingsRepositoryProvider);
+    final seen = await repository.loadGuideSeen();
+    if (seen != false || !mounted) {
+      return;
+    }
+    await showGuide(context, appGuideSteps(context.l10n));
+    await repository.saveGuideSeen();
   }
 
   @override

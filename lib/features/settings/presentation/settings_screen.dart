@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/app_theme.dart' show AppThemeSetting;
 import '../../../app/l10n.dart';
 import '../../../core/music/note.dart';
+import '../../guide/guide.dart';
 import '../application/settings_providers.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -70,6 +71,16 @@ class SettingsScreen extends ConsumerWidget {
                   ref.read(notationProvider.notifier).setNotation(selection.first),
             ),
             const SizedBox(height: 28),
+            ListTile(
+              key: const ValueKey('settings-guide'),
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.school_outlined),
+              title: Text(l10n.guideTitle),
+              subtitle: Text(l10n.guideOpenHint),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showGuide(context, appGuideSteps(l10n)),
+            ),
+            const SizedBox(height: 20),
             Text(l10n.settingsInfo, style: sectionStyle),
             const SizedBox(height: 8),
             Text('${l10n.settingsAbout(version)}\n${l10n.settingsSoundCredit}',

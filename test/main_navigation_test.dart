@@ -73,6 +73,12 @@ class _MemorySettings extends AppSettingsRepository {
   Future<double?> loadNoiseThreshold() async => null;
   @override
   Future<void> saveNoiseThreshold(double threshold) async {}
+  // La guida del primo avvio è già stata vista, salvo nei test dedicati.
+  bool guideSeen = true;
+  @override
+  Future<bool?> loadGuideSeen() async => guideSeen;
+  @override
+  Future<void> saveGuideSeen() async => guideSeen = true;
 }
 
 SessionRecord _session(DateTime when, String name, int correct, int errors) => SessionRecord(
@@ -103,6 +109,7 @@ Future<_App> _launch(
   Size size = const Size(390, 844),
   AppThemeSetting theme = AppThemeSetting.dark,
   Locale device = const Locale('it'),
+  bool guideSeen = true,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -110,6 +117,7 @@ Future<_App> _launch(
 
   final app = _App(FakeMicrophonePitchService());
   app.settings.theme = theme;
+  app.settings.guideSeen = guideSeen;
   await tester.pumpWidget(ProviderScope(
     overrides: [
       microphonePitchServiceProvider.overrideWithValue(app.mic),
@@ -415,6 +423,70 @@ void main() {
         scrollable: find.byType(Scrollable).first);
     expect(find.textContaining('RE · Ottava 3 · Completo'), findsOneWidget);
     expect(find.textContaining('Ottava'), findsOneWidget, reason: 'la sessione vecchia non ne ha');
+  });
+
+  testWidgets('first launch: the mascot guide shows once, can be navigated and skipped',
+      (tester) async {
+    final app = await _launch(tester, guideSeen: false);
+    expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
+    expect(find.text('1 di 6'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('guide-next')));
+    await _frames(tester, 3);
+    expect(find.text('2 di 6'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('guide-back')));
+    await _frames(tester, 3);
+    expect(find.text('1 di 6'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('guide-skip')));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('guide-sheet')), findsNothing);
+    expect(app.settings.guideSeen, isTrue);
+    expect(app.settings.theme, AppThemeSetting.dark, reason: 'altre preferenze intatte');
+  });
+
+  testWidgets('the guide does not come back once seen and reopens from Settings', (tester) async {
+    await _launch(tester);
+    expect(find.byKey(const ValueKey('guide-sheet')), findsNothing);
+    await _openTab(tester, 'Profilo');
+    await tester.tap(find.byKey(const ValueKey('profile-settings')));
+    await _frames(tester, 5);
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('settings-guide')), 150,
+        scrollable: find.byType(Scrollable).first);
+    await tester.tap(find.byKey(const ValueKey('settings-guide')));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
+    for (var i = 0; i < 5; i++) {
+      await tester.tap(find.byKey(const ValueKey('guide-next')));
+      await _frames(tester, 2);
+    }
+    expect(find.text('6 di 6'), findsOneWidget);
+    expect(find.byKey(const ValueKey('guide-skip')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('guide-next')));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('guide-sheet')), findsNothing);
+  });
+
+  testWidgets('the exercise guide explains only the controls on screen', (tester) async {
+    await _launch(tester);
+    await _openTab(tester, 'Esercizi');
+    await tester.tap(find.text('Triadi'));
+    await _frames(tester, 5);
+    await tester.tap(find.widgetWithText(ListTile, 'Triade maggiore'));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('trainer-direction')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('trainer-guide')));
+    await _frames(tester, 5);
+    // Tonalità, ottava, modalità e vertice (la triade in Completo ha un vertice).
+    expect(find.text('1 di 4'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('guide-close')));
+    await _frames(tester, 5);
+
+    // In modalità Dritto il vertice non si ripete: niente spiegazione.
+    await tester.tap(find.text('Dritto'));
+    await _frames(tester, 2);
+    expect(find.byKey(const ValueKey('trainer-repeat-top')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('trainer-guide')));
+    await _frames(tester, 5);
+    expect(find.text('1 di 3'), findsOneWidget);
   });
 
   for (final (size, scale) in [

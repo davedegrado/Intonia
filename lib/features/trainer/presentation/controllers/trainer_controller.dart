@@ -188,6 +188,10 @@ class TrainerController extends Notifier<TrainerState> {
     _pitchSubscription = null;
     await _microphone.stop();
     await _audio.stopAll();
+    // Il provider può essere eliminato durante le attese (es. uscita).
+    if (!ref.mounted) {
+      return;
+    }
     if (state.isPlaying || state.isListening) {
       final finished = state.sessionStats.finish();
       _recordSession(finished);
