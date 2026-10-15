@@ -1,11 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
+import 'package:vocal_scale_trainer/l10n/app_localizations.dart';
 import 'package:vocal_scale_trainer/features/access/application/access_providers.dart';
 import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
 import 'package:vocal_scale_trainer/features/range/application/range_test_controller.dart';
+import 'package:vocal_scale_trainer/features/settings/application/settings_providers.dart';
+import 'package:vocal_scale_trainer/features/trainer/domain/trainer_state.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/training_settings.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/controllers/trainer_controller.dart';
 import 'package:vocal_scale_trainer/features/tuner/application/tuner_controller.dart';
@@ -20,6 +24,8 @@ ProviderContainer _container(FakeMicrophonePitchService mic, FakeMidiPro midi) {
       microphonePitchServiceProvider.overrideWithValue(mic),
       pianoAudioServiceProvider.overrideWithValue(PianoAudioService(midiPro: midi)),
       chargesRepositoryProvider.overrideWithValue(InMemoryChargesRepository()),
+      // I messaggi verificati sono in italiano.
+      deviceLocaleProvider.overrideWithValue(const Locale('it')),
     ],
   );
 }
@@ -94,7 +100,12 @@ void main() {
       final state = container.read(trainerControllerProvider);
       expect(state.isPlaying, isFalse);
       expect(state.isListening, isFalse);
-      expect(state.message, TrainerController.microphoneDeniedMessage);
+      expect(state.message, TrainerMessage.microphoneDenied);
+      // Il messaggio esiste in entrambe le lingue.
+      expect(lookupAppLocalizations(const Locale('it')).trainerMicrophoneDenied,
+          startsWith('Permesso microfono negato'));
+      expect(lookupAppLocalizations(const Locale('en')).trainerMicrophoneDenied,
+          startsWith('Microphone permission denied'));
     });
 
     test('stop during microphone start-up does not leave the microphone on', () async {

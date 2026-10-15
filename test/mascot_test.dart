@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
+import 'package:vocal_scale_trainer/l10n/app_localizations.dart';
 import 'package:vocal_scale_trainer/features/mascot/domain/mascot_mood.dart';
 import 'package:vocal_scale_trainer/features/mascot/presentation/intonia_mascot.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/note_progress.dart';
@@ -11,6 +12,9 @@ import 'package:vocal_scale_trainer/features/trainer/domain/training_state_machi
 
 Widget _host(Widget child, {Brightness brightness = Brightness.dark, bool reduceMotion = false}) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('it'),
     theme: ThemeData(brightness: brightness),
     home: MediaQuery(
       data: MediaQueryData(disableAnimations: reduceMotion),
@@ -18,6 +22,9 @@ Widget _host(Widget child, {Brightness brightness = Brightness.dark, bool reduce
     ),
   );
 }
+
+final _it = lookupAppLocalizations(const Locale('it'));
+final _en = lookupAppLocalizations(const Locale('en'));
 
 MascotPainter _painter(WidgetTester tester) {
   final paint = tester.widget<CustomPaint>(
@@ -227,7 +234,7 @@ void main() {
         validationState: TrainingValidationState.waitChange,
       );
       expect(mascotMoodForTrainer(state), MascotMood.success);
-      expect(mascotMessageForTrainer(state), 'Perfetto! Continua così.');
+      expect(mascotMessageForTrainer(state, _it), 'Perfetto! Continua così.');
     });
 
     test('retry when the current note was marked wrong', () {
@@ -238,14 +245,15 @@ void main() {
         validationState: TrainingValidationState.waitRetry,
       );
       expect(mascotMoodForTrainer(state), MascotMood.retry);
-      expect(mascotMessageForTrainer(state), 'Quasi! Prova ancora.');
+      expect(mascotMessageForTrainer(state, _it), 'Quasi! Prova ancora.');
+      expect(mascotMessageForTrainer(state, _en), 'Almost! Try again.');
     });
 
     test('messages follow the mode when idle or listening', () {
-      expect(mascotMessageForTrainer(_trainer()), 'Pronto ad allenare il tuo orecchio?');
-      expect(mascotMessageForTrainer(_trainer(isPlaying: true, mode: TrainerMode.listen)),
+      expect(mascotMessageForTrainer(_trainer(), _it), 'Pronto ad allenare il tuo orecchio?');
+      expect(mascotMessageForTrainer(_trainer(isPlaying: true, mode: TrainerMode.listen), _it),
           'Ascolta bene la sequenza…');
-      expect(mascotMessageForTrainer(_trainer(isPlaying: true, isListening: true)),
+      expect(mascotMessageForTrainer(_trainer(isPlaying: true, isListening: true), _it),
           'Canta la nota: ti ascolto.');
     });
 
@@ -255,6 +263,8 @@ void main() {
         currentIndex: 1,
       );
       expect(mascotMoodForTrainer(state), MascotMood.success);
+      expect(mascotMessageForTrainer(state, _it), 'Esercizio completato! Grande lavoro.');
+      expect(mascotMessageForTrainer(state, _en), 'Exercise complete! Great job.');
     });
   });
 }
