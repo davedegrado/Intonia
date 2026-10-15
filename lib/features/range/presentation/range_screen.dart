@@ -143,6 +143,7 @@ class _LatestResult extends StatelessWidget {
                       style: theme.textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant)),
                 ),
                 Text(formatShortDate(record.timestamp), style: caption),
+                _NotMineMenu(key: const ValueKey('range-latest-menu'), record: record),
               ],
             ),
             const SizedBox(height: 6),
@@ -292,15 +293,73 @@ class _HistoryTile extends StatelessWidget {
         suffix: '  (${context.l10n.span(record.spanSemitones)})',
       ),
       subtitle: Text(formatShortDate(record.timestamp)),
-      trailing: delta == null || delta == 0
-          ? null
-          : Text(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (delta != null && delta != 0)
+            Text(
               context.l10n.rangeDeltaShort('${delta > 0 ? '+' : ''}$delta'),
               style: theme.textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: delta > 0 ? decor.success : colors.error,
               ),
             ),
+          _NotMineMenu(record: record),
+        ],
+      ),
+    );
+  }
+}
+
+/// Conferma di "Non ero io": il test verrà tolto da risultati e storico.
+Future<bool> confirmNotMine(BuildContext context, RangeRecord record) async {
+  final l10n = context.l10n;
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(l10n.rangeNotMineTitle),
+      content: Text(l10n.rangeNotMineBody(formatShortDate(record.timestamp))),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.commonCancel)),
+        FilledButton(
+          key: const ValueKey('range-not-mine-confirm'),
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.rangeNotMineConfirm),
+        ),
+      ],
+    ),
+  );
+  return confirmed == true;
+}
+
+/// Menu di un test salvato con la voce "Non ero io".
+class _NotMineMenu extends ConsumerWidget {
+  const _NotMineMenu({required this.record, super.key});
+
+  final RangeRecord record;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return PopupMenuButton<void>(
+      tooltip: context.l10n.rangeNotMine,
+      icon: const Icon(Icons.more_vert),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          key: const ValueKey('range-not-mine'),
+          onTap: () async {
+            if (await confirmNotMine(context, record)) {
+              await ref.read(rangeHistoryProvider.notifier).remove(record);
+            }
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.person_off_outlined),
+              const SizedBox(width: 12),
+              Text(context.l10n.rangeNotMine),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

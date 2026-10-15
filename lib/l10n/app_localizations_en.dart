@@ -1244,4 +1244,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideRepeatTop =>
       'Only in Full mode: you sing the highest note twice before going down.';
+
+  @override
+  String get rangeNotMine => 'Not me';
+
+  @override
+  String get rangeNotMineResult => 'It wasn\'t me: remove this test';
+
+  @override
+  String get rangeNotMineTitle => 'Not your test?';
+
+  @override
+  String rangeNotMineBody(String date) {
+    return 'The test from $date will be removed from your results and history.';
+  }
+
+  @override
+  String get rangeNotMineConfirm => 'Remove';
 }

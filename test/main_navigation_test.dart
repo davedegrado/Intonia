@@ -489,6 +489,32 @@ void main() {
     expect(find.text('1 di 3'), findsOneWidget);
   });
 
+  testWidgets('"Not me" removes a range test from the results and the history', (tester) async {
+    final app = await _launch(tester, ranges: [
+      RangeRecord(timestamp: DateTime(2026, 10, 1, 9), minMidi: 45, maxMidi: 69),
+      RangeRecord(timestamp: DateTime(2026, 10, 14, 17, 23), minMidi: 33, maxMidi: 83),
+    ]);
+    await _openTab(tester, 'Estensione');
+    expect(find.text('14/10 17:23'), findsOneWidget);
+
+    await tester.tap(find.descendant(
+      of: find.byKey(const ValueKey('range-latest-menu')),
+      matching: find.byIcon(Icons.more_vert),
+    ));
+    await _frames(tester, 5);
+    await tester.tap(find.text('Non ero io'));
+    await _frames(tester, 5);
+    expect(find.text('Non era il tuo test?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('range-not-mine-confirm')));
+    await _frames(tester, 5);
+
+    expect(find.text('14/10 17:23'), findsNothing, reason: 'tolto dai risultati');
+    expect(find.text('01/10 09:00'), findsOneWidget, reason: 'il precedente diventa l\'ultimo');
+    final ranges = await _container(tester).read(rangeHistoryRepositoryProvider).load();
+    expect(ranges.map((r) => r.timestamp), [DateTime(2026, 10, 1, 9)], reason: 'e dallo storico');
+    expect(app.settings.theme, AppThemeSetting.dark);
+  });
+
   for (final (size, scale) in [
     (const Size(320, 568), 1.0),
     (const Size(360, 640), 1.3),

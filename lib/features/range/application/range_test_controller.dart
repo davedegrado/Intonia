@@ -315,6 +315,23 @@ class RangeTestController extends Notifier<RangeTestState> {
     }
   }
 
+  /// Test appena salvato (per "Non ero io").
+  RangeRecord? _savedRecord;
+
+  /// "Non ero io": toglie il test appena fatto dai risultati e dallo storico
+  /// e torna alla configurazione.
+  Future<void> discardLastResult() async {
+    final record = _savedRecord;
+    _savedRecord = null;
+    if (record != null) {
+      await ref.read(rangeHistoryProvider.notifier).remove(record);
+    }
+    if (!ref.mounted) {
+      return;
+    }
+    state = state.copyWith(phase: RangePhase.setup, isListening: false, clearMessage: true);
+  }
+
   Future<void> cancel() async {
     await _stopAudio();
     state = state.copyWith(phase: RangePhase.setup, isListening: false, clearMessage: true);
@@ -390,11 +407,9 @@ class RangeTestController extends Notifier<RangeTestState> {
     final lowest = state.lowestMidi;
     final highest = state.highestMidi;
     if (lowest != null && highest != null) {
-      unawaited(ref.read(rangeHistoryProvider.notifier).add(RangeRecord(
-            timestamp: DateTime.now(),
-            minMidi: lowest,
-            maxMidi: highest,
-          )));
+      final record = RangeRecord(timestamp: DateTime.now(), minMidi: lowest, maxMidi: highest);
+      _savedRecord = record;
+      unawaited(ref.read(rangeHistoryProvider.notifier).add(record));
     }
     state = state.copyWith(
       phase: RangePhase.done,

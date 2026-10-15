@@ -1246,4 +1246,21 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get guideRepeatTop =>
       'Solo in Completo: canti due volte la nota più alta prima di scendere.';
+
+  @override
+  String get rangeNotMine => 'Non ero io';
+
+  @override
+  String get rangeNotMineResult => 'Non ero io: togli questo test';
+
+  @override
+  String get rangeNotMineTitle => 'Non era il tuo test?';
+
+  @override
+  String rangeNotMineBody(String date) {
+    return 'Il test del $date verrà tolto dai risultati e dallo storico.';
+  }
+
+  @override
+  String get rangeNotMineConfirm => 'Togli';
 }

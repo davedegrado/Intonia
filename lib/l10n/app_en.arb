@@ -729,5 +729,17 @@
   "guideOctave": "How high or low the exercise is: pick one that's comfortable for your voice.",
   "guideDirectionTitle": "Mode",
   "guideDirection": "Straight plays the sequence forwards, Reverse plays it backwards, Full goes forwards and then comes back.",
-  "guideRepeatTop": "Only in Full mode: you sing the highest note twice before going down."
+  "guideRepeatTop": "Only in Full mode: you sing the highest note twice before going down.",
+  "rangeNotMine": "Not me",
+  "rangeNotMineResult": "It wasn't me: remove this test",
+  "rangeNotMineTitle": "Not your test?",
+  "rangeNotMineBody": "The test from {date} will be removed from your results and history.",
+  "@rangeNotMineBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "rangeNotMineConfirm": "Remove"
 }

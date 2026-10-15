@@ -2138,6 +2138,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only in Full mode: you sing the highest note twice before going down.'**
   String get guideRepeatTop;
+
+  /// No description provided for @rangeNotMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Not me'**
+  String get rangeNotMine;
+
+  /// No description provided for @rangeNotMineResult.
+  ///
+  /// In en, this message translates to:
+  /// **'It wasn\'t me: remove this test'**
+  String get rangeNotMineResult;
+
+  /// No description provided for @rangeNotMineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not your test?'**
+  String get rangeNotMineTitle;
+
+  /// No description provided for @rangeNotMineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The test from {date} will be removed from your results and history.'**
+  String rangeNotMineBody(String date);
+
+  /// No description provided for @rangeNotMineConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get rangeNotMineConfirm;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
