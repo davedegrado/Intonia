@@ -3,6 +3,8 @@ package io.github.davedegrado.intonia
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Color
 import android.view.View
 import android.widget.RemoteViews
@@ -33,9 +35,10 @@ class IntoniaWidgetProvider : HomeWidgetProvider() {
             streakAtLastTraining = widgetData.getString(KEY_STREAK, null)?.toIntOrNull() ?: 0,
             now = Calendar.getInstance(),
         )
+    val res = localizedResources(context, widgetData.getString(KEY_LANGUAGE, null))
     for (widgetId in appWidgetIds) {
       val views = RemoteViews(context.packageName, R.layout.widget_intonia)
-      bind(context, views, content)
+      bind(res, views, content)
       views.setOnClickPendingIntent(
           R.id.widget_root,
           HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
@@ -45,11 +48,20 @@ class IntoniaWidgetProvider : HomeWidgetProvider() {
   }
 
   /**
-   * Testi dalle risorse Android: inglese di base (res/values), italiano in
-   * res/values-it. Il widget segue la lingua del dispositivo.
+   * Risorse nella lingua scelta nell'app ([languageCode], salvata da
+   * HomeWidgetService); senza indicazioni, quella del dispositivo. Testi:
+   * inglese di base (res/values), italiano in res/values-it.
    */
-  private fun bind(context: Context, views: RemoteViews, content: WidgetContent) {
-    val res = context.resources
+  private fun localizedResources(context: Context, languageCode: String?): Resources {
+    if (languageCode.isNullOrBlank()) {
+      return context.resources
+    }
+    val configuration = Configuration(context.resources.configuration)
+    configuration.setLocale(Locale(languageCode))
+    return context.createConfigurationContext(configuration).resources
+  }
+
+  private fun bind(res: Resources, views: RemoteViews, content: WidgetContent) {
     val title =
         when (content.status) {
           WidgetStatus.START -> res.getString(R.string.widget_default_title)
@@ -108,6 +120,7 @@ class IntoniaWidgetProvider : HomeWidgetProvider() {
   companion object {
     const val KEY_LAST_TRAINING_DAY = "intonia_last_training_day"
     const val KEY_STREAK = "intonia_streak_at_last_training"
+    const val KEY_LANGUAGE = "intonia_language"
 
     private val DAY_IDS =
         intArrayOf(

@@ -19,6 +19,11 @@ Ordine di scelta (`appLocaleProvider`): lingua scelta nelle Impostazioni
 (salvata in `app_settings.json`, chiave `language`) → lingua del dispositivo se
 supportata → inglese.
 
+Il widget della schermata Home usa la stessa lingua dell'app: l'app la salva
+nei dati condivisi (`intonia_language`, vedi `HomeWidgetService`) a ogni avvio
+e a ogni cambio; finché non l'ha mai salvata, il widget segue la lingua del
+dispositivo.
+
 ## Notazione delle note
 
 Indipendente dalla lingua. Default per chi non ha mai salvato una scelta:
