@@ -1,9 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/app_theme.dart' show brandCyan, brandIndigo, brandViolet;
+import '../../../app/app_theme.dart';
 import '../../../app/date_format.dart';
 import '../../../app/main_shell.dart';
+import '../../../app/neon_scene.dart';
 import '../../../app/note_text.dart';
 import '../../../app/status_chips.dart';
 import '../../../core/music/note.dart';
@@ -32,23 +35,25 @@ class RangeScreen extends ConsumerWidget {
         (record: ranges[i], before: i > 0 ? ranges[i - 1] : null),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Estensione vocale'),
-        actions: const [StatusChips()],
-      ),
+    return SectionScaffold(
+      title: 'Estensione vocale',
+      actions: const [StatusChips()],
+      variant: SceneVariant.range,
       body: ListView(
         key: const PageStorageKey('range-list'),
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
           const Center(
-            child: IntoniaMascot(mood: MascotMood.idle, size: 150),
+            child: MascotStage(
+              size: 150,
+              child: IntoniaMascot(mood: MascotMood.idle, size: 150),
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 22),
           Text(
             'Scopri la tua estensione vocale',
             textAlign: TextAlign.center,
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
           Text(
@@ -56,17 +61,19 @@ class RangeScreen extends ConsumerWidget {
             'alla più acuta che riesci a cantare. Il risultato resta nel profilo per '
             'seguire i progressi.',
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.4,
+            ),
           ),
-          const SizedBox(height: 20),
-          FilledButton.icon(
+          const SizedBox(height: 22),
+          HeroButton(
             key: const ValueKey('range-start'),
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+            icon: Icons.graphic_eq_rounded,
+            label: latest == null ? 'Avvia test' : 'Rifai il test',
             onPressed: () => pushFullScreen(context, ref, '/range-test'),
-            icon: const Icon(Icons.graphic_eq),
-            label: Text(latest == null ? 'Avvia test' : 'Rifai il test'),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 22),
           if (latest == null)
             Text(
               'Nessun test ancora: il tuo risultato comparirà qui.',
@@ -76,23 +83,20 @@ class RangeScreen extends ConsumerWidget {
           else
             _LatestResult(record: latest, notation: notation),
           if (previous.isNotEmpty) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             Text('Test precedenti',
                 style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-            const SizedBox(height: 4),
-            for (final item in previous)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-                leading: const Icon(Icons.height),
-                title: NoteRangeText(
-                  low: spelledMidi(item.record.minMidi),
-                  high: spelledMidi(item.record.maxMidi),
-                  notation: notation,
-                  suffix: '  (${formatSpan(item.record.spanSemitones)})',
-                ),
-                subtitle: Text(formatShortDate(item.record.timestamp)),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  for (final (index, item) in previous.indexed) ...[
+                    if (index > 0) const Divider(height: 1, indent: 16, endIndent: 16),
+                    _HistoryTile(record: item.record, before: item.before, notation: notation),
+                  ],
+                ],
               ),
+            ),
           ],
           if (ranges.length > 1)
             Align(
@@ -110,7 +114,7 @@ class RangeScreen extends ConsumerWidget {
   }
 }
 
-/// Ultimo test salvato: estensione, ampiezza e data.
+/// Ultimo test salvato: note estreme, ampiezza, posizione sulla tastiera e data.
 class _LatestResult extends StatelessWidget {
   const _LatestResult({required this.record, required this.notation});
 
@@ -121,49 +125,181 @@ class _LatestResult extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final noteStyle = theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700);
+    final noteStyle = theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800);
+    final caption = theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant);
 
     return Card(
       key: const ValueKey('range-latest'),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Ultimo risultato', style: theme.textTheme.labelLarge),
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Ultimo risultato',
+                      style: theme.textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant)),
+                ),
+                Text(formatShortDate(record.timestamp), style: caption),
+              ],
+            ),
             const SizedBox(height: 6),
             NoteRangeText(
               low: spelledMidi(record.minMidi),
               high: spelledMidi(record.maxMidi),
               notation: notation,
-              style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+              style: theme.textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w800),
               octaveColor: colors.onSurfaceVariant,
             ),
+            const SizedBox(height: 2),
             Text(
               '${formatSpan(record.spanSemitones)} (${record.spanSemitones} semitoni)',
-              style: theme.textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
             ),
-            const SizedBox(height: 12),
-            Container(
-              height: 8,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                gradient: const LinearGradient(colors: [brandCyan, brandIndigo, brandViolet]),
-              ),
-            ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 16),
+            _RangeBar(low: record.minMidi, high: record.maxMidi),
+            const SizedBox(height: 8),
             Row(
               children: [
-                NoteText(spelledMidi(record.minMidi), notation: notation, style: noteStyle),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Più grave', style: caption),
+                    NoteText(spelledMidi(record.minMidi), notation: notation, style: noteStyle),
+                  ],
+                ),
                 const Spacer(),
-                NoteText(spelledMidi(record.maxMidi), notation: notation, style: noteStyle),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('Più acuta', style: caption),
+                    NoteText(spelledMidi(record.maxMidi), notation: notation, style: noteStyle),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(formatShortDate(record.timestamp), style: theme.textTheme.bodySmall),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Estensione sulla tastiera: binario neutro (DO2–DO6, allargato se serve) e
+/// tratto colorato fra la nota più grave e la più acuta.
+class _RangeBar extends StatelessWidget {
+  const _RangeBar({required this.low, required this.high});
+
+  final int low;
+  final int high;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final decor = context.decor;
+    final from = math.min(36, low - 2);
+    final to = math.max(84, high + 2);
+    final start = (low - from) / (to - from);
+    final end = (high - from) / (to - from);
+
+    return SizedBox(
+      height: 18,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          Widget marker(double fraction) => Positioned(
+                left: width * fraction - 9,
+                top: 0,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.surface,
+                    border: Border.all(color: colors.onSurface, width: 3),
+                    boxShadow: decor.ambient
+                        ? [
+                            BoxShadow(
+                              color: decor.heroBorder.withValues(alpha: 0.6),
+                              blurRadius: 10,
+                            ),
+                          ]
+                        : null,
+                  ),
+                ),
+              );
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 6,
+                child: Container(
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: colors.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: width * start,
+                width: width * (end - start),
+                top: 4,
+                child: Container(
+                  height: 10,
+                  decoration: BoxDecoration(
+                    gradient: decor.spectrum,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ),
+              marker(start),
+              marker(end),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Un test precedente con la variazione rispetto al test prima.
+class _HistoryTile extends StatelessWidget {
+  const _HistoryTile({required this.record, required this.before, required this.notation});
+
+  final RangeRecord record;
+  final RangeRecord? before;
+  final NoteNotation notation;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final decor = context.decor;
+    final delta = before == null ? null : record.spanSemitones - before!.spanSemitones;
+
+    return ListTile(
+      leading: AccentIcon(icon: Icons.height_rounded, color: decor.accent(2), size: 40),
+      title: NoteRangeText(
+        low: spelledMidi(record.minMidi),
+        high: spelledMidi(record.maxMidi),
+        notation: notation,
+        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+        suffix: '  (${formatSpan(record.spanSemitones)})',
+      ),
+      subtitle: Text(formatShortDate(record.timestamp)),
+      trailing: delta == null || delta == 0
+          ? null
+          : Text(
+              '${delta > 0 ? '+' : ''}$delta st',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: delta > 0 ? decor.success : colors.error,
+              ),
+            ),
     );
   }
 }

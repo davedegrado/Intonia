@@ -96,12 +96,14 @@ Future<_App> _launch(
   List<SessionRecord> sessions = const [],
   List<RangeRecord> ranges = const [],
   Size size = const Size(390, 844),
+  AppThemeSetting theme = AppThemeSetting.dark,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
   final app = _App(FakeMicrophonePitchService());
+  app.settings.theme = theme;
   await tester.pumpWidget(ProviderScope(
     overrides: [
       microphonePitchServiceProvider.overrideWithValue(app.mic),
@@ -272,8 +274,9 @@ void main() {
     expect(find.text('Inizia il test'), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
-    await _frames(tester, 5);
-    expect(find.text('Scopri la tua estensione vocale'), findsOneWidget);
+    await _frames(tester, 10);
+    expect(find.byKey(const ValueKey('range-start')), findsOneWidget);
+    expect(find.byType(NavigationBar).hitTestable(), findsOneWidget);
   });
 
   testWidgets('range section without tests invents no result', (tester) async {
@@ -322,12 +325,64 @@ void main() {
     await _frames(tester, 5);
     await tester.tap(find.widgetWithText(ListTile, 'Neon'));
     await _frames(tester, 5);
-    expect(Theme.of(tester.element(home)).scaffoldBackgroundColor, const Color(0xFF0D0D1A));
+    expect(Theme.of(tester.element(home)).scaffoldBackgroundColor, const Color(0xFF0B0B1C));
 
     await tester.tap(find.byKey(const ValueKey('quick-notation')));
     await _frames(tester, 2);
     expect(app.settings.notation, NoteNotation.english);
     expect(find.text('C D E'), findsOneWidget);
+  });
+
+  testWidgets('ambient decorations exist only in the Neon theme', (tester) async {
+    for (final theme in AppThemeSetting.values) {
+      final now = DateTime.now();
+      await _launch(tester,
+          theme: theme, ranges: [RangeRecord(timestamp: now, minMidi: 40, maxMidi: 70)]);
+      final neon = theme == AppThemeSetting.neon;
+      for (final label in ['Home', 'Esercizi', 'Estensione', 'Profilo']) {
+        await _openTab(tester, label);
+        expect(find.byKey(const ValueKey('neon-scene')), neon ? findsOneWidget : findsNothing,
+            reason: '$theme $label');
+        if (label == 'Home' || label == 'Estensione') {
+          expect(find.byKey(const ValueKey('mascot-halo')), neon ? findsOneWidget : findsNothing,
+              reason: '$theme $label');
+        }
+      }
+      // Nuova app per il tema successivo.
+      await tester.pumpWidget(const SizedBox());
+    }
+  });
+
+  testWidgets('the layout is identical in every theme', (tester) async {
+    const keys = {
+      'Home': ['home-bubble', 'home-mascot', 'home-mic', 'home-note-card', 'quick-theme'],
+      'Esercizi': ['create-sequence'],
+      'Estensione': ['range-start', 'range-latest'],
+      'Profilo': ['streak-card'],
+    };
+    Map<String, Rect>? reference;
+    for (final theme in AppThemeSetting.values) {
+      final now = DateTime.now();
+      await _launch(
+        tester,
+        theme: theme,
+        sessions: [_session(now, 'Triade maggiore', 8, 2)],
+        ranges: [RangeRecord(timestamp: now, minMidi: 40, maxMidi: 70)],
+      );
+      final rects = <String, Rect>{};
+      for (final entry in keys.entries) {
+        await _openTab(tester, entry.key);
+        for (final key in entry.value) {
+          rects[key] = tester.getRect(find.byKey(ValueKey(key)));
+        }
+      }
+      if (reference == null) {
+        reference = rects;
+      } else {
+        expect(rects, reference, reason: '$theme');
+      }
+      await tester.pumpWidget(const SizedBox());
+    }
   });
 
   for (final (size, scale) in [

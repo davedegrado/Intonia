@@ -4,10 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/session/session_record.dart';
 import '../features/access/presentation/charges_widgets.dart';
 import '../features/profile/application/history_providers.dart';
+import 'app_theme.dart';
 import 'main_shell.dart';
-
-/// Colore della serie giornaliera (fiamma).
-const streakColor = Color(0xFFF97316);
 
 /// Serie giornaliera e cariche, per la barra in alto delle sezioni principali.
 class StatusChips extends StatelessWidget {
@@ -40,7 +38,7 @@ class StreakChip extends ConsumerWidget {
     return StatusPill(
       key: const ValueKey('streak-chip'),
       icon: Icons.local_fire_department,
-      iconColor: streak > 0 ? streakColor : Theme.of(context).colorScheme.outline,
+      iconColor: streak > 0 ? context.decor.streak : Theme.of(context).colorScheme.outline,
       label: '$streak',
       semanticLabel: streak == 1 ? 'Serie: 1 giorno di fila' : 'Serie: $streak giorni di fila',
       onTap: () => goToSection(context, ref, '/profile'),

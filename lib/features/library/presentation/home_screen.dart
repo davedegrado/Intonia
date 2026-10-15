@@ -3,8 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/app_theme.dart' show AppThemeSetting, brandCyan, brandIndigo, brandViolet;
+import '../../../app/app_theme.dart';
 import '../../../app/main_shell.dart';
+import '../../../app/neon_scene.dart';
 import '../../../app/note_text.dart';
 import '../../../app/status_chips.dart';
 import '../../../core/music/note.dart';
@@ -30,6 +31,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   /// Ultima nota riconosciuta in questa apertura dell'app (non salvata).
   PitchDetectionResult? _lastNote;
 
+  /// Festa della mascotte quando la nota diventa intonata (al massimo una
+  /// ogni [_celebrationGap], così non "saltella" di continuo).
+  static const _celebrationGap = Duration(seconds: 3);
+  bool _wasInTune = false;
+  DateTime? _lastCelebration;
+  int _reactionId = 0;
+
   @override
   void initState() {
     super.initState();
@@ -51,14 +59,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     }
   }
 
+  void _onTuner(TunerState? previous, TunerState next) {
+    final detection = next.detection;
+    final stable = next.active && detection != null && detection.isStable;
+    final inTune = stable && detection.cents.abs() <= PitchRecognitionConfig.inTuneCents;
+    var celebrate = false;
+    if (inTune && !_wasInTune) {
+      final now = DateTime.now();
+      final last = _lastCelebration;
+      if (last == null || now.difference(last) >= _celebrationGap) {
+        _lastCelebration = now;
+        celebrate = true;
+      }
+    }
+    _wasInTune = inTune;
+    if (stable || celebrate) {
+      setState(() {
+        if (stable) {
+          _lastNote = detection;
+        }
+        if (celebrate) {
+          _reactionId++;
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    ref.listen(tunerControllerProvider, (previous, next) {
-      final detection = next.detection;
-      if (detection != null && detection.isStable) {
-        setState(() => _lastNote = detection);
-      }
-    });
+    ref.listen(tunerControllerProvider, _onTuner);
     final theme = Theme.of(context);
     final tuner = ref.watch(tunerControllerProvider);
     final detection = tuner.detection;
@@ -75,11 +104,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     ? 'Perfettamente intonata!'
                     : 'Ci sei quasi: aggiusta un pochino.';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Intonia'),
-        actions: const [StatusChips()],
-      ),
+    return SectionScaffold(
+      title: 'Intonia',
+      actions: const [StatusChips()],
+      variant: SceneVariant.home,
       body: SafeArea(
         bottom: false,
         child: LayoutBuilder(
@@ -87,8 +115,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             // Mascotte e microfono si adattano all'altezza disponibile; sotto
             // una certa altezza la pagina scorre invece di andare in overflow.
             final height = math.max(constraints.maxHeight, 480.0);
-            final mascotSize = (height * 0.30).clamp(110.0, 260.0);
-            final micSize = (height * 0.17).clamp(84.0, 128.0);
+            final mascotSize = (height * 0.31).clamp(110.0, 270.0);
+            final micSize = (height * 0.16).clamp(84.0, 124.0);
 
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
@@ -97,18 +125,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _SpeechBubble(
-                      message: message,
-                      isError: tuner.permissionDenied,
-                    ),
-                    const SizedBox(height: 4),
-                    IntoniaMascot(
-                      key: const ValueKey('home-mascot'),
-                      mood: tuner.active ? MascotMood.listening : MascotMood.idle,
+                    _SpeechBubble(message: message, isError: tuner.permissionDenied),
+                    const SizedBox(height: 6),
+                    MascotStage(
                       size: mascotSize,
-                      greetOnAppear: true,
+                      child: IntoniaMascot(
+                        key: const ValueKey('home-mascot'),
+                        mood: tuner.active ? MascotMood.listening : MascotMood.idle,
+                        reaction: _reactionId == 0
+                            ? null
+                            : MascotReaction(mood: MascotMood.success, id: _reactionId),
+                        size: mascotSize,
+                        greetOnAppear: true,
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 14),
                     _MicButton(
                       size: micSize,
                       active: tuner.active,
@@ -117,16 +148,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         tuner.active ? controller.stop() : controller.start();
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       tuner.active ? 'Ferma ascolto' : 'Avvia ascolto',
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 16),
-                    _NoteCard(
-                      detection: hasPitch ? detection : _lastNote,
-                      live: hasPitch,
-                    ),
+                    _NoteCard(detection: hasPitch ? detection : _lastNote, live: hasPitch),
                     const SizedBox(height: 12),
                     const _QuickActions(),
                   ],
@@ -140,7 +168,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   }
 }
 
-/// Fumetto della mascotte.
+/// Fumetto della mascotte, con la punta verso di lei.
 class _SpeechBubble extends StatelessWidget {
   const _SpeechBubble({required this.message, this.isError = false});
 
@@ -151,36 +179,89 @@ class _SpeechBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final decor = context.decor;
+    final border = isError
+        ? colors.error
+        : decor.ambient
+            ? decor.heroBorder.withValues(alpha: 0.55)
+            : colors.outlineVariant;
+    final fill = decor.ambient ? colors.surface.withValues(alpha: 0.92) : colors.surface;
+
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 300),
-      child: Container(
-        key: const ValueKey('home-bubble'),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isError ? colors.error : colors.primary.withValues(alpha: 0.6),
-          ),
-        ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: Text(
-            message,
-            key: ValueKey(message),
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: isError ? colors.error : null,
-              fontWeight: FontWeight.w600,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            key: const ValueKey('home-bubble'),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            decoration: BoxDecoration(
+              color: fill,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: border, width: 1.2),
+              boxShadow: decor.ambient
+                  ? [
+                      BoxShadow(
+                        color: decor.glow.withValues(alpha: 0.35),
+                        blurRadius: 18,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Text(
+                message,
+                key: ValueKey(message),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: isError ? colors.error : colors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
+                ),
+              ),
             ),
           ),
-        ),
+          CustomPaint(
+            size: const Size(22, 10),
+            painter: _BubbleTailPainter(fill: fill, border: border),
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Grande pulsante circolare del riconoscimento, con alone luminoso.
+class _BubbleTailPainter extends CustomPainter {
+  const _BubbleTailPainter({required this.fill, required this.border});
+
+  final Color fill;
+  final Color border;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(0, -1)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, -1);
+    canvas
+      ..drawPath(path, Paint()..color = fill)
+      ..drawPath(
+        path,
+        Paint()
+          ..color = border
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2,
+      );
+  }
+
+  @override
+  bool shouldRepaint(_BubbleTailPainter oldDelegate) =>
+      oldDelegate.fill != fill || oldDelegate.border != border;
+}
+
+/// Grande pulsante circolare del riconoscimento. Stessa forma in ogni tema;
+/// in Neon con sfumatura viola, anello ciano e ombra colorata.
 class _MicButton extends StatefulWidget {
   const _MicButton({required this.size, required this.active, required this.onPressed});
 
@@ -231,31 +312,42 @@ class _MicButtonState extends State<_MicButton> with SingleTickerProviderStateMi
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final decor = context.decor;
     final size = widget.size;
-    final ring = size * 0.15;
+    final ring = size * 0.14;
+    final ringColor = decor.ambient ? decor.heroBorder : colors.outlineVariant;
 
     return Semantics(
       button: true,
       label: widget.active ? 'Ferma il riconoscimento' : 'Avvia il riconoscimento delle note',
-      child: SizedBox(
-        width: size + ring * 2,
-        height: size + ring * 2,
+      child: SizedBox.square(
+        dimension: size + ring * 2,
         child: Stack(
           alignment: Alignment.center,
           children: [
+            // Anello esterno fisso.
+            Container(
+              width: size + ring,
+              height: size + ring,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: ringColor.withValues(alpha: 0.45), width: 1.5),
+              ),
+            ),
             // Onda che si espande durante l'ascolto.
             AnimatedBuilder(
               animation: _pulse,
               builder: (context, _) {
                 final t = _pulse.value;
                 return Opacity(
-                  opacity: widget.active ? (1 - t) * 0.7 : 0,
+                  opacity: widget.active ? (1 - t) * 0.8 : 0,
                   child: Container(
                     width: size + ring * 2 * t,
                     height: size + ring * 2 * t,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: brandCyan, width: 3),
+                      border: Border.all(color: decor.heroBorder, width: 3),
                     ),
                   ),
                 );
@@ -266,19 +358,27 @@ class _MicButtonState extends State<_MicButton> with SingleTickerProviderStateMi
               height: size,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: widget.active ? [brandCyan, brandIndigo] : [brandIndigo, brandViolet],
+                gradient: decor.heroGradient,
+                // Bordo presente in ogni tema (trasparente fuori da Neon): la
+                // geometria del pulsante non cambia.
+                border: Border.all(
+                  color:
+                      decor.ambient ? decor.heroBorder.withValues(alpha: 0.9) : Colors.transparent,
+                  width: 2.5,
                 ),
-                border: Border.all(color: brandCyan.withValues(alpha: 0.8), width: 3),
-                boxShadow: [
-                  BoxShadow(
-                    color: (widget.active ? brandCyan : brandIndigo).withValues(alpha: 0.45),
-                    blurRadius: size * 0.3,
-                    spreadRadius: 2,
-                  ),
-                ],
+                boxShadow: decor.ambient
+                    ? [
+                        BoxShadow(
+                          color: decor.glow.withValues(alpha: 0.55),
+                          blurRadius: size * 0.35,
+                          spreadRadius: 2,
+                        ),
+                        BoxShadow(
+                          color: decor.heroBorder.withValues(alpha: 0.25),
+                          blurRadius: size * 0.12,
+                        ),
+                      ]
+                    : null,
               ),
               child: Material(
                 type: MaterialType.transparency,
@@ -287,9 +387,9 @@ class _MicButtonState extends State<_MicButton> with SingleTickerProviderStateMi
                   customBorder: const CircleBorder(),
                   onTap: widget.onPressed,
                   child: Icon(
-                    widget.active ? Icons.stop_rounded : Icons.mic,
-                    size: size * 0.42,
-                    color: Colors.white,
+                    widget.active ? Icons.stop_rounded : Icons.mic_rounded,
+                    size: size * 0.44,
+                    color: decor.onHero,
                   ),
                 ),
               ),
@@ -301,8 +401,9 @@ class _MicButtonState extends State<_MicButton> with SingleTickerProviderStateMi
   }
 }
 
-/// Nota riconosciuta (in diretta) o l'ultima riconosciuta, con lo scostamento.
-/// Altezza fissa: la pagina non "salta" quando compare la prima nota.
+/// Nota riconosciuta (in diretta) o l'ultima riconosciuta: il nome della nota
+/// in grande, lo scostamento in secondo piano. Altezza fissa, così la pagina
+/// non "salta" quando compare la prima nota.
 class _NoteCard extends ConsumerWidget {
   const _NoteCard({required this.detection, required this.live});
 
@@ -313,14 +414,16 @@ class _NoteCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final decor = context.decor;
     final notation = ref.watch(notationProvider);
     final detection = this.detection;
 
     return SizedBox(
-      height: 76,
+      height: 84,
       child: Card(
+        key: const ValueKey('home-note-card'),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
           child: detection == null
               ? Center(
                   child: Text(
@@ -336,35 +439,40 @@ class _NoteCard extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Text(live ? 'Nota rilevata' : 'Ultima nota',
+                              style: theme.textTheme.labelMedium
+                                  ?.copyWith(color: colors.onSurfaceVariant)),
                           NoteText(
                             NoteSpeller.spellRoot(detection.note),
                             notation: notation,
-                            style: theme.textTheme.headlineSmall?.copyWith(
+                            style: theme.textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.w800,
-                              color: colors.primary,
+                              color: colors.onSurface,
                               height: 1.1,
                             ),
                             octaveColor: colors.onSurfaceVariant,
                           ),
-                          Text(live ? 'Nota rilevata' : 'Ultima nota',
-                              style: theme.textTheme.labelSmall),
                         ],
                       ),
                     ),
+                    Container(width: 1, height: 44, color: colors.outlineVariant),
+                    const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Text('Scostamento',
+                            style: theme.textTheme.labelMedium
+                                ?.copyWith(color: colors.onSurfaceVariant)),
                         Text(
                           '${detection.cents >= 0 ? '+' : ''}${detection.cents.toStringAsFixed(0)} cent',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             color: detection.cents.abs() <= PitchRecognitionConfig.inTuneCents
-                                ? const Color(0xFF22C55E)
+                                ? decor.success
                                 : colors.error,
                           ),
                         ),
-                        Text('Scostamento', style: theme.textTheme.labelSmall),
                       ],
                     ),
                   ],
@@ -375,7 +483,7 @@ class _NoteCard extends ConsumerWidget {
   }
 }
 
-/// Accesso rapido: notazione, tema, impostazioni.
+/// Accesso rapido (secondario): notazione, tema, impostazioni.
 class _QuickActions extends ConsumerWidget {
   const _QuickActions();
 
@@ -402,7 +510,7 @@ class _QuickActions extends ConsumerWidget {
           Expanded(
             child: _QuickAction(
               key: const ValueKey('quick-theme'),
-              icon: Icons.brightness_6_outlined,
+              icon: Icons.palette_outlined,
               label: 'Tema',
               value: themeLabel(themeSetting),
               onTap: () => _chooseTheme(context, ref),
@@ -476,27 +584,27 @@ class _QuickAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: theme.colorScheme.primary),
+              Icon(icon, size: 20, color: colors.onSurfaceVariant),
               const SizedBox(height: 4),
               Text(label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600)),
               if (value != null)
                 Text(value!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelSmall
-                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                    style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant)),
             ],
           ),
         ),
