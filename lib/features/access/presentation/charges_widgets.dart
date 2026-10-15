@@ -5,21 +5,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/app_theme.dart';
+import '../../../app/l10n.dart';
 import '../application/access_providers.dart';
 import '../domain/charge_ledger.dart';
 
-/// "2 h 15 min", "45 min", "meno di 1 min".
-String formatWait(Duration wait) {
+/// "2 h 15 min", "45 min", "meno di 1 min" / "less than 1 min".
+String formatWait(AppLocalizations l10n, Duration wait) {
   final minutes = (wait.inSeconds / 60).ceil();
   if (minutes <= 0) {
-    return 'meno di 1 min';
+    return l10n.chargesWaitUnderMinute;
   }
   final hours = minutes ~/ 60;
   final rest = minutes % 60;
   if (hours == 0) {
-    return '$rest min';
+    return l10n.chargesWaitMinutes(rest);
   }
-  return rest == 0 ? '$hours h' : '$hours h $rest min';
+  return rest == 0 ? l10n.chargesWaitHours(hours) : l10n.chargesWaitHoursMinutes(hours, rest);
 }
 
 /// Aggiorna periodicamente le cariche maturate mentre è visibile (solo per
@@ -76,8 +77,8 @@ class ChargesChip extends ConsumerWidget {
         iconColor: context.decor.charge,
         label: 'Pro',
         semanticLabel: entitlement.developer
-            ? 'Intonia Pro, build sviluppatore: esercizi illimitati'
-            : 'Intonia Pro: esercizi illimitati',
+            ? context.l10n.chargesProDeveloperSemantics
+            : context.l10n.chargesProSemantics,
         onTap: () => context.push('/pro'),
       );
     }
@@ -87,7 +88,7 @@ class ChargesChip extends ConsumerWidget {
         icon: Icons.bolt,
         iconColor: context.decor.charge,
         label: '${ledger.charges}/${ChargeLedger.max}',
-        semanticLabel: 'Cariche esercizi: ${ledger.charges} su ${ChargeLedger.max}',
+        semanticLabel: context.l10n.chargesChipSemantics(ledger.charges, ChargeLedger.max),
         onTap: () => showChargesInfo(context),
       ),
     );
@@ -176,6 +177,7 @@ class _ChargesSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final hours = ChargeLedger.interval.inHours;
     return SafeArea(
       child: Padding(
@@ -194,7 +196,7 @@ class _ChargesSheet extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          exhausted ? 'Cariche esaurite' : 'Cariche esercizi',
+                          exhausted ? l10n.chargesExhaustedTitle : l10n.chargesTitle,
                           style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                         ),
                       ),
@@ -207,20 +209,18 @@ class _ChargesSheet extends StatelessWidget {
                   const SizedBox(height: 12),
                   if (wait != null)
                     Text(
-                      'Prossima carica tra ${formatWait(wait)}.',
+                      l10n.chargesNextIn(formatWait(l10n, wait)),
                       key: const ValueKey('charges-wait'),
                       style: theme.textTheme.titleSmall,
                     ),
                   const SizedBox(height: 8),
                   Text(
-                    'Ogni sessione di esercizio usa una carica. Se ne ricarica una ogni '
-                    '$hours ore, anche ad app chiusa, fino a ${ChargeLedger.max}.',
+                    l10n.chargesExplanation(hours, ChargeLedger.max),
                     style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Il riconoscimento in tempo reale e il test di estensione vocale sono '
-                    'sempre gratuiti e illimitati.',
+                    l10n.chargesFreeFeatures,
                     style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 20),
@@ -230,11 +230,11 @@ class _ChargesSheet extends StatelessWidget {
                       context.push('/pro');
                     },
                     icon: const Icon(Icons.workspace_premium),
-                    label: const Text('Scopri Intonia Pro'),
+                    label: Text(l10n.chargesDiscoverPro),
                   ),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text(exhausted ? 'Aspetto la ricarica' : 'Chiudi'),
+                    child: Text(exhausted ? l10n.chargesWaitForRecharge : l10n.commonClose),
                   ),
                 ],
               ),
@@ -268,7 +268,7 @@ class ChargesHint extends ConsumerWidget {
             const SizedBox(width: 4),
             Flexible(
               child: Text(
-                'Ogni sessione usa 1 carica · ${ledger.charges}/${ChargeLedger.max} disponibili',
+                context.l10n.chargesHint(ledger.charges, ChargeLedger.max),
                 textAlign: TextAlign.center,
                 style: theme.textTheme.labelMedium,
               ),

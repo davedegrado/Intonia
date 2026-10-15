@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/app/vocal_scale_trainer_app.dart';
+import 'package:vocal_scale_trainer/features/settings/application/settings_providers.dart';
 
 void main() {
   testWidgets('renders the home and the exercise catalog', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: VocalScaleTrainerApp()));
+    // Dispositivo in italiano: l'interfaccia segue la lingua del sistema.
+    await tester.pumpWidget(ProviderScope(
+      overrides: [deviceLocaleProvider.overrideWithValue(const Locale('it'))],
+      child: const VocalScaleTrainerApp(),
+    ));
     await tester.pump();
 
     // Splash per 2 secondi, poi dissolvenza verso la Home.

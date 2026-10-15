@@ -2,67 +2,77 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/app_theme.dart' show AppThemeSetting;
+import '../../../app/l10n.dart';
 import '../../../core/music/note.dart';
 import '../application/settings_providers.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
+  static const version = '0.1.0';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final notation = ref.watch(notationProvider);
     final themeSetting = ref.watch(themeSettingProvider);
+    final language = ref.watch(appLocaleProvider).languageCode;
+    final sectionStyle = theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Impostazioni')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text('Aspetto',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(l10n.languageSectionTitle, style: sectionStyle),
+            const SizedBox(height: 12),
+            SegmentedButton<String>(
+              key: const ValueKey('settings-language'),
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(value: 'it', label: Text(l10n.languageItalian)),
+                ButtonSegment(value: 'en', label: Text(l10n.languageEnglish)),
+              ],
+              selected: {language},
+              onSelectionChanged: (selection) =>
+                  ref.read(languageProvider.notifier).setLanguage(selection.first),
+            ),
+            const SizedBox(height: 8),
+            Text(l10n.languageHint, style: theme.textTheme.bodySmall),
+            const SizedBox(height: 28),
+            Text(l10n.settingsAppearance, style: sectionStyle),
             const SizedBox(height: 12),
             SegmentedButton<AppThemeSetting>(
               showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: AppThemeSetting.system, label: Text('Sistema')),
-                ButtonSegment(value: AppThemeSetting.light, label: Text('Chiaro')),
-                ButtonSegment(value: AppThemeSetting.dark, label: Text('Scuro')),
-                ButtonSegment(value: AppThemeSetting.neon, label: Text('Neon')),
+              segments: [
+                ButtonSegment(value: AppThemeSetting.system, label: Text(l10n.themeSystem)),
+                ButtonSegment(value: AppThemeSetting.light, label: Text(l10n.themeLight)),
+                ButtonSegment(value: AppThemeSetting.dark, label: Text(l10n.themeDark)),
+                ButtonSegment(value: AppThemeSetting.neon, label: Text(l10n.themeNeon)),
               ],
               selected: {themeSetting},
               onSelectionChanged: (selection) =>
                   ref.read(themeSettingProvider.notifier).setThemeSetting(selection.first),
             ),
             const SizedBox(height: 28),
-            Text('Notazione delle note',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(l10n.settingsNotation, style: sectionStyle),
             const SizedBox(height: 12),
             SegmentedButton<NoteNotation>(
-              segments: const [
-                ButtonSegment(value: NoteNotation.italian, label: Text('DO RE MI')),
-                ButtonSegment(value: NoteNotation.english, label: Text('C D E')),
+              key: const ValueKey('settings-notation'),
+              segments: [
+                ButtonSegment(value: NoteNotation.italian, label: Text(l10n.notationItalian)),
+                ButtonSegment(value: NoteNotation.english, label: Text(l10n.notationInternational)),
               ],
               selected: {notation},
               onSelectionChanged: (selection) =>
                   ref.read(notationProvider.notifier).setNotation(selection.first),
             ),
             const SizedBox(height: 28),
-            Text('Lingua',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(l10n.settingsInfo, style: sectionStyle),
             const SizedBox(height: 8),
-            Text(
-              'Italiano. La localizzazione inglese arriverà con l\'apertura al pubblico.',
-              style: theme.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 28),
-            Text('Info', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            Text(
-                'Intonia 0.1.0 — allenamento di intonazione offline.\n'
-                'Suono di pianoforte: Fluid (R3) SoundFont, © 2000–2002, 2008 Frank Wen, '
-                'licenza MIT.',
+            Text('${l10n.settingsAbout(version)}\n${l10n.settingsSoundCredit}',
                 style: theme.textTheme.bodyMedium),
             const SizedBox(height: 8),
             Align(
@@ -70,11 +80,11 @@ class SettingsScreen extends ConsumerWidget {
               child: TextButton.icon(
                 onPressed: () => showLicensePage(
                   context: context,
-                  applicationName: 'Intonia',
-                  applicationVersion: '0.1.0',
+                  applicationName: l10n.appTitle,
+                  applicationVersion: version,
                 ),
                 icon: const Icon(Icons.description_outlined),
-                label: const Text('Licenze'),
+                label: Text(l10n.settingsLicenses),
               ),
             ),
           ],

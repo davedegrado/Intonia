@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vocal_scale_trainer/app/l10n.dart';
 import 'package:vocal_scale_trainer/features/access/application/access_providers.dart';
 import 'package:vocal_scale_trainer/features/access/domain/charge_ledger.dart';
 import 'package:vocal_scale_trainer/features/access/domain/entitlement.dart';
@@ -10,9 +11,17 @@ import 'package:vocal_scale_trainer/features/library/presentation/custom_exercis
 
 import 'support/access_fakes.dart';
 
-Widget _app(Widget child, {required List overrides}) => ProviderScope(
+Widget _localized(Widget home, {Locale locale = const Locale('it')}) => MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
+      home: home,
+    );
+
+Widget _app(Widget child, {required List overrides, Locale locale = const Locale('it')}) =>
+    ProviderScope(
       overrides: [...overrides],
-      child: MaterialApp(home: Scaffold(body: child)),
+      child: _localized(Scaffold(body: child), locale: locale),
     );
 
 void main() {
@@ -25,10 +34,14 @@ void main() {
       ];
 
   test('wait formatting', () {
-    expect(formatWait(const Duration(hours: 2, minutes: 15)), '2 h 15 min');
-    expect(formatWait(const Duration(minutes: 45)), '45 min');
-    expect(formatWait(const Duration(hours: 3)), '3 h');
-    expect(formatWait(Duration.zero), 'meno di 1 min');
+    final it = lookupAppLocalizations(const Locale('it'));
+    expect(formatWait(it, const Duration(hours: 2, minutes: 15)), '2 h 15 min');
+    expect(formatWait(it, const Duration(minutes: 45)), '45 min');
+    expect(formatWait(it, const Duration(hours: 3)), '3 h');
+    expect(formatWait(it, Duration.zero), 'meno di 1 min');
+    final en = lookupAppLocalizations(const Locale('en'));
+    expect(formatWait(en, const Duration(hours: 2, minutes: 15)), '2 h 15 min');
+    expect(formatWait(en, Duration.zero), 'less than 1 min');
   });
 
   testWidgets('charges chip: available charges, tap shows the time to the next one',
@@ -61,7 +74,7 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(ProviderScope(
       overrides: [...overrides(ChargeLedger.full, entitlement: entitlement)],
-      child: const MaterialApp(home: ProScreen()),
+      child: _localized(const ProScreen()),
     ));
     await tester.pump();
     await tester.pump();
@@ -91,7 +104,7 @@ void main() {
   testWidgets('Free users see an explanation instead of the sequence editor', (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [...overrides(ChargeLedger.full)],
-      child: const MaterialApp(home: CustomExerciseEditorScreen()),
+      child: _localized(const CustomExerciseEditorScreen()),
     ));
     await tester.pump();
     expect(find.byKey(const ValueKey('custom-sequences-pro')), findsOneWidget);
@@ -101,7 +114,7 @@ void main() {
   testWidgets('Pro users get the sequence editor', (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [...overrides(ChargeLedger.full, entitlement: const Entitlement(plan: Plan.pro))],
-      child: const MaterialApp(home: CustomExerciseEditorScreen()),
+      child: _localized(const CustomExerciseEditorScreen()),
     ));
     await tester.pump();
     expect(find.byKey(const ValueKey('custom-sequences-pro')), findsNothing);
@@ -114,12 +127,50 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(ProviderScope(
       overrides: [...overrides(ChargeLedger.full)],
-      child: const MaterialApp(home: ProScreen()),
+      child: _localized(const ProScreen()),
     ));
     await tester.pump();
     expect(find.text('€4,99'), findsOneWidget);
     expect(find.text('€39,99'), findsOneWidget);
     final subscribe = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Abbonati'));
+    expect(subscribe.onPressed, isNull);
+  });
+
+  testWidgets('English: charges sheet and paywall', (tester) async {
+    final stored = ChargeLedger(charges: 0, regenStartedAt: DateTime(2026, 10, 14, 10));
+    await tester.pumpWidget(_app(
+      Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showChargesExhausted(context),
+          child: const Text('open'),
+        ),
+      ),
+      overrides: overrides(stored),
+      locale: const Locale('en'),
+    ));
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.text('Out of charges'), findsOneWidget);
+    expect(find.text('Next charge in 1 h.'), findsOneWidget);
+    expect(find.textContaining('vocal range test are always free'), findsOneWidget);
+    expect(find.text('Discover Intonia Pro'), findsOneWidget);
+    expect(find.text("I'll wait for a recharge"), findsOneWidget);
+
+    tester.view.physicalSize = const Size(400, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [...overrides(ChargeLedger.full)],
+      child: _localized(const ProScreen(), locale: const Locale('en')),
+    ));
+    await tester.pump();
+    expect(find.text('Train without limits'), findsOneWidget);
+    expect(find.text('Monthly'), findsOneWidget);
+    expect(find.text('Yearly'), findsOneWidget);
+    expect(find.text('€4.99'), findsOneWidget);
+    expect(find.text('per year'), findsOneWidget);
+    expect(find.text('Save 33%'), findsOneWidget);
+    final subscribe = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Subscribe'));
     expect(subscribe.onPressed, isNull);
   });
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/app_theme.dart';
+import '../../../app/l10n.dart';
 import '../../../app/main_shell.dart';
 import '../../../app/neon_scene.dart';
 import '../../../app/note_text.dart';
@@ -89,23 +90,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   Widget build(BuildContext context) {
     ref.listen(tunerControllerProvider, _onTuner);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final tuner = ref.watch(tunerControllerProvider);
     final detection = tuner.detection;
     final hasPitch = tuner.active && detection != null && detection.isStable;
     final inTune = hasPitch && detection.cents.abs() <= PitchRecognitionConfig.inTuneCents;
 
     final message = tuner.permissionDenied
-        ? 'Permesso microfono negato: abilitalo nelle impostazioni del telefono.'
+        ? l10n.homeBubblePermissionDenied
         : !tuner.active
-            ? 'Canta o suona una nota:\nti dico qual è!'
+            ? l10n.homeBubbleIdle
             : !hasPitch
-                ? 'Ti ascolto…\ncanta o suona una nota.'
+                ? l10n.homeBubbleListening
                 : inTune
-                    ? 'Perfettamente intonata!'
-                    : 'Ci sei quasi: aggiusta un pochino.';
+                    ? l10n.homeBubbleInTune
+                    : l10n.homeBubbleAlmost;
 
     return SectionScaffold(
-      title: 'Intonia',
+      title: l10n.appTitle,
       actions: const [StatusChips()],
       variant: SceneVariant.home,
       body: SafeArea(
@@ -150,7 +152,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      tuner.active ? 'Ferma ascolto' : 'Avvia ascolto',
+                      tuner.active ? l10n.homeStopListening : l10n.homeStartListening,
                       style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 16),
@@ -172,6 +174,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 class _SpeechBubble extends StatelessWidget {
   const _SpeechBubble({required this.message, this.isError = false});
 
+  static const maxLines = 2;
+  static const verticalPadding = 12.0;
+
   final String message;
   final bool isError;
 
@@ -186,6 +191,17 @@ class _SpeechBubble extends StatelessWidget {
             ? decor.heroBorder.withValues(alpha: 0.55)
             : colors.outlineVariant;
     final fill = decor.ambient ? colors.surface.withValues(alpha: 0.92) : colors.surface;
+    final style = theme.textTheme.bodyLarge?.copyWith(
+      color: isError ? colors.error : colors.onSurface,
+      fontWeight: FontWeight.w600,
+      height: 1.3,
+    );
+    // Altezza fissa per due righe, qualunque sia il messaggio o la lingua:
+    // la mascotte sotto il fumetto non si sposta mai.
+    final lineHeight = MediaQuery.textScalerOf(context).scale(style?.fontSize ?? 16) * 1.3;
+    final height = (lineHeight * _SpeechBubble.maxLines).ceilToDouble() +
+        _SpeechBubble.verticalPadding * 2 +
+        2;
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 300),
@@ -194,7 +210,12 @@ class _SpeechBubble extends StatelessWidget {
         children: [
           Container(
             key: const ValueKey('home-bubble'),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            height: height,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: _SpeechBubble.verticalPadding,
+            ),
             decoration: BoxDecoration(
               color: fill,
               borderRadius: BorderRadius.circular(22),
@@ -214,11 +235,9 @@ class _SpeechBubble extends StatelessWidget {
                 message,
                 key: ValueKey(message),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: isError ? colors.error : colors.onSurface,
-                  fontWeight: FontWeight.w600,
-                  height: 1.3,
-                ),
+                maxLines: _SpeechBubble.maxLines,
+                overflow: TextOverflow.ellipsis,
+                style: style,
               ),
             ),
           ),
@@ -320,7 +339,7 @@ class _MicButtonState extends State<_MicButton> with SingleTickerProviderStateMi
 
     return Semantics(
       button: true,
-      label: widget.active ? 'Ferma il riconoscimento' : 'Avvia il riconoscimento delle note',
+      label: widget.active ? context.l10n.homeMicStopSemantics : context.l10n.homeMicStartSemantics,
       child: SizedBox.square(
         dimension: size + ring * 2,
         child: Stack(
@@ -416,6 +435,7 @@ class _NoteCard extends ConsumerWidget {
     final colors = theme.colorScheme;
     final decor = context.decor;
     final notation = ref.watch(notationProvider);
+    final l10n = context.l10n;
     final detection = this.detection;
 
     return SizedBox(
@@ -427,7 +447,7 @@ class _NoteCard extends ConsumerWidget {
           child: detection == null
               ? Center(
                   child: Text(
-                    'Qui vedrai la nota riconosciuta e quanto sei intonato.',
+                    l10n.homeNotePlaceholder,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall,
                   ),
@@ -439,7 +459,9 @@ class _NoteCard extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(live ? 'Nota rilevata' : 'Ultima nota',
+                          Text(live ? l10n.homeNoteDetected : l10n.homeLastNote,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.labelMedium
                                   ?.copyWith(color: colors.onSurfaceVariant)),
                           NoteText(
@@ -461,11 +483,15 @@ class _NoteCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Scostamento',
+                        Text(l10n.homeDeviation,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.labelMedium
                                 ?.copyWith(color: colors.onSurfaceVariant)),
                         Text(
-                          '${detection.cents >= 0 ? '+' : ''}${detection.cents.toStringAsFixed(0)} cent',
+                          l10n.homeCents(
+                            '${detection.cents >= 0 ? '+' : ''}${detection.cents.toStringAsFixed(0)}',
+                          ),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: detection.cents.abs() <= PitchRecognitionConfig.inTuneCents
@@ -491,6 +517,7 @@ class _QuickActions extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notation = ref.watch(notationProvider);
     final themeSetting = ref.watch(themeSettingProvider);
+    final l10n = context.l10n;
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -499,8 +526,10 @@ class _QuickActions extends ConsumerWidget {
             child: _QuickAction(
               key: const ValueKey('quick-notation'),
               icon: Icons.music_note_outlined,
-              label: 'Notazione',
-              value: notation == NoteNotation.italian ? 'DO RE MI' : 'C D E',
+              label: l10n.homeQuickNotation,
+              value: notation == NoteNotation.italian
+                  ? l10n.notationItalian
+                  : l10n.notationInternational,
               onTap: () => ref.read(notationProvider.notifier).setNotation(
                     notation == NoteNotation.italian ? NoteNotation.english : NoteNotation.italian,
                   ),
@@ -511,8 +540,8 @@ class _QuickActions extends ConsumerWidget {
             child: _QuickAction(
               key: const ValueKey('quick-theme'),
               icon: Icons.palette_outlined,
-              label: 'Tema',
-              value: themeLabel(themeSetting),
+              label: l10n.homeQuickTheme,
+              value: themeLabel(l10n, themeSetting),
               onTap: () => _chooseTheme(context, ref),
             ),
           ),
@@ -521,7 +550,7 @@ class _QuickActions extends ConsumerWidget {
             child: _QuickAction(
               key: const ValueKey('quick-settings'),
               icon: Icons.settings_outlined,
-              label: 'Impostazioni',
+              label: l10n.homeQuickSettings,
               onTap: () => pushFullScreen(context, ref, '/settings'),
             ),
           ),
@@ -543,7 +572,7 @@ class _QuickActions extends ConsumerWidget {
               children: [
                 for (final setting in AppThemeSetting.values)
                   ListTile(
-                    title: Text(themeLabel(setting)),
+                    title: Text(themeLabel(context.l10n, setting)),
                     trailing: setting == current ? const Icon(Icons.check) : null,
                     onTap: () {
                       ref.read(themeSettingProvider.notifier).setThemeSetting(setting);
@@ -560,11 +589,11 @@ class _QuickActions extends ConsumerWidget {
 }
 
 /// Nome del tema come nelle impostazioni.
-String themeLabel(AppThemeSetting setting) => switch (setting) {
-      AppThemeSetting.system => 'Sistema',
-      AppThemeSetting.light => 'Chiaro',
-      AppThemeSetting.dark => 'Scuro',
-      AppThemeSetting.neon => 'Neon',
+String themeLabel(AppLocalizations l10n, AppThemeSetting setting) => switch (setting) {
+      AppThemeSetting.system => l10n.themeSystem,
+      AppThemeSetting.light => l10n.themeLight,
+      AppThemeSetting.dark => l10n.themeDark,
+      AppThemeSetting.neon => l10n.themeNeon,
     };
 
 class _QuickAction extends StatelessWidget {
