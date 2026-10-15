@@ -6,6 +6,36 @@ private let appGroupId = "group.io.github.davedegrado.intonia"
 private let keyLastTrainingDay = "intonia_last_training_day"
 private let keyStreak = "intonia_streak_at_last_training"
 
+/// Testi del widget: italiano se il dispositivo è in italiano, altrimenti
+/// inglese (come l'app per le lingue non supportate).
+enum WidgetStrings {
+  static let italian = (Locale.preferredLanguages.first ?? "en").hasPrefix("it")
+
+  static func streakTitle(_ streak: Int) -> String {
+    if italian {
+      return streak == 1 ? "1 giorno di fila" : "\(streak) giorni di fila"
+    }
+    return "\(streak)-day streak"
+  }
+
+  static func streakLabel(_ streak: Int) -> String {
+    italian ? (streak == 1 ? "giorno\ndi fila" : "giorni\ndi fila") : "day\nstreak"
+  }
+
+  static var trainedMessage: String { italian ? "Fatto! Sei inarrestabile ✨" : "Done! You're unstoppable ✨" }
+  static var keepStreakMessage: String {
+    italian ? "Allenati oggi: salva la serie! 🔥" : "Practice today: keep your streak! 🔥"
+  }
+  static var startTitle: String { italian ? "Allena l'orecchio" : "Train your ear" }
+  static var startMessage: String { italian ? "Pronto ad allenarti? 🎵" : "Ready to practice? 🎵" }
+  static var mascot: String { italian ? "Mascotte di Intonia" : "Intonia mascot" }
+  static var description: String {
+    italian
+      ? "La tua serie di allenamenti con la mascotte di Intonia."
+      : "Your Intonia training streak with the mascot."
+  }
+}
+
 /// Contenuto del widget. Stessa logica di WidgetView
 /// (lib/features/home_widget/domain/widget_streak.dart) e di WidgetContent
 /// (IntoniaWidgetProvider.kt).
@@ -44,25 +74,23 @@ struct StreakContent {
       }
     }
 
-    func streakTitle(_ streak: Int) -> String {
-      streak == 1 ? "1 giorno di fila" : "\(streak) giorni di fila"
-    }
+    func streakTitle(_ streak: Int) -> String { WidgetStrings.streakTitle(streak) }
 
     if lastTrainingDay == today && streakAtLastTraining > 0 {
       return StreakContent(
         status: .trainedToday, streak: streakAtLastTraining,
         title: streakTitle(streakAtLastTraining),
-        message: "Fatto! Sei inarrestabile ✨", week: week)
+        message: WidgetStrings.trainedMessage, week: week)
     }
     if lastTrainingDay == yesterday && streakAtLastTraining > 0 {
       return StreakContent(
         status: .keepStreak, streak: streakAtLastTraining,
         title: streakTitle(streakAtLastTraining),
-        message: "Allenati oggi: salva la serie! 🔥", week: week)
+        message: WidgetStrings.keepStreakMessage, week: week)
     }
     return StreakContent(
-      status: .start, streak: 0, title: "Allena l'orecchio",
-      message: "Pronto ad allenarti? 🎵", week: week)
+      status: .start, streak: 0, title: WidgetStrings.startTitle,
+      message: WidgetStrings.startMessage, week: week)
   }
 
   static func load(now: Date) -> StreakContent {
@@ -131,7 +159,7 @@ struct IntoniaWidgetView: View {
       Image(content.trainedToday ? "MascotHappy" : "MascotInvite")
         .resizable()
         .scaledToFit()
-        .accessibilityLabel("Mascotte di Intonia")
+        .accessibilityLabel(Text(verbatim: WidgetStrings.mascot))
     }
   }
 
@@ -150,7 +178,7 @@ struct IntoniaWidgetView: View {
           .font(.system(size: numberSize, weight: .heavy, design: .rounded))
           .foregroundColor(color)
           .shadow(color: color.opacity(0.6), radius: 8)
-        Text(content.streak == 1 ? "giorno\ndi fila" : "giorni\ndi fila")
+        Text(verbatim: WidgetStrings.streakLabel(content.streak))
           .font(.system(size: 12, weight: .bold))
           .foregroundColor(rgb(0xE0E7FF))
           .lineLimit(2)
@@ -247,7 +275,7 @@ struct IntoniaWidget: Widget {
       IntoniaWidgetView(entry: entry)
     }
     .configurationDisplayName("Intonia")
-    .description("La tua serie di allenamenti con la mascotte di Intonia.")
+    .description(WidgetStrings.description)
     .supportedFamilies([.systemSmall, .systemMedium])
   }
 }

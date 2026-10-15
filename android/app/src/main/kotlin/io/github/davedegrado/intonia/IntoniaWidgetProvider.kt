@@ -35,7 +35,7 @@ class IntoniaWidgetProvider : HomeWidgetProvider() {
         )
     for (widgetId in appWidgetIds) {
       val views = RemoteViews(context.packageName, R.layout.widget_intonia)
-      bind(views, content)
+      bind(context, views, content)
       views.setOnClickPendingIntent(
           R.id.widget_root,
           HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
@@ -44,7 +44,25 @@ class IntoniaWidgetProvider : HomeWidgetProvider() {
     }
   }
 
-  private fun bind(views: RemoteViews, content: WidgetContent) {
+  /**
+   * Testi dalle risorse Android: inglese di base (res/values), italiano in
+   * res/values-it. Il widget segue la lingua del dispositivo.
+   */
+  private fun bind(context: Context, views: RemoteViews, content: WidgetContent) {
+    val res = context.resources
+    val title =
+        when (content.status) {
+          WidgetStatus.START -> res.getString(R.string.widget_default_title)
+          else -> res.getQuantityString(R.plurals.widget_streak_title, content.streak, content.streak)
+        }
+    val message =
+        res.getString(
+            when (content.status) {
+              WidgetStatus.TRAINED_TODAY -> R.string.widget_message_trained
+              WidgetStatus.KEEP_STREAK -> R.string.widget_message_keep_streak
+              WidgetStatus.START -> R.string.widget_default_message
+            },
+        )
     val trainedToday = content.status == WidgetStatus.TRAINED_TODAY
     views.setImageViewResource(
         R.id.widget_mascot,
@@ -62,10 +80,10 @@ class IntoniaWidgetProvider : HomeWidgetProvider() {
     )
     views.setTextViewText(
         R.id.widget_streak_label,
-        if (content.streak == 1) "giorno\ndi fila" else "giorni\ndi fila",
+        res.getQuantityString(R.plurals.widget_streak_label, content.streak),
     )
-    views.setTextViewText(R.id.widget_title, content.title)
-    views.setContentDescription(R.id.widget_streak_row, content.title)
+    views.setTextViewText(R.id.widget_title, title)
+    views.setContentDescription(R.id.widget_streak_row, title)
 
     content.week.forEachIndexed { index, trained ->
       val isToday = index == content.week.lastIndex
@@ -79,7 +97,7 @@ class IntoniaWidgetProvider : HomeWidgetProvider() {
       )
     }
 
-    views.setTextViewText(R.id.widget_message, content.message)
+    views.setTextViewText(R.id.widget_message, message)
     views.setInt(
         R.id.widget_message,
         "setBackgroundResource",
@@ -113,8 +131,6 @@ enum class WidgetStatus {
 data class WidgetContent(
     val status: WidgetStatus,
     val streak: Int,
-    val title: String,
-    val message: String,
     /** Ultimi 7 giorni, da 6 giorni fa a oggi: true se fanno parte della serie. */
     val week: List<Boolean>,
 ) {
@@ -124,9 +140,6 @@ data class WidgetContent(
 
     private fun daysBefore(calendar: Calendar, days: Int): Calendar =
         (calendar.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -days) }
-
-    private fun streakTitle(streak: Int): String =
-        if (streak == 1) "1 giorno di fila" else "$streak giorni di fila"
 
     private fun weekOf(lastTrainingDay: String?, streak: Int, now: Calendar): List<Boolean> {
       val lastDate =
@@ -152,24 +165,18 @@ data class WidgetContent(
             WidgetContent(
                 status = WidgetStatus.TRAINED_TODAY,
                 streak = streakAtLastTraining,
-                title = streakTitle(streakAtLastTraining),
-                message = "Fatto! Sei inarrestabile ✨",
                 week = week,
             )
         lastTrainingDay == yesterday && streakAtLastTraining > 0 ->
             WidgetContent(
                 status = WidgetStatus.KEEP_STREAK,
                 streak = streakAtLastTraining,
-                title = streakTitle(streakAtLastTraining),
-                message = "Allenati oggi: salva la serie! 🔥",
                 week = week,
             )
         else ->
             WidgetContent(
                 status = WidgetStatus.START,
                 streak = 0,
-                title = "Allena l'orecchio",
-                message = "Pronto ad allenarti? 🎵",
                 week = week,
             )
       }
