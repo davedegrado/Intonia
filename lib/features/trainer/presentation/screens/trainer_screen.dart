@@ -300,6 +300,8 @@ class _BottomControlBar extends ConsumerWidget {
                   ),
                 ],
               ),
+            const SizedBox(height: 10),
+            _DirectionRow(state: state, controller: controller),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -554,5 +556,67 @@ Future<void> startTrainerSession(BuildContext context, WidgetRef ref) async {
   final started = await ref.read(trainerControllerProvider.notifier).play();
   if (!started && context.mounted) {
     await showChargesExhausted(context);
+  }
+}
+
+/// Modalità di esecuzione (avanti / al contrario / completo) e, in modalità
+/// completa per esercizi con un vertice, ripetizione della nota più alta.
+class _DirectionRow extends StatelessWidget {
+  const _DirectionRow({required this.state, required this.controller});
+
+  final TrainerState state;
+  final TrainerController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final exercise = controller.exercise;
+    final direction = state.settings.direction ?? exercise.defaultDirection;
+    final showRepeatTop = direction == PlaybackDirection.complete && exercise.hasApex;
+    final disabled = state.isPlaying;
+
+    return Row(
+      children: [
+        Expanded(
+          child: SegmentedButton<PlaybackDirection>(
+            key: const ValueKey('trainer-direction'),
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(
+                value: PlaybackDirection.forward,
+                icon: const Icon(Icons.arrow_forward),
+                label: Text(l10n.trainerDirectionForward),
+              ),
+              ButtonSegment(
+                value: PlaybackDirection.reverse,
+                icon: const Icon(Icons.arrow_back),
+                label: Text(l10n.trainerDirectionReverse),
+              ),
+              ButtonSegment(
+                value: PlaybackDirection.complete,
+                icon: const Icon(Icons.swap_horiz),
+                label: Text(l10n.trainerDirectionComplete),
+              ),
+            ],
+            style: const ButtonStyle(visualDensity: VisualDensity.compact),
+            selected: {direction},
+            onSelectionChanged:
+                disabled ? null : (selection) => controller.updateDirection(selection.first),
+          ),
+        ),
+        if (showRepeatTop) ...[
+          const SizedBox(width: 6),
+          IconButton(
+            key: const ValueKey('trainer-repeat-top'),
+            isSelected: state.settings.repeatTop,
+            tooltip: '${l10n.trainerRepeatTop}: ${l10n.trainerRepeatTopHint}',
+            icon: const Icon(Icons.repeat_one),
+            selectedIcon: const Icon(Icons.repeat_one_on),
+            onPressed:
+                disabled ? null : () => controller.updateRepeatTop(!state.settings.repeatTop),
+          ),
+        ],
+      ],
+    );
   }
 }

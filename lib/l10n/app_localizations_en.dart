@@ -1144,4 +1144,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLicenses => 'Licenses';
+
+  @override
+  String get trainerDirectionForward => 'Straight';
+
+  @override
+  String get trainerDirectionReverse => 'Reverse';
+
+  @override
+  String get trainerDirectionComplete => 'Full';
+
+  @override
+  String get trainerRepeatTop => 'Repeat the top note';
+
+  @override
+  String get trainerRepeatTopHint => 'Repeats the highest note before going down';
 }

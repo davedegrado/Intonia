@@ -1146,4 +1146,19 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsLicenses => 'Licenze';
+
+  @override
+  String get trainerDirectionForward => 'Dritto';
+
+  @override
+  String get trainerDirectionReverse => 'Al contrario';
+
+  @override
+  String get trainerDirectionComplete => 'Completo';
+
+  @override
+  String get trainerRepeatTop => 'Ripeti la nota di vertice';
+
+  @override
+  String get trainerRepeatTopHint => 'Ripete la nota più alta prima di scendere';
 }

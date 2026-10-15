@@ -680,5 +680,10 @@
     }
   },
   "settingsSoundCredit": "Piano sound: Fluid (R3) SoundFont, © 2000–2002, 2008 Frank Wen, MIT license.",
-  "settingsLicenses": "Licenses"
+  "settingsLicenses": "Licenses",
+  "trainerDirectionForward": "Straight",
+  "trainerDirectionReverse": "Reverse",
+  "trainerDirectionComplete": "Full",
+  "trainerRepeatTop": "Repeat the top note",
+  "trainerRepeatTopHint": "Repeats the highest note before going down"
 }

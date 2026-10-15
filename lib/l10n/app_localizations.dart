@@ -1964,6 +1964,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Licenses'**
   String get settingsLicenses;
+
+  /// No description provided for @trainerDirectionForward.
+  ///
+  /// In en, this message translates to:
+  /// **'Straight'**
+  String get trainerDirectionForward;
+
+  /// No description provided for @trainerDirectionReverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse'**
+  String get trainerDirectionReverse;
+
+  /// No description provided for @trainerDirectionComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get trainerDirectionComplete;
+
+  /// No description provided for @trainerRepeatTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat the top note'**
+  String get trainerRepeatTop;
+
+  /// No description provided for @trainerRepeatTopHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeats the highest note before going down'**
+  String get trainerRepeatTopHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

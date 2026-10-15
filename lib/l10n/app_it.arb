@@ -311,5 +311,10 @@
   "settingsInfo": "Info",
   "settingsAbout": "Intonia {version} — allenamento di intonazione offline.",
   "settingsSoundCredit": "Suono di pianoforte: Fluid (R3) SoundFont, © 2000–2002, 2008 Frank Wen, licenza MIT.",
-  "settingsLicenses": "Licenze"
+  "settingsLicenses": "Licenze",
+  "trainerDirectionForward": "Dritto",
+  "trainerDirectionReverse": "Al contrario",
+  "trainerDirectionComplete": "Completo",
+  "trainerRepeatTop": "Ripeti la nota di vertice",
+  "trainerRepeatTopHint": "Ripete la nota più alta prima di scendere"
 }
