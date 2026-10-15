@@ -34,7 +34,8 @@ class ProScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final isPro = ref.watch(entitlementProvider).isPro;
+    final entitlement = ref.watch(entitlementProvider);
+    final isPro = entitlement.isPro;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Intonia Pro')),
@@ -49,6 +50,14 @@ class ProScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
+            if (entitlement.developer) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Build sviluppatore: Pro attivo senza abbonamento.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
             const SizedBox(height: 16),
             const _Benefit(
               icon: Icons.all_inclusive,

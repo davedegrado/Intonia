@@ -176,7 +176,7 @@ del job.
 ### 4.1.1 Pro sviluppatore
 
 Le build compilate con `--dart-define=INTONIA_DEV_PRO=true` sono Pro senza
-abbonamento (in Home: "Intonia Pro · build sviluppatore"). Nell'app non c'è
+abbonamento (in alto compare "Pro" al posto delle cariche; la schermata Intonia Pro indica "Build sviluppatore"). Nell'app non c'è
 alcun pulsante o codice per attivarlo: decide solo la compilazione.
 
 - **APK di test della CI**: sempre con Pro sviluppatore (non pubblicabile).
