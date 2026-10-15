@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/l10n.dart';
 import '../../../app/note_text.dart';
 import '../../../core/music/exercise.dart';
 import '../../access/application/access_providers.dart';
 import '../../access/domain/entitlement.dart';
 import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
+import '../../../l10n/exercise_l10n.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../trainer/presentation/controllers/trainer_controller.dart';
 import '../application/exercise_providers.dart';
@@ -27,7 +29,14 @@ class CustomExerciseEditorScreen extends ConsumerStatefulWidget {
 class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEditorScreen> {
   static const _defaultRootMidi = 60; // DO4
 
-  static const focusOptions = ['Precisione', 'Controllo', 'Estensione', 'Agilità', 'Orecchio'];
+  /// Ordine dei tag nell'editor; si salva il valore storico italiano.
+  static const focusOptions = [
+    ExerciseFocus.accuracy,
+    ExerciseFocus.control,
+    ExerciseFocus.range,
+    ExerciseFocus.agility,
+    ExerciseFocus.ear,
+  ];
 
   late final TextEditingController _nameController;
   late final TextEditingController _groupController;
@@ -41,7 +50,10 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
     super.initState();
     _nameController = TextEditingController(text: widget.initial?.name ?? '');
     _groupController = TextEditingController(text: widget.initial?.group ?? '');
-    _focus = widget.initial?.focus;
+    final initialFocus = widget.initial?.focus;
+    _focus = initialFocus == null
+        ? null
+        : ExerciseFocus.parse(initialFocus)?.storedValue ?? initialFocus;
     final root = widget.initial?.rootMidi ?? _defaultRootMidi;
     _midis = [
       for (final step in widget.initial?.steps ?? const <int>[0]) root + step,
@@ -74,7 +86,7 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Audio non disponibile: verifica il SoundFont piano.sf2.')),
+          SnackBar(content: Text(context.l10n.editorAudioUnavailable)),
         );
       }
     } finally {
@@ -88,12 +100,12 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Dai un nome alla sequenza.')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.editorErrorNoName)));
       return;
     }
     if (_midis.length < 2) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Aggiungi almeno 2 note.')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.editorErrorTooFewNotes)));
       return;
     }
 
@@ -118,6 +130,7 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final notation = ref.watch(notationProvider);
     if (!ref.watch(entitlementProvider).allows(ProFeature.customSequences)) {
       return const _CustomSequencesPro();
@@ -125,12 +138,12 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initial == null ? 'Nuova sequenza' : 'Modifica sequenza'),
+        title: Text(widget.initial == null ? l10n.editorTitleNew : l10n.editorTitleEdit),
         actions: [
           TextButton.icon(
             onPressed: _save,
             icon: const Icon(Icons.check),
-            label: const Text('Salva'),
+            label: Text(l10n.commonSave),
           ),
         ],
       ),
@@ -140,18 +153,18 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
           children: [
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome',
-                hintText: 'Es. Estensione sui DO / Vocalizzo 1-3-5-8',
+              decoration: InputDecoration(
+                labelText: l10n.editorNameLabel,
+                hintText: l10n.editorNameHint,
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _groupController,
-              decoration: const InputDecoration(
-                labelText: 'Gruppo (opzionale)',
-                hintText: 'Es. Riscaldamento, Lezione 3…',
+              decoration: InputDecoration(
+                labelText: l10n.editorGroupLabel,
+                hintText: l10n.editorGroupHint,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -182,7 +195,7 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
               );
             }),
             const SizedBox(height: 12),
-            Text('Tag (opzionale)', style: theme.textTheme.labelLarge),
+            Text(l10n.editorTagLabel, style: theme.textTheme.labelLarge),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,
@@ -190,31 +203,28 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
               children: [
                 for (final option in focusOptions)
                   ChoiceChip(
-                    label: Text(option),
-                    selected: _focus == option,
-                    onSelected: (selected) => setState(() => _focus = selected ? option : null),
+                    label: Text(l10n.focusLabel(option.storedValue)),
+                    selected: _focus == option.storedValue,
+                    onSelected: (selected) =>
+                        setState(() => _focus = selected ? option.storedValue : null),
                   ),
               ],
             ),
             // Prima il picker (posizione fissa), poi la sequenza selezionata:
             // così aggiungere note non fa "scendere" i tasti da premere.
             const SizedBox(height: 20),
-            Text('Aggiungi note', style: theme.textTheme.titleMedium),
+            Text(l10n.editorAddNotesTitle, style: theme.textTheme.titleMedium),
             Text(
-              'Puoi partire da qualsiasi nota, ripetere la stessa nota e scendere sotto la prima. '
-              'Nel trainer potrai comunque trasporre tutta la sequenza.',
+              l10n.editorAddNotesHint,
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
             Center(
               child: SegmentedButton<int>(
                 showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(value: 2, label: Text('Ott. 2')),
-                  ButtonSegment(value: 3, label: Text('Ott. 3')),
-                  ButtonSegment(value: 4, label: Text('Ott. 4')),
-                  ButtonSegment(value: 5, label: Text('Ott. 5')),
-                  ButtonSegment(value: 6, label: Text('Ott. 6')),
+                segments: [
+                  for (var octave = 2; octave <= 6; octave++)
+                    ButtonSegment(value: octave, label: Text(l10n.editorOctaveShort(octave))),
                 ],
                 selected: {_pickerOctave},
                 onSelectionChanged: (selection) => setState(() => _pickerOctave = selection.first),
@@ -233,16 +243,18 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
             Row(
               children: [
                 Expanded(
-                  child:
-                      Text('Sequenza (${_midis.length} note)', style: theme.textTheme.titleMedium),
+                  child: Text(
+                    l10n.editorSequenceTitle(_midis.length),
+                    style: theme.textTheme.titleMedium,
+                  ),
                 ),
                 IconButton(
-                  tooltip: 'Anteprima',
+                  tooltip: l10n.editorPreview,
                   onPressed: _previewing ? null : _preview,
                   icon: Icon(_previewing ? Icons.hourglass_top : Icons.play_circle_outline),
                 ),
                 IconButton(
-                  tooltip: 'Rimuovi ultima nota',
+                  tooltip: l10n.editorRemoveLast,
                   onPressed: _midis.isEmpty ? null : () => setState(_midis.removeLast),
                   icon: const Icon(Icons.backspace_outlined),
                 ),
@@ -250,8 +262,7 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
             ),
             const SizedBox(height: 8),
             if (_midis.isEmpty)
-              Text('Tocca le note qui sopra per costruire la sequenza.',
-                  style: theme.textTheme.bodySmall)
+              Text(l10n.editorEmptySequence, style: theme.textTheme.bodySmall)
             else
               Builder(builder: (context) {
                 final spelled = NoteSpeller.spellSequence(
@@ -303,8 +314,9 @@ class _CustomSequencesPro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Crea la tua sequenza')),
+      appBar: AppBar(title: Text(l10n.editorProTitle)),
       body: SafeArea(
         child: ListView(
           key: const ValueKey('custom-sequences-pro'),
@@ -313,22 +325,19 @@ class _CustomSequencesPro extends StatelessWidget {
             Icon(Icons.edit_note, size: 64, color: theme.colorScheme.primary),
             const SizedBox(height: 12),
             Text(
-              'Le tue sequenze, su misura',
+              l10n.editorProHeadline,
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
             Text(
-              'Componi qualsiasi giro di note partendo dalla nota che vuoi: vocalizzi, '
-              'pattern, salti, prove di estensione. Le sequenze si salvano nella Home, '
-              'raggruppate come preferisci, e si allenano come gli esercizi predefiniti.',
+              l10n.editorProBody,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge,
             ),
             const SizedBox(height: 12),
             Text(
-              'Creare, modificare e salvare sequenze è una funzione di Intonia Pro. '
-              'Le sequenze che hai già salvato restano disponibili.',
+              l10n.editorProNote,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium,
             ),
@@ -336,7 +345,7 @@ class _CustomSequencesPro extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => context.push('/pro'),
               icon: const Icon(Icons.workspace_premium),
-              label: const Text('Scopri Intonia Pro'),
+              label: Text(l10n.editorProCta),
             ),
           ],
         ),
