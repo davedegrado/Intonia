@@ -8,7 +8,7 @@ import '../../mascot/presentation/confetti.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
 
 /// Scelta dell'utente sul riepilogo del test di estensione.
-enum RangeResultAction { done, retry }
+enum RangeResultAction { done, retry, notMine }
 
 /// Confronto con il test precedente.
 enum RangeComparison {
@@ -140,118 +140,138 @@ class _RangeResultScreenState extends State<RangeResultScreen> with SingleTicker
                 child: IgnorePointer(child: CustomPaint(painter: ConfettiPainter(_intro))),
               ),
             SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-                child: Column(
-                  children: [
-                    const Spacer(),
-                    FadeTransition(
-                      opacity: reveal,
-                      child: ScaleTransition(
-                        scale: Tween(begin: 0.6, end: 1.0).animate(
-                          CurvedAnimation(
-                            parent: _intro,
-                            curve: const Interval(0, 0.35, curve: Curves.elasticOut),
-                          ),
-                        ),
-                        child: const IntoniaMascot(mood: MascotMood.success, size: 140),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    FadeTransition(
-                      opacity: reveal,
-                      child: Text(
-                        comparison.title(l10n),
-                        key: const ValueKey('range-result-title'),
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    AnimatedBuilder(
-                      animation: opening,
-                      builder: (context, _) {
-                        final t = opening.value;
-                        final low = widget.startMidi + (widget.lowestMidi - widget.startMidi) * t;
-                        final high = widget.startMidi + (widget.highestMidi - widget.startMidi) * t;
-                        final shownSpan = (widget.span * t).round();
-                        return Column(
+              // Scorre solo se lo schermo è troppo basso; altrimenti gli
+              // Spacer distribuiscono lo spazio come prima.
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                        child: Column(
                           children: [
-                            SizedBox(
-                              height: 74,
-                              width: double.infinity,
-                              child: CustomPaint(
-                                painter: _KeyboardRangePainter(
-                                  lowest: widget.lowestMidi,
-                                  highest: widget.highestMidi,
-                                  start: widget.startMidi,
-                                  shownLow: low,
-                                  shownHigh: high,
+                            const Spacer(),
+                            FadeTransition(
+                              opacity: reveal,
+                              child: ScaleTransition(
+                                scale: Tween(begin: 0.6, end: 1.0).animate(
+                                  CurvedAnimation(
+                                    parent: _intro,
+                                    curve: const Interval(0, 0.35, curve: Curves.elasticOut),
+                                  ),
+                                ),
+                                child: const IntoniaMascot(mood: MascotMood.success, size: 140),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            FadeTransition(
+                              opacity: reveal,
+                              child: Text(
+                                comparison.title(l10n),
+                                key: const ValueKey('range-result-title'),
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            NoteRangeText(
-                              low: spelledMidi(low.round()),
-                              high: spelledMidi(high.round()),
-                              notation: widget.notation,
-                              style: noteStyle,
-                              octaveColor: _soft,
-                              textAlign: TextAlign.center,
+                            const SizedBox(height: 24),
+                            AnimatedBuilder(
+                              animation: opening,
+                              builder: (context, _) {
+                                final t = opening.value;
+                                final low =
+                                    widget.startMidi + (widget.lowestMidi - widget.startMidi) * t;
+                                final high =
+                                    widget.startMidi + (widget.highestMidi - widget.startMidi) * t;
+                                final shownSpan = (widget.span * t).round();
+                                return Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 74,
+                                      width: double.infinity,
+                                      child: CustomPaint(
+                                        painter: _KeyboardRangePainter(
+                                          lowest: widget.lowestMidi,
+                                          highest: widget.highestMidi,
+                                          start: widget.startMidi,
+                                          shownLow: low,
+                                          shownHigh: high,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    NoteRangeText(
+                                      low: spelledMidi(low.round()),
+                                      high: spelledMidi(high.round()),
+                                      notation: widget.notation,
+                                      style: noteStyle,
+                                      octaveColor: _soft,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      l10n.rangeSpanDetail(l10n.span(shownSpan), shownSpan),
+                                      key: const ValueKey('range-result-span'),
+                                      style: theme.textTheme.titleMedium?.copyWith(color: _soft),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              l10n.rangeSpanDetail(l10n.span(shownSpan), shownSpan),
-                              key: const ValueKey('range-result-span'),
-                              style: theme.textTheme.titleMedium?.copyWith(color: _soft),
+                            const SizedBox(height: 16),
+                            if (delta != null)
+                              FadeTransition(
+                                opacity: details,
+                                child: Text(
+                                  delta > 0
+                                      ? l10n.rangeProgressBetter(delta)
+                                      : delta == 0
+                                          ? l10n.rangeProgressSame
+                                          : l10n.rangeProgressWorseEncouraging(-delta),
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    color: delta > 0 ? const Color(0xFF34D399) : _soft,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            const Spacer(),
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: _violet,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  textStyle: theme.textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                                onPressed: () => Navigator.of(context).pop(RangeResultAction.done),
+                                child: Text(l10n.rangeContinue),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton.icon(
+                              style: TextButton.styleFrom(foregroundColor: _soft),
+                              onPressed: () => Navigator.of(context).pop(RangeResultAction.retry),
+                              icon: const Icon(Icons.replay),
+                              label: Text(l10n.rangeRetryTest),
+                            ),
+                            TextButton.icon(
+                              key: const ValueKey('range-result-not-mine'),
+                              style: TextButton.styleFrom(foregroundColor: _soft),
+                              onPressed: () => Navigator.of(context).pop(RangeResultAction.notMine),
+                              icon: const Icon(Icons.person_off_outlined),
+                              label: Text(l10n.rangeNotMineResult),
                             ),
                           ],
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    if (delta != null)
-                      FadeTransition(
-                        opacity: details,
-                        child: Text(
-                          delta > 0
-                              ? l10n.rangeProgressBetter(delta)
-                              : delta == 0
-                                  ? l10n.rangeProgressSame
-                                  : l10n.rangeProgressWorseEncouraging(-delta),
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: delta > 0 ? const Color(0xFF34D399) : _soft,
-                            fontWeight: FontWeight.w700,
-                          ),
                         ),
                       ),
-                    const Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: _violet,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle:
-                              theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                        onPressed: () => Navigator.of(context).pop(RangeResultAction.done),
-                        child: Text(l10n.rangeContinue),
-                      ),
                     ),
-                    const SizedBox(height: 8),
-                    TextButton.icon(
-                      style: TextButton.styleFrom(foregroundColor: _soft),
-                      onPressed: () => Navigator.of(context).pop(RangeResultAction.retry),
-                      icon: const Icon(Icons.replay),
-                      label: Text(l10n.rangeRetryTest),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

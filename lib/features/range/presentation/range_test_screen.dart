@@ -12,8 +12,10 @@ import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/mascot_coach.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../trainer/presentation/widgets/pitch_feedback_panel.dart';
+import '../application/range_providers.dart';
 import '../application/range_test_controller.dart';
 import 'range_result_screen.dart';
+import 'range_screen.dart' show confirmNotMine;
 
 class RangeTestScreen extends ConsumerStatefulWidget {
   const RangeTestScreen({super.key});
@@ -67,6 +69,18 @@ class _RangeTestScreenState extends ConsumerState<RangeTestScreen> with WidgetsB
     if (action == RangeResultAction.retry && mounted) {
       await ref.read(rangeTestControllerProvider.notifier).start();
     }
+    if (action == RangeResultAction.notMine && mounted) {
+      await _discard();
+    }
+  }
+
+  /// "Non ero io": dopo conferma toglie il test da risultati e storico.
+  Future<void> _discard() async {
+    final record = ref.read(rangeHistoryProvider).value?.lastOrNull;
+    if (record == null || !await confirmNotMine(context, record) || !mounted) {
+      return;
+    }
+    await ref.read(rangeTestControllerProvider.notifier).discardLastResult();
   }
 
   @override
@@ -92,7 +106,12 @@ class _RangeTestScreenState extends ConsumerState<RangeTestScreen> with WidgetsB
           RangePhase.descending ||
           RangePhase.ascending =>
             _TestingView(state: state, controller: controller, notation: notation),
-          RangePhase.done => _ResultView(state: state, controller: controller, notation: notation),
+          RangePhase.done => _ResultView(
+              state: state,
+              controller: controller,
+              notation: notation,
+              onNotMine: _discard,
+            ),
         },
       ),
     );
@@ -384,11 +403,17 @@ class _FindingStartView extends StatelessWidget {
 }
 
 class _ResultView extends StatelessWidget {
-  const _ResultView({required this.state, required this.controller, required this.notation});
+  const _ResultView({
+    required this.state,
+    required this.controller,
+    required this.notation,
+    required this.onNotMine,
+  });
 
   final RangeTestState state;
   final RangeTestController controller;
   final NoteNotation notation;
+  final VoidCallback onNotMine;
 
   @override
   Widget build(BuildContext context) {
@@ -471,6 +496,13 @@ class _ResultView extends StatelessWidget {
           onPressed: () => context.pop(),
           child: Text(l10n.commonClose),
         ),
+        if (lowest != null)
+          TextButton.icon(
+            key: const ValueKey('range-view-not-mine'),
+            onPressed: onNotMine,
+            icon: const Icon(Icons.person_off_outlined),
+            label: Text(l10n.rangeNotMineResult),
+          ),
       ],
     );
   }

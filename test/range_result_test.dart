@@ -95,5 +95,6 @@ void main() {
   testWidgets('continue and retry report the choice', (tester) async {
     expect(await open(tester, tap: 'Continua'), RangeResultAction.done);
     expect(await open(tester, tap: 'Riprova il test'), RangeResultAction.retry);
+    expect(await open(tester, tap: 'Non ero io: togli questo test'), RangeResultAction.notMine);
   });
 }

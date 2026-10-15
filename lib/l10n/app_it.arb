@@ -340,5 +340,10 @@
   "guideOctave": "Quanto in alto o in basso si svolge l'esercizio: scegline una comoda per la tua voce.",
   "guideDirectionTitle": "Modalità",
   "guideDirection": "Dritto esegue la sequenza in avanti, Al contrario all'indietro, Completo in avanti e poi a ritroso.",
-  "guideRepeatTop": "Solo in Completo: canti due volte la nota più alta prima di scendere."
+  "guideRepeatTop": "Solo in Completo: canti due volte la nota più alta prima di scendere.",
+  "rangeNotMine": "Non ero io",
+  "rangeNotMineResult": "Non ero io: togli questo test",
+  "rangeNotMineTitle": "Non era il tuo test?",
+  "rangeNotMineBody": "Il test del {date} verrà tolto dai risultati e dallo storico.",
+  "rangeNotMineConfirm": "Togli"
 }
