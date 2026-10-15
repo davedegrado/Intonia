@@ -5,11 +5,17 @@ import WidgetKit
 private let appGroupId = "group.io.github.davedegrado.intonia"
 private let keyLastTrainingDay = "intonia_last_training_day"
 private let keyStreak = "intonia_streak_at_last_training"
+private let keyLanguage = "intonia_language"
 
-/// Testi del widget: italiano se il dispositivo è in italiano, altrimenti
-/// inglese (come l'app per le lingue non supportate).
+/// Testi del widget nella lingua scelta nell'app (salvata da
+/// HomeWidgetService); senza indicazioni, italiano se il dispositivo è in
+/// italiano, altrimenti inglese (come l'app per le lingue non supportate).
 enum WidgetStrings {
-  static let italian = (Locale.preferredLanguages.first ?? "en").hasPrefix("it")
+  static var italian: Bool {
+    let appLanguage = UserDefaults(suiteName: appGroupId)?.string(forKey: keyLanguage)
+    let language = appLanguage ?? Locale.preferredLanguages.first ?? "en"
+    return language.hasPrefix("it")
+  }
 
   static func streakTitle(_ streak: Int) -> String {
     if italian {
