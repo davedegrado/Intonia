@@ -1,0 +1,33 @@
+{
+  "@@locale": "it",
+  "appTitle": "Intonia",
+
+  "navHome": "Home",
+  "navExercises": "Esercizi",
+  "navRange": "Estensione",
+  "navProfile": "Profilo",
+
+  "commonCancel": "Annulla",
+  "commonDelete": "Elimina",
+  "commonClose": "Chiudi",
+  "commonSave": "Salva",
+  "commonBack": "Indietro",
+  "commonRetry": "Riprova",
+
+  "spanSemitones": "{count, plural, =1{1 semitono} other{{count} semitoni}}",
+  "spanOctaves": "{count, plural, =1{1 ottava} other{{count} ottave}}",
+  "spanOctavesAndSemitones": "{octaves} + {semitones}",
+
+  "languageSectionTitle": "Lingua",
+  "languageItalian": "Italiano",
+  "languageEnglish": "English",
+  "languageHint": "I nomi delle note (C D E oppure DO RE MI) si scelgono a parte, in Notazione delle note.",
+
+  "themeSystem": "Sistema",
+  "themeLight": "Chiaro",
+  "themeDark": "Scuro",
+  "themeNeon": "Neon",
+
+  "notationInternational": "C D E",
+  "notationItalian": "DO RE MI"
+}

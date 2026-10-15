@@ -1,0 +1,40 @@
+{
+  "@@locale": "en",
+  "appTitle": "Intonia",
+  "@appTitle": {"description": "Product name, never translated."},
+
+  "navHome": "Home",
+  "navExercises": "Exercises",
+  "navRange": "Range",
+  "navProfile": "Profile",
+
+  "commonCancel": "Cancel",
+  "commonDelete": "Delete",
+  "commonClose": "Close",
+  "commonSave": "Save",
+  "commonBack": "Back",
+  "commonRetry": "Try again",
+
+  "spanSemitones": "{count, plural, =1{1 semitone} other{{count} semitones}}",
+  "@spanSemitones": {"placeholders": {"count": {"type": "int"}}},
+  "spanOctaves": "{count, plural, =1{1 octave} other{{count} octaves}}",
+  "@spanOctaves": {"placeholders": {"count": {"type": "int"}}},
+  "spanOctavesAndSemitones": "{octaves} + {semitones}",
+  "@spanOctavesAndSemitones": {
+    "description": "Range width, e.g. '2 octaves + 7 semitones'. Both parts are already pluralized.",
+    "placeholders": {"octaves": {"type": "String"}, "semitones": {"type": "String"}}
+  },
+
+  "languageSectionTitle": "Language",
+  "languageItalian": "Italiano",
+  "languageEnglish": "English",
+  "languageHint": "The note names (C D E or DO RE MI) are chosen separately, under Note names.",
+
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeNeon": "Neon",
+
+  "notationInternational": "C D E",
+  "notationItalian": "DO RE MI"
+}

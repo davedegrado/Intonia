@@ -43,9 +43,12 @@ class AppSettingsRepository {
     }
   }
 
+  /// Notazione salvata. Senza una scelta esplicita (nuova installazione o
+  /// preferenza mai salvata) vale la notazione internazionale C D E; una
+  /// scelta già salvata, anche "italian", viene sempre rispettata.
   Future<NoteNotation> loadNotation() async {
     final json = await _read();
-    return json['notation'] == 'english' ? NoteNotation.english : NoteNotation.italian;
+    return json['notation'] == 'italian' ? NoteNotation.italian : NoteNotation.english;
   }
 
   Future<void> saveNotation(NoteNotation notation) {
@@ -71,6 +74,17 @@ class AppSettingsRepository {
           AppThemeSetting.neon => 'neon',
           AppThemeSetting.system => 'system',
         });
+  }
+
+  /// Lingua scelta a mano (codice, es. "it"); null = lingua del dispositivo.
+  Future<String?> loadLanguage() async {
+    final json = await _read();
+    final value = json['language'];
+    return value is String ? value : null;
+  }
+
+  Future<void> saveLanguage(String? languageCode) {
+    return _write('language', languageCode);
   }
 
   /// Soglia RMS di silenzio calibrata sul rumore ambientale (null = default).
