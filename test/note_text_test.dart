@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/app/note_text.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
+import 'package:vocal_scale_trainer/l10n/app_localizations.dart';
 
 /// Span di testo di primo livello (nome e ottava) di un Text.rich.
 List<TextSpan> _parts(WidgetTester tester, Finder finder) {
@@ -19,6 +20,9 @@ List<TextSpan> _parts(WidgetTester tester, Finder finder) {
 void main() {
   testWidgets('the note name dominates, the octave is small and secondary', (tester) async {
     await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('it'),
       home: Scaffold(
         body: NoteText(
           spelledMidi(60),
@@ -38,8 +42,25 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('the octave is announced in the active language', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: Scaffold(
+        body: NoteText(spelledMidi(70), notation: NoteNotation.english),
+      ),
+    ));
+    final handle = tester.ensureSemantics();
+    expect(find.bySemanticsLabel('Bb, octave 4'), findsOneWidget);
+    handle.dispose();
+  });
+
   testWidgets('a range keeps both octaves small, with surrounding text', (tester) async {
     await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('it'),
       home: Scaffold(
         body: NoteRangeText(
           low: spelledMidi(48),
