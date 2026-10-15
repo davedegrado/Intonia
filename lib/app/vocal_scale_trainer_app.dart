@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/home_widget/application/home_widget_sync.dart';
 import '../features/settings/application/settings_providers.dart';
+import '../l10n/app_localizations.dart';
 import 'app_router.dart';
 import 'app_theme.dart';
 import 'splash_overlay.dart';
@@ -19,7 +19,7 @@ class VocalScaleTrainerApp extends ConsumerWidget {
     final neon = setting == AppThemeSetting.neon;
 
     return MaterialApp.router(
-      title: 'Intonia',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       theme: neon ? buildNeonTheme() : buildLightTheme(),
       darkTheme: neon ? buildNeonTheme() : buildDarkTheme(),
@@ -30,8 +30,11 @@ class VocalScaleTrainerApp extends ConsumerWidget {
       },
       routerConfig: ref.watch(appRouterProvider),
       builder: (context, child) => SplashOverlay(child: child ?? const SizedBox.shrink()),
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: const [Locale('it'), Locale('en')],
+      // Lingua: scelta manuale, altrimenti quella del dispositivo se
+      // supportata, altrimenti inglese (vedi appLocaleProvider).
+      locale: ref.watch(appLocaleProvider),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }

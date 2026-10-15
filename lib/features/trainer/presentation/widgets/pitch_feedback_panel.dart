@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/l10n.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
 import '../../../../core/pitch/pitch_detection_result.dart';
@@ -24,16 +25,17 @@ class PitchFeedbackPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notation = ref.watch(notationProvider);
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final cents = detection?.cents ?? 0;
     final normalized = ((cents.clamp(-50, 50) + 50) / 100).toDouble();
     final hasPitch = detection != null && detection!.confidence > 0;
     final label = !hasPitch
-        ? 'In ascolto'
+        ? l10n.trainerListening
         : cents.abs() <= toleranceCents
-            ? 'intonata'
+            ? l10n.trainerInTune
             : cents < 0
-                ? 'troppo bassa'
-                : 'troppo alta';
+                ? l10n.trainerTooLow
+                : l10n.trainerTooHigh;
 
     return Card(
       child: Padding(
@@ -41,13 +43,13 @@ class PitchFeedbackPanel extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Riconoscimento', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.trainerDetection, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: _Metric(
-                    label: 'Nota rilevata',
+                    label: l10n.trainerDetectedNote,
                     value: !hasPitch
                         ? '-'
                         : root != null
@@ -57,9 +59,11 @@ class PitchFeedbackPanel extends ConsumerWidget {
                 ),
                 Expanded(
                   child: _Metric(
-                    label: 'Scostamento',
-                    value:
-                        hasPitch ? '${cents >= 0 ? '+' : ''}${cents.toStringAsFixed(0)} cent' : '-',
+                    label: l10n.trainerDeviation,
+                    value: hasPitch
+                        ? l10n.trainerCentsValue(
+                            '${cents >= 0 ? '+' : ''}${cents.toStringAsFixed(0)}')
+                        : '-',
                   ),
                 ),
               ],

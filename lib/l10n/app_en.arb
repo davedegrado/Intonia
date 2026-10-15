@@ -1,0 +1,684 @@
+{
+  "@@locale": "en",
+  "appTitle": "Intonia",
+  "@appTitle": {
+    "description": "Product name, never translated."
+  },
+  "navHome": "Home",
+  "navExercises": "Exercises",
+  "navRange": "Range",
+  "navProfile": "Profile",
+  "commonCancel": "Cancel",
+  "commonDelete": "Delete",
+  "commonClose": "Close",
+  "commonSave": "Save",
+  "commonBack": "Back",
+  "commonRetry": "Try again",
+  "spanSemitones": "{count, plural, =1{1 semitone} other{{count} semitones}}",
+  "@spanSemitones": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spanOctaves": "{count, plural, =1{1 octave} other{{count} octaves}}",
+  "@spanOctaves": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spanOctavesAndSemitones": "{octaves} + {semitones}",
+  "@spanOctavesAndSemitones": {
+    "description": "Range width, e.g. '2 octaves + 7 semitones'. Both parts are already pluralized.",
+    "placeholders": {
+      "octaves": {
+        "type": "String"
+      },
+      "semitones": {
+        "type": "String"
+      }
+    }
+  },
+  "languageSectionTitle": "Language",
+  "languageItalian": "Italiano",
+  "languageEnglish": "English",
+  "languageHint": "The note names (C D E or DO RE MI) are chosen separately, under Note names.",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeNeon": "Neon",
+  "notationInternational": "C D E",
+  "notationItalian": "DO RE MI",
+  "trainerAdvancedSettings": "Advanced settings",
+  "trainerCurrentNote": "Current note",
+  "trainerPlayCurrentNote": "Play the current note",
+  "trainerSessionStats": "Session stats",
+  "trainerStartingNote": "Starting note:",
+  "@trainerStartingNote": {
+    "description": "Followed by the note name (custom sequences)."
+  },
+  "trainerKey": "Key",
+  "trainerOctave": "Octave",
+  "trainerModeListen": "Listen",
+  "trainerModeTrain": "Training",
+  "trainerPlay": "Play",
+  "trainerStop": "Stop",
+  "trainerBpm": "BPM",
+  "trainerSettingValue": "{label}: {value}",
+  "@trainerSettingValue": {
+    "description": "Slider caption, e.g. 'Tolerance: ± 25 cents'.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trainerTolerance": "Tolerance",
+  "trainerToleranceValue": "± {cents} cents",
+  "@trainerToleranceValue": {
+    "placeholders": {
+      "cents": {
+        "type": "int"
+      }
+    }
+  },
+  "trainerStabilityTime": "Stability time",
+  "trainerMilliseconds": "{ms} ms",
+  "@trainerMilliseconds": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "trainerGuideEveryNote": "Play the guide note on every note",
+  "trainerGuideEveryNoteHint": "When off, you only hear the first note: tap a note to hear it again",
+  "trainerLoop": "Loop (Listen mode only)",
+  "trainerCalibrate": "Calibrate background noise",
+  "trainerCalibrating": "Stay silent… (3 s)",
+  "trainerCalibrationFailed": "Calibration failed: check the microphone permission.",
+  "trainerCalibrationDone": "Calibration complete: background noise filtered out.",
+  "trainerStatusMicOn": "Microphone on",
+  "trainerStatusPlaying": "Playing",
+  "trainerStatusReady": "Ready",
+  "trainerMicrophoneDenied": "Microphone permission denied: enable it in your system settings to train.",
+  "trainerAudioUnavailable": "Audio could not start: check the microphone and the piano.sf2 SoundFont.",
+  "trainerDetection": "Detection",
+  "trainerDetectedNote": "Detected note",
+  "trainerDeviation": "Deviation",
+  "trainerCentsValue": "{value} cents",
+  "@trainerCentsValue": {
+    "description": "Signed deviation, e.g. '+12 cents'.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trainerListening": "Listening",
+  "trainerInTune": "in tune",
+  "trainerTooLow": "too low",
+  "trainerTooHigh": "too high",
+  "trainerStatTime": "Time",
+  "trainerStatErrors": "Errors",
+  "trainerStatAccuracy": "Accuracy",
+  "trainerStatCorrect": "Correct",
+  "trainerViewNotes": "Notes",
+  "trainerViewStaff": "Staff",
+  "trainerNoteCorrect": "{note}, correct",
+  "@trainerNoteCorrect": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "trainerNoteWrong": "{note}, to retry",
+  "@trainerNoteWrong": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "trainerNoteCurrent": "{note}, current note",
+  "@trainerNoteCurrent": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "trainerNotePending": "{note}, to sing",
+  "@trainerNotePending": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "trainerTapToHear": "tap to hear it",
+  "trainerStaffSemantics": "Staff: {notes}",
+  "@trainerStaffSemantics": {
+    "description": "Screen reader label for the staff, followed by the comma-separated note names.",
+    "placeholders": {
+      "notes": {
+        "type": "String"
+      }
+    }
+  },
+  "mascotSemanticLabel": "Intonia mascot",
+  "mascotCompleted": "Exercise complete! Great job.",
+  "mascotSuccess": "Perfect! Keep it up.",
+  "mascotRetry": "Almost! Try again.",
+  "mascotListenSequence": "Listen closely to the sequence…",
+  "mascotSingNote": "Sing the note: I'm listening.",
+  "mascotIdleListen": "Press Play and listen to the sequence.",
+  "mascotIdleTrain": "Ready to train your ear?",
+  "sessionPerfectTitle": "Perfect!",
+  "sessionPerfectMessage": "No mistakes: you were perfectly in tune!",
+  "sessionGreatTitle": "Great job!",
+  "sessionGreatMessage": "Almost perfect: your ear is getting better.",
+  "sessionGoodTitle": "Well done!",
+  "sessionGoodMessage": "You're nearly there: repeat it to lock in the notes.",
+  "sessionRetryTitle": "Don't give up!",
+  "sessionRetryMessage": "Listen to the notes again and retry: you improve every round.",
+  "sessionCorrect": "Correct",
+  "sessionErrors": "Errors",
+  "sessionDuration": "Duration",
+  "sessionSeconds": "{seconds} s",
+  "@sessionSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionAccuracy": "accuracy",
+  "sessionAccuracySemantics": "Accuracy {percent} percent",
+  "@sessionAccuracySemantics": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionContinue": "Continue",
+  "sessionRepeat": "Repeat exercise",
+  "rangeSectionTitle": "Vocal range",
+  "rangeHeadline": "Discover your vocal range",
+  "rangeIntro": "Start from a comfortable note: we go down to the lowest and up to the highest note you can sing. The result stays in your profile so you can track your progress.",
+  "rangeStartTest": "Start test",
+  "rangeRetakeTest": "Retake the test",
+  "rangeNoTestsYet": "No tests yet: your result will appear here.",
+  "rangePreviousTests": "Previous tests",
+  "rangeHistoryInProfile": "Test history in your profile",
+  "rangeLatestResult": "Latest result",
+  "rangeSpanDetail": "{span} ({count, plural, =1{1 semitone} other{{count} semitones}})",
+  "@rangeSpanDetail": {
+    "description": "Range width followed by the total semitones, e.g. '2 octaves + 5 semitones (29 semitones)'. span is already localized.",
+    "placeholders": {
+      "span": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rangeLowest": "Lowest",
+  "rangeHighest": "Highest",
+  "rangeDeltaShort": "{delta} st",
+  "@rangeDeltaShort": {
+    "description": "Compact signed change in semitones, e.g. '+2 st'.",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "rangeTestTitle": "Vocal range test",
+  "rangeHowItWorks": "How it works",
+  "rangeHowItWorksBody": "Tap \"Start the test\" and sing a comfortable note, holding it for a moment: I'll recognize it and from there we go down one semitone at a time. You only move on when you hit the note; when you really can't reach it, tap \"Low limit reached\" (or skip that single note). Then we go up toward the high notes the same way. At the end your range is saved in your profile.",
+  "rangeSensitivity": "Sensitivity",
+  "rangeTolerance": "Tolerance",
+  "rangeStabilityTime": "Stability time",
+  "rangeCents": "± {cents} cents",
+  "@rangeCents": {
+    "placeholders": {
+      "cents": {
+        "type": "int"
+      }
+    }
+  },
+  "rangeLastTestPrefix": "Last test: ",
+  "rangeStartButton": "Start the test",
+  "rangeTowardLow": "Going down",
+  "rangeTowardHigh": "Going up",
+  "rangeSingThisNote": "Sing this note (tap to hear it again)",
+  "rangeValidatedSoFar": "Range validated so far: ",
+  "rangeSkipNote": "Skip this note",
+  "rangeLowLimitReached": "Low limit reached",
+  "rangeHighLimitReached": "High limit reached",
+  "rangeCancelTest": "Cancel the test",
+  "rangeSingComfortable": "Sing a comfortable note and hold it",
+  "rangeListening": "Listening…",
+  "rangeStartHoldHint": "When the bar is full, that's your starting note.",
+  "rangeYourRange": "Your range",
+  "rangeProgressBetter": "{count, plural, =1{+1 semitone} other{+{count} semitones}} compared to your last test",
+  "@rangeProgressBetter": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rangeProgressSame": "Same span as your last test",
+  "rangeProgressWorse": "{count, plural, =1{-1 semitone} other{-{count} semitones}} compared to your last test",
+  "@rangeProgressWorse": {
+    "description": "count is the absolute number of semitones lost.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rangeProgressWorseEncouraging": "{count, plural, =1{-1 semitone} other{-{count} semitones}} compared to your last test: it happens, your voice changes from day to day",
+  "@rangeProgressWorseEncouraging": {
+    "description": "count is the absolute number of semitones lost.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rangeSavedToProfile": "Result saved to your profile: the test history shows your progress over time.",
+  "rangeRetryTest": "Retry the test",
+  "rangeContinue": "Continue",
+  "rangeCoachValidated": "Great! Next note.",
+  "rangeCoachSkipped": "No problem, let's try the next one.",
+  "rangeCoachSetup": "Start from a comfortable note: we'll go down toward the low notes together.",
+  "rangeCoachFindingStart": "Sing a comfortable note and hold it: I'll recognize it.",
+  "rangeCoachDescending": "Sing the note: we're heading down.",
+  "rangeCoachAscending": "Now let's go up toward the high notes!",
+  "rangeCoachDone": "Here's your range! Great job.",
+  "rangeCoachRetry": "Let's try again starting from a more comfortable note.",
+  "rangeMicDenied": "Microphone permission denied: enable it in your system settings.",
+  "rangeAudioInitFailed": "Audio not initialized: check the microphone and the SoundFont.",
+  "rangeNothingValidated": "No notes validated: the test was not saved.",
+  "rangeResultFirst": "Here's your vocal range!",
+  "rangeResultBetter": "New record!",
+  "rangeResultSame": "Range confirmed!",
+  "rangeResultWorse": "Here's your range today",
+  "profileTitle": "Profile",
+  "profileSettingsTooltip": "Settings",
+  "profileEmptyTitle": "No sessions yet",
+  "profileEmptyBody": "Complete a workout: here you'll find your streak, accuracy, vocal range and history.",
+  "profileStatSessions": "Sessions",
+  "profileStatMinutes": "Total minutes",
+  "profileStatAccuracy": "Average accuracy",
+  "profileStatRange": "Vocal range",
+  "profileBestWorstNotes": "Best and worst notes",
+  "profileRangeTests": "Vocal range tests",
+  "profileRangeDeltaUp": "{count, plural, =1{+1 semitone} other{+{count} semitones}} vs. previous",
+  "@profileRangeDeltaUp": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileRangeDeltaDown": "{count, plural, =1{-1 semitone} other{-{count} semitones}} vs. previous",
+  "@profileRangeDeltaDown": {
+    "description": "count is the absolute number of semitones lost.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileRangeUnchanged": "unchanged",
+  "profileDeleteRangeTooltip": "Delete test",
+  "profileDeleteSessionTooltip": "Delete session",
+  "profileAllSessions": "All sessions",
+  "profileRecentSessions": "Recent sessions",
+  "profileFullHistoryPro": "Full history ({count, plural, =1{1 session} other{{count} sessions}}) with Intonia Pro",
+  "@profileFullHistoryPro": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileDeleteRangeTitle": "Delete this test?",
+  "profileDeleteRangeBody": "The test from {date} will be removed.",
+  "@profileDeleteRangeBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileDeleteSessionTitle": "Delete this session?",
+  "profileDeleteSessionBody": "\"{name}\" from {date} will be removed from your stats, streak and vocal range.",
+  "@profileDeleteSessionBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileStreakDays": "{count, plural, =1{1-day streak} other{{count}-day streak}}",
+  "@profileStreakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStreakStart": "Practice today to start your streak!",
+  "profileStreakKeep": "Keep it up, don't break it!",
+  "exerciseNameTriadMajor": "Major triad",
+  "exerciseNameTriadMinor": "Minor triad",
+  "exerciseNameTriadAugmented": "Augmented triad",
+  "exerciseNameTriadDiminished": "Diminished triad",
+  "exerciseNameArpeggioMajorOctave": "Major arpeggio (octave)",
+  "exerciseNameArpeggioMinorOctave": "Minor arpeggio (octave)",
+  "exerciseNameMajorPentatonic": "Major pentatonic",
+  "exerciseNameMinorPentatonic": "Minor pentatonic",
+  "exerciseNameMajor": "Major scale",
+  "exerciseNameNaturalMinor": "Natural minor scale",
+  "exerciseNameHarmonicMinor": "Harmonic minor scale",
+  "exerciseNameMelodicMinor": "Melodic minor scale",
+  "exerciseNameBlues": "Blues scale",
+  "exerciseNameHarmonizedMajor": "Harmonized major scale",
+  "exerciseNameHarmonizedNaturalMinor": "Harmonized natural minor scale",
+  "exerciseNameHarmonizedHarmonicMinor": "Harmonized harmonic minor scale",
+  "exerciseNameHarmonizedMelodicMinor": "Harmonized melodic minor scale",
+  "exerciseNameFiveNotePattern": "5-note pattern (1-2-3-4-5)",
+  "exerciseNameThirdLeaps": "Leaps in thirds (1-3, 2-4...)",
+  "categoryLabelCustom": "Your sequences",
+  "categoryDescriptionCustom": "Create and practice your own custom sequences",
+  "categoryLabelTriads": "Triads",
+  "categoryDescriptionTriads": "Major, minor, augmented and diminished",
+  "categoryLabelArpeggios": "Arpeggios",
+  "categoryDescriptionArpeggios": "Triads extended to the octave",
+  "categoryLabelPentatonics": "Pentatonic scales",
+  "categoryDescriptionPentatonics": "Major and minor",
+  "categoryLabelScales": "Scales",
+  "categoryDescriptionScales": "Major, minor and blues",
+  "categoryLabelHarmonizations": "Three-part harmonies",
+  "categoryDescriptionHarmonizations": "Diatonic triads on every scale degree",
+  "categoryLabelPatterns": "Patterns",
+  "categoryDescriptionPatterns": "Melodic warm-up sequences",
+  "focusAccuracy": "Accuracy",
+  "focusEar": "Ear training",
+  "focusAgility": "Agility",
+  "focusControl": "Control",
+  "focusRange": "Range",
+  "editorTitleNew": "New sequence",
+  "editorTitleEdit": "Edit sequence",
+  "editorNameLabel": "Name",
+  "editorNameHint": "e.g. Octave sirens / Vocalise 1-3-5-8",
+  "editorGroupLabel": "Group (optional)",
+  "editorGroupHint": "e.g. Warm-up, Lesson 3…",
+  "editorTagLabel": "Tag (optional)",
+  "editorAddNotesTitle": "Add notes",
+  "editorAddNotesHint": "You can start from any note, repeat the same note and go below the first one. In the trainer you can still transpose the whole sequence.",
+  "editorOctaveShort": "Oct. {octave}",
+  "@editorOctaveShort": {
+    "description": "Short label of the octave selector in the note picker.",
+    "placeholders": {
+      "octave": {
+        "type": "int"
+      }
+    }
+  },
+  "editorSequenceTitle": "{count, plural, =1{Sequence (1 note)} other{Sequence ({count} notes)}}",
+  "@editorSequenceTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "editorPreview": "Preview",
+  "editorRemoveLast": "Remove last note",
+  "editorEmptySequence": "Tap the notes above to build the sequence.",
+  "editorErrorNoName": "Give the sequence a name.",
+  "editorErrorTooFewNotes": "Add at least 2 notes.",
+  "editorAudioUnavailable": "Audio unavailable: check the piano.sf2 SoundFont.",
+  "editorProTitle": "Create your sequence",
+  "editorProHeadline": "Your sequences, made to measure",
+  "editorProBody": "Compose any run of notes, starting from any note you like: vocalises, patterns, leaps, range work. Sequences are saved on the Home screen, grouped the way you prefer, and you practice them just like the built-in exercises.",
+  "editorProNote": "Creating, editing and saving sequences is an Intonia Pro feature. Sequences you have already saved remain available.",
+  "editorProCta": "Discover Intonia Pro",
+  "noteSemanticsLabel": "{note}, octave {octave}",
+  "@noteSemanticsLabel": {
+    "description": "Screen reader label of a note name with its octave, e.g. 'C, octave 4'.",
+    "placeholders": {
+      "note": {
+        "type": "String"
+      },
+      "octave": {
+        "type": "int"
+      }
+    }
+  },
+  "statusStreakSemantics": "{count, plural, =1{Streak: 1 day in a row} other{Streak: {count} days in a row}}",
+  "@statusStreakSemantics": {
+    "description": "Screen reader label of the streak pill.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeBubbleIdle": "Sing or play a note: I'll tell you which one!",
+  "@homeBubbleIdle": {
+    "description": "Mascot speech bubble. Must fit two short lines."
+  },
+  "homeBubbleListening": "I'm listening… sing or play a note.",
+  "@homeBubbleListening": {
+    "description": "Mascot speech bubble. Must fit two short lines."
+  },
+  "homeBubbleInTune": "Perfectly in tune!",
+  "homeBubbleAlmost": "Almost there: adjust just a little.",
+  "homeBubblePermissionDenied": "Microphone access denied: enable it in Settings.",
+  "@homeBubblePermissionDenied": {
+    "description": "Mascot speech bubble. Must fit two short lines."
+  },
+  "homeStartListening": "Start listening",
+  "homeStopListening": "Stop listening",
+  "homeMicStartSemantics": "Start live note detection",
+  "homeMicStopSemantics": "Stop note detection",
+  "homeNotePlaceholder": "Here you'll see the detected note and how in tune you are.",
+  "homeNoteDetected": "Detected note",
+  "homeLastNote": "Last note",
+  "homeDeviation": "Deviation",
+  "homeCents": "{value} cents",
+  "@homeCents": {
+    "description": "Signed deviation in cents, e.g. '+3 cents'.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "homeQuickNotation": "Notation",
+  "homeQuickTheme": "Theme",
+  "homeQuickSettings": "Settings",
+  "exercisesCategories": "Categories",
+  "exercisesSequenceCount": "{count, plural, =1{1 sequence} other{{count} sequences}}",
+  "@exercisesSequenceCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exercisesCount": "{count, plural, =1{1 exercise} other{{count} exercises}}",
+  "@exercisesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exercisesNoteCount": "{count, plural, =1{1 note} other{{count} notes}}",
+  "@exercisesNoteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exercisesProBadge": "PRO",
+  "exercisesEdit": "Edit",
+  "exercisesDeleteTitle": "Delete this sequence?",
+  "exercisesDeleteMessage": "“{name}” will be permanently removed.",
+  "@exercisesDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exercisesCreateTitle": "Create your sequence",
+  "exercisesCreateSubtitle": "Compose any run of notes: patterns, vocal warm-ups, range drills…",
+  "chargesProSemantics": "Intonia Pro: unlimited exercises",
+  "chargesProDeveloperSemantics": "Intonia Pro, developer build: unlimited exercises",
+  "chargesChipSemantics": "Exercise charges: {count} of {max}",
+  "@chargesChipSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "chargesWaitUnderMinute": "less than 1 min",
+  "chargesWaitMinutes": "{minutes} min",
+  "@chargesWaitMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "chargesWaitHours": "{hours} h",
+  "@chargesWaitHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "chargesWaitHoursMinutes": "{hours} h {minutes} min",
+  "@chargesWaitHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "chargesTitle": "Exercise charges",
+  "chargesExhaustedTitle": "Out of charges",
+  "chargesNextIn": "Next charge in {wait}.",
+  "@chargesNextIn": {
+    "placeholders": {
+      "wait": {
+        "type": "String"
+      }
+    }
+  },
+  "chargesExplanation": "Each exercise session uses one charge. {hours, plural, =1{One comes back every hour} other{One comes back every {hours} hours}}, even with the app closed, up to {max}.",
+  "@chargesExplanation": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "chargesFreeFeatures": "Live note detection and the vocal range test are always free and unlimited.",
+  "chargesDiscoverPro": "Discover Intonia Pro",
+  "chargesWaitForRecharge": "I'll wait for a recharge",
+  "chargesHint": "Each session uses 1 charge · {count}/{max} available",
+  "@chargesHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "proTitle": "Intonia Pro",
+  "proHeadlinePro": "You have Intonia Pro",
+  "proHeadlineFree": "Train without limits",
+  "proDeveloperNote": "Developer build: Pro active without a subscription.",
+  "proBenefitUnlimitedTitle": "Unlimited exercises",
+  "proBenefitUnlimitedText": "No charges: as many sessions as you like.",
+  "proBenefitCustomTitle": "Custom sequences",
+  "proBenefitCustomText": "Create, edit and save your own exercises.",
+  "proBenefitHistoryTitle": "Full history",
+  "proBenefitHistoryText": "All your sessions in your profile.",
+  "proBenefitComingTitle": "Coming soon",
+  "proBenefitComingText": "Advanced statistics, progress charts and personalized paths.",
+  "proFreeForever": "Free forever: live note detection, the vocal range test, every exercise with {max} recharging charges, profile, essential stats and daily streak.",
+  "@proFreeForever": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "proPlanMonthly": "Monthly",
+  "proPlanYearly": "Yearly",
+  "proPriceMonthly": "€4.99",
+  "@proPriceMonthly": {
+    "description": "Indicative price, formatted for the locale."
+  },
+  "proPriceYearly": "€39.99",
+  "@proPriceYearly": {
+    "description": "Indicative price, formatted for the locale."
+  },
+  "proPeriodMonth": "per month",
+  "proPeriodYear": "per year",
+  "proYearlySaving": "Save 33%",
+  "proSubscribe": "Subscribe",
+  "proComingSoon": "Subscriptions will be available soon through the App Store and Google Play.",
+  "proRestore": "Restore purchases",
+  "settingsTitle": "Settings",
+  "settingsAppearance": "Appearance",
+  "settingsNotation": "Note names",
+  "settingsInfo": "About",
+  "settingsAbout": "Intonia {version} — offline pitch training.",
+  "@settingsAbout": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSoundCredit": "Piano sound: Fluid (R3) SoundFont, © 2000–2002, 2008 Frank Wen, MIT license.",
+  "settingsLicenses": "Licenses"
+}

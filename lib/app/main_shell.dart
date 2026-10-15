@@ -4,19 +4,23 @@ import 'package:go_router/go_router.dart';
 
 import '../features/tuner/application/tuner_controller.dart';
 import 'app_theme.dart';
+import 'l10n.dart';
 
 /// Destinazioni principali, nell'ordine della barra di navigazione.
 const mainDestinations = [
-  (path: '/', label: 'Home', icon: Icons.home_outlined, selected: Icons.home),
-  (
-    path: '/exercises',
-    label: 'Esercizi',
-    icon: Icons.music_note_outlined,
-    selected: Icons.music_note
-  ),
-  (path: '/range', label: 'Estensione', icon: Icons.bar_chart_outlined, selected: Icons.bar_chart),
-  (path: '/profile', label: 'Profilo', icon: Icons.person_outline, selected: Icons.person),
+  (path: '/', icon: Icons.home_outlined, selected: Icons.home),
+  (path: '/exercises', icon: Icons.music_note_outlined, selected: Icons.music_note),
+  (path: '/range', icon: Icons.bar_chart_outlined, selected: Icons.bar_chart),
+  (path: '/profile', icon: Icons.person_outline, selected: Icons.person),
 ];
+
+/// Nome di una sezione principale nella lingua attiva.
+String destinationLabel(AppLocalizations l10n, String path) => switch (path) {
+      '/exercises' => l10n.navExercises,
+      '/range' => l10n.navRange,
+      '/profile' => l10n.navProfile,
+      _ => l10n.navHome,
+    };
 
 /// Scaffold delle quattro sezioni principali con la barra di navigazione.
 class MainShell extends ConsumerWidget {
@@ -79,7 +83,7 @@ class MainShell extends ConsumerWidget {
               NavigationDestination(
                 icon: Icon(destination.icon),
                 selectedIcon: Icon(destination.selected),
-                label: destination.label,
+                label: destinationLabel(context.l10n, destination.path),
               ),
           ],
         ),

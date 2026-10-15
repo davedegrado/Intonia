@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Testi del widget: inglese di base (anche per le lingue non supportate),
+     italiano in values-it. -->
 <resources>
-    <string name="widget_description">La tua serie di allenamenti con la mascotte di Intonia</string>
-    <string name="widget_mascot_description">Mascotte di Intonia</string>
-    <string name="widget_default_title">Allena l\'orecchio</string>
-    <string name="widget_default_message">Pronto ad allenarti? 🎵</string>
+    <string name="widget_description">Your Intonia training streak with the mascot</string>
+    <string name="widget_mascot_description">Intonia mascot</string>
+    <string name="widget_default_title">Train your ear</string>
+    <string name="widget_default_message">Ready to practice? 🎵</string>
+    <string name="widget_message_trained">Done! You\'re unstoppable ✨</string>
+    <string name="widget_message_keep_streak">Practice today: keep your streak! 🔥</string>
+    <plurals name="widget_streak_title">
+        <item quantity="one">%d-day streak</item>
+        <item quantity="other">%d-day streak</item>
+    </plurals>
+    <plurals name="widget_streak_label">
+        <item quantity="one">day\nstreak</item>
+        <item quantity="other">day\nstreak</item>
+    </plurals>
 </resources>

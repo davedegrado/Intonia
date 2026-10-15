@@ -64,6 +64,11 @@ class _MemorySettings extends AppSettingsRepository {
   Future<AppThemeSetting> loadThemeSetting() async => theme;
   @override
   Future<void> saveThemeSetting(AppThemeSetting value) async => theme = value;
+  String? language = 'it';
+  @override
+  Future<String?> loadLanguage() async => language;
+  @override
+  Future<void> saveLanguage(String? value) async => language = value;
   @override
   Future<double?> loadNoiseThreshold() async => null;
   @override
@@ -97,6 +102,7 @@ Future<_App> _launch(
   List<RangeRecord> ranges = const [],
   Size size = const Size(390, 844),
   AppThemeSetting theme = AppThemeSetting.dark,
+  Locale device = const Locale('it'),
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -113,6 +119,7 @@ Future<_App> _launch(
       rangeHistoryRepositoryProvider.overrideWithValue(_MemoryRanges([...ranges])),
       customExerciseRepositoryProvider.overrideWithValue(_MemoryCustom()),
       appSettingsRepositoryProvider.overrideWithValue(app.settings),
+      deviceLocaleProvider.overrideWithValue(device),
     ],
     child: const VocalScaleTrainerApp(),
   ));

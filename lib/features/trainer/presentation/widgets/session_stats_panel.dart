@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/l10n.dart';
 import '../../../../core/session/session_stats.dart';
 
 class SessionStatsPanel extends StatelessWidget {
@@ -13,22 +14,23 @@ class SessionStatsPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accuracy = (stats.accuracy * 100).toStringAsFixed(0);
+    final l10n = context.l10n;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Statistiche sessione', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.trainerSessionStats, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             Wrap(
               spacing: 12,
               runSpacing: 12,
               children: [
-                _StatTile(label: 'Tempo', value: _formatDuration(stats.elapsed)),
-                _StatTile(label: 'Errori', value: '${stats.errors}'),
-                _StatTile(label: 'Accuratezza', value: '$accuracy%'),
-                _StatTile(label: 'Corrette', value: '${stats.correctNotes}'),
+                _StatTile(label: l10n.trainerStatTime, value: _formatDuration(stats.elapsed)),
+                _StatTile(label: l10n.trainerStatErrors, value: '${stats.errors}'),
+                _StatTile(label: l10n.trainerStatAccuracy, value: '$accuracy%'),
+                _StatTile(label: l10n.trainerStatCorrect, value: '${stats.correctNotes}'),
               ],
             ),
             const SizedBox(height: 14),

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/app_theme.dart';
+import '../../../app/l10n.dart';
 import '../../../app/main_shell.dart';
 import '../../../app/neon_scene.dart';
 import '../../../app/status_chips.dart';
 import '../../../core/music/exercise.dart';
+import '../../../l10n/exercise_l10n.dart';
 import '../../access/application/access_providers.dart';
 import '../../access/domain/entitlement.dart';
 import '../application/exercise_providers.dart';
@@ -35,8 +37,9 @@ class ExercisesScreen extends ConsumerWidget {
     ];
 
     final decor = context.decor;
+    final l10n = context.l10n;
     return SectionScaffold(
-      title: 'Esercizi',
+      title: l10n.navExercises,
       actions: const [StatusChips()],
       body: ListView(
         key: const PageStorageKey('exercises-list'),
@@ -44,7 +47,7 @@ class ExercisesScreen extends ConsumerWidget {
         children: [
           _CustomSection(exercises: sections[ExerciseCategory.custom]!),
           const SizedBox(height: 22),
-          Text('Categorie',
+          Text(l10n.exercisesCategories,
               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
           for (final (index, category) in categories.indexed)
@@ -82,6 +85,7 @@ class _CustomSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final canCreate = ref.watch(entitlementProvider).allows(ProFeature.customSequences);
 
     final grouped = <String, List<ExerciseDefinition>>{};
@@ -102,7 +106,7 @@ class _CustomSection extends ConsumerWidget {
         ),
         if (exercises.isNotEmpty) ...[
           const SizedBox(height: 16),
-          Text(ExerciseCategory.custom.label,
+          Text(l10n.categoryLabel(ExerciseCategory.custom),
               style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
         ],
         // Sequenze senza gruppo: elencate direttamente.
@@ -120,7 +124,7 @@ class _CustomSection extends ConsumerWidget {
                 title: Text(name,
                     style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 subtitle: Text(
-                  grouped[name]!.length == 1 ? '1 sequenza' : '${grouped[name]!.length} sequenze',
+                  l10n.exercisesSequenceCount(grouped[name]!.length),
                   style: theme.textTheme.bodySmall,
                 ),
                 children: [
@@ -150,6 +154,7 @@ class _CategoryAccordion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5),
       clipBehavior: Clip.antiAlias,
@@ -158,15 +163,15 @@ class _CategoryAccordion extends StatelessWidget {
         tilePadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
         iconColor: accent,
         leading: AccentIcon(icon: categoryIcon(category), color: accent, size: 50),
-        title: Text(category.label,
+        title: Text(l10n.categoryLabel(category),
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 2),
           child: Text.rich(
             TextSpan(children: [
-              TextSpan(text: category.description),
+              TextSpan(text: l10n.categoryDescription(category)),
               TextSpan(
-                text: '  ·  ${exercises.length} esercizi',
+                text: '  ·  ${l10n.exercisesCount(exercises.length)}',
                 style: TextStyle(color: accent, fontWeight: FontWeight.w700),
               ),
             ]),
@@ -192,7 +197,7 @@ class ProBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(8)),
-      child: Text('PRO',
+      child: Text(context.l10n.exercisesProBadge,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: colors.onPrimary,
                 fontWeight: FontWeight.w800,
@@ -210,15 +215,16 @@ class _ExerciseTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final tile = ListTile(
       dense: dense,
-      title: Text(exercise.name),
+      title: Text(l10n.exerciseName(exercise)),
       subtitle: Wrap(
         spacing: 8,
         runSpacing: 4,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Text('${exercise.steps.length} note'),
+          Text(l10n.exercisesNoteCount(exercise.steps.length)),
           if (exercise.focus != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -227,7 +233,7 @@ class _ExerciseTile extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                exercise.focus!,
+                l10n.focusLabel(exercise.focus!),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -243,12 +249,12 @@ class _ExerciseTile extends ConsumerWidget {
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Modifica',
+                  tooltip: l10n.exercisesEdit,
                   onPressed: () => _open(context, ref, '/editor', extra: exercise),
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Elimina',
+                  tooltip: l10n.commonDelete,
                   onPressed: () => _confirmDelete(context, ref),
                 ),
               ],
@@ -264,14 +270,21 @@ class _ExerciseTile extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminare la sequenza?'),
-        content: Text('"${exercise.name}" verrà rimossa definitivamente.'),
+        title: Text(l10n.exercisesDeleteTitle),
+        content: Text(l10n.exercisesDeleteMessage(l10n.exerciseName(exercise))),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.commonDelete),
+          ),
         ],
       ),
     );
@@ -339,7 +352,7 @@ class _CreateSequenceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Crea la tua sequenza',
+                        context.l10n.exercisesCreateTitle,
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: decor.onFeature,
                           fontWeight: FontWeight.w800,
@@ -347,7 +360,7 @@ class _CreateSequenceCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Componi qualsiasi giro di note: pattern, vocalizzi, prove di estensione…',
+                        context.l10n.exercisesCreateSubtitle,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: decor.onFeature.withValues(alpha: 0.85),
                         ),

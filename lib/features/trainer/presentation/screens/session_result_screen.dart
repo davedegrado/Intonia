@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../app/l10n.dart';
 import '../../../../core/session/session_record.dart';
 import '../../../mascot/presentation/confetti.dart';
 import '../../../mascot/presentation/intonia_mascot.dart';
@@ -73,6 +74,7 @@ class _SessionResultScreenState extends State<SessionResultScreen>
     final percent = record.accuracyPercent;
     final tier = ResultTier.of(percent);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     final count = CurvedAnimation(
       parent: _intro,
@@ -113,7 +115,12 @@ class _SessionResultScreenState extends State<SessionResultScreen>
                             curve: const Interval(0, 0.35, curve: Curves.elasticOut),
                           ),
                         ),
-                        child: IntoniaMascot(mood: tier.mood, size: 160, interactive: true),
+                        child: IntoniaMascot(
+                          mood: tier.mood,
+                          size: 160,
+                          interactive: true,
+                          semanticLabel: l10n.mascotSemanticLabel,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -122,7 +129,7 @@ class _SessionResultScreenState extends State<SessionResultScreen>
                       child: Column(
                         children: [
                           Text(
-                            tier.title,
+                            tier.title(l10n),
                             key: const ValueKey('result-title'),
                             textAlign: TextAlign.center,
                             style: theme.textTheme.headlineMedium?.copyWith(
@@ -132,7 +139,7 @@ class _SessionResultScreenState extends State<SessionResultScreen>
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            tier.message,
+                            tier.message(l10n),
                             textAlign: TextAlign.center,
                             style:
                                 theme.textTheme.bodyLarge?.copyWith(color: const Color(0xFFC7D2FE)),
@@ -149,17 +156,21 @@ class _SessionResultScreenState extends State<SessionResultScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Expanded(
-                            child:
-                                _Stat(label: 'Corrette', value: '${record.correct}', color: _cyan),
-                          ),
-                          Expanded(
-                            child:
-                                _Stat(label: 'Errori', value: '${record.errors}', color: _magenta),
+                            child: _Stat(
+                                label: l10n.sessionCorrect,
+                                value: '${record.correct}',
+                                color: _cyan),
                           ),
                           Expanded(
                             child: _Stat(
-                              label: 'Durata',
-                              value: _formatDuration(record.durationSeconds),
+                                label: l10n.sessionErrors,
+                                value: '${record.errors}',
+                                color: _magenta),
+                          ),
+                          Expanded(
+                            child: _Stat(
+                              label: l10n.sessionDuration,
+                              value: _formatDuration(l10n, record.durationSeconds),
                               color: _violet,
                             ),
                           ),
@@ -178,7 +189,7 @@ class _SessionResultScreenState extends State<SessionResultScreen>
                               theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         onPressed: () => Navigator.of(context).pop(SessionResultAction.done),
-                        child: const Text('Continua'),
+                        child: Text(l10n.sessionContinue),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -186,7 +197,7 @@ class _SessionResultScreenState extends State<SessionResultScreen>
                       style: TextButton.styleFrom(foregroundColor: const Color(0xFFC7D2FE)),
                       onPressed: () => Navigator.of(context).pop(SessionResultAction.repeat),
                       icon: const Icon(Icons.replay),
-                      label: const Text('Ripeti esercizio'),
+                      label: Text(l10n.sessionRepeat),
                     ),
                   ],
                 ),
@@ -198,10 +209,10 @@ class _SessionResultScreenState extends State<SessionResultScreen>
     );
   }
 
-  static String _formatDuration(int seconds) {
+  static String _formatDuration(AppLocalizations l10n, int seconds) {
     final minutes = seconds ~/ 60;
     final rest = seconds % 60;
-    return minutes > 0 ? '$minutes:${rest.toString().padLeft(2, '0')}' : '$rest s';
+    return minutes > 0 ? '$minutes:${rest.toString().padLeft(2, '0')}' : l10n.sessionSeconds(rest);
   }
 }
 
@@ -215,8 +226,9 @@ class _AccuracyRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Semantics(
-      label: 'Precisione $percent per cento',
+      label: l10n.sessionAccuracySemantics(percent),
       excludeSemantics: true,
       child: SizedBox.square(
         dimension: 170,
@@ -239,7 +251,7 @@ class _AccuracyRing extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'precisione',
+                      l10n.sessionAccuracy,
                       style: theme.textTheme.labelLarge?.copyWith(color: const Color(0xFFC7D2FE)),
                     ),
                   ],

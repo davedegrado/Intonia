@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">La tua serie di allenamenti con la mascotte di Intonia</string>
+    <string name="widget_mascot_description">Mascotte di Intonia</string>
+    <string name="widget_default_title">Allena l\'orecchio</string>
+    <string name="widget_default_message">Pronto ad allenarti? 🎵</string>
+    <string name="widget_message_trained">Fatto! Sei inarrestabile ✨</string>
+    <string name="widget_message_keep_streak">Allenati oggi: salva la serie! 🔥</string>
+    <plurals name="widget_streak_title">
+        <item quantity="one">%d giorno di fila</item>
+        <item quantity="other">%d giorni di fila</item>
+    </plurals>
+    <plurals name="widget_streak_label">
+        <item quantity="one">giorno\ndi fila</item>
+        <item quantity="other">giorni\ndi fila</item>
+    </plurals>
+</resources>

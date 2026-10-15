@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/app_theme.dart';
 import '../../../app/date_format.dart';
+import '../../../app/l10n.dart';
 import '../../../app/neon_scene.dart';
 import '../../access/application/access_providers.dart';
 import '../../access/domain/entitlement.dart';
@@ -12,6 +13,7 @@ import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
 import '../../../core/session/range_record.dart';
 import '../../../core/session/session_record.dart';
+import '../../../l10n/exercise_l10n.dart';
 import '../../range/application/range_providers.dart';
 import '../../settings/application/settings_providers.dart';
 import '../application/history_providers.dart';
@@ -22,13 +24,14 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final notation = ref.watch(notationProvider);
     final records = ref.watch(sessionHistoryProvider).value ?? const <SessionRecord>[];
     final ranges = ref.watch(rangeHistoryProvider).value ?? const <RangeRecord>[];
 
     if (records.isEmpty && ranges.isEmpty) {
       return SectionScaffold(
-        title: 'Profilo',
+        title: l10n.profileTitle,
         actions: _actions(context),
         body: Center(
           child: Padding(
@@ -38,10 +41,10 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 Icon(Icons.insights, size: 56, color: theme.colorScheme.primary),
                 const SizedBox(height: 16),
-                Text('Nessuna sessione ancora', style: theme.textTheme.titleLarge),
+                Text(l10n.profileEmptyTitle, style: theme.textTheme.titleLarge),
                 const SizedBox(height: 8),
                 Text(
-                  'Completa un allenamento: qui troverai streak, accuratezza, estensione vocale e storico.',
+                  l10n.profileEmptyBody,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium,
                 ),
@@ -100,7 +103,7 @@ class ProfileScreen extends ConsumerWidget {
 
     final decor = context.decor;
     return SectionScaffold(
-      title: 'Profilo',
+      title: l10n.profileTitle,
       actions: _actions(context),
       body: SafeArea(
         child: ListView(
@@ -112,12 +115,12 @@ class ProfileScreen extends ConsumerWidget {
               _StatCard(
                   icon: Icons.event_repeat_rounded,
                   accent: decor.accent(0),
-                  label: 'Sessioni',
+                  label: l10n.profileStatSessions,
                   value: '${records.length}'),
               _StatCard(
                   icon: Icons.timer_outlined,
                   accent: decor.accent(1),
-                  label: 'Minuti totali',
+                  label: l10n.profileStatMinutes,
                   value: '$totalMinutes'),
             ]),
             const SizedBox(height: 10),
@@ -125,12 +128,12 @@ class ProfileScreen extends ConsumerWidget {
               _StatCard(
                   icon: Icons.track_changes_rounded,
                   accent: decor.accent(3),
-                  label: 'Accuratezza media',
+                  label: l10n.profileStatAccuracy,
                   value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
               _StatCard(
                 icon: Icons.height_rounded,
                 accent: decor.accent(2),
-                label: 'Estensione',
+                label: l10n.profileStatRange,
                 value: '—',
                 valueWidget: lowMidi != null && highMidi != null
                     ? NoteRangeText(
@@ -144,7 +147,7 @@ class ProfileScreen extends ConsumerWidget {
             ]),
             if (rated.isNotEmpty) ...[
               const SizedBox(height: 20),
-              _SectionTitle('Note migliori e peggiori'),
+              _SectionTitle(l10n.profileBestWorstNotes),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -184,7 +187,7 @@ class ProfileScreen extends ConsumerWidget {
             ],
             if (ranges.isNotEmpty) ...[
               const SizedBox(height: 20),
-              _SectionTitle('Test estensione vocale'),
+              _SectionTitle(l10n.profileRangeTests),
               Card(
                 child: Column(children: [
                   for (var i = ranges.length - 1; i >= 0 && i >= ranges.length - 5; i--) ...[
@@ -196,14 +199,14 @@ class ProfileScreen extends ConsumerWidget {
                         low: spelledMidi(ranges[i].minMidi),
                         high: spelledMidi(ranges[i].maxMidi),
                         notation: notation,
-                        suffix: '  (${formatSpan(ranges[i].spanSemitones)})',
+                        suffix: '  (${l10n.span(ranges[i].spanSemitones)})',
                       ),
                       subtitle: Text(formatShortDate(ranges[i].timestamp) +
                           (i > 0
-                              ? '  ·  ${_deltaLabel(ranges[i].spanSemitones - ranges[i - 1].spanSemitones)}'
+                              ? '  ·  ${_deltaLabel(l10n, ranges[i].spanSemitones - ranges[i - 1].spanSemitones)}'
                               : '')),
                       trailing: IconButton(
-                        tooltip: 'Elimina test',
+                        tooltip: l10n.profileDeleteRangeTooltip,
                         icon: const Icon(Icons.delete_outline, size: 20),
                         onPressed: () => _confirmDeleteRange(context, ref, ranges[i]),
                       ),
@@ -213,7 +216,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 20),
-            _SectionTitle(fullHistory ? 'Tutte le sessioni' : 'Ultime sessioni'),
+            _SectionTitle(fullHistory ? l10n.profileAllSessions : l10n.profileRecentSessions),
             if (recent.isNotEmpty)
               Card(
                 child: Column(children: [
@@ -227,7 +230,7 @@ class ProfileScreen extends ConsumerWidget {
                         color: decor.accent(index),
                         size: 40,
                       ),
-                      title: Text(record.exerciseName),
+                      title: Text(l10n.exerciseNameById(record.exerciseId, record.exerciseName)),
                       subtitle: Text(formatShortDate(record.timestamp)),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -248,7 +251,7 @@ class ProfileScreen extends ConsumerWidget {
                           // sbagliate o impossibili create per prova.
                           if (record.isCustomExercise)
                             IconButton(
-                              tooltip: 'Elimina sessione',
+                              tooltip: l10n.profileDeleteSessionTooltip,
                               icon: const Icon(Icons.delete_outline, size: 20),
                               onPressed: () => _confirmDeleteSession(context, ref, record),
                             ),
@@ -263,7 +266,7 @@ class ProfileScreen extends ConsumerWidget {
                 key: const ValueKey('full-history-pro'),
                 onPressed: () => context.push('/pro'),
                 icon: const Icon(Icons.workspace_premium, size: 18),
-                label: Text('Storico completo (${records.length} sessioni) con Intonia Pro'),
+                label: Text(l10n.profileFullHistoryPro(records.length)),
               ),
           ],
         ),
@@ -274,7 +277,7 @@ class ProfileScreen extends ConsumerWidget {
   List<Widget> _actions(BuildContext context) => [
         IconButton(
           key: const ValueKey('profile-settings'),
-          tooltip: 'Impostazioni',
+          tooltip: context.l10n.profileSettingsTooltip,
           icon: const Icon(Icons.settings_outlined),
           onPressed: () => context.push('/settings'),
         ),
@@ -284,14 +287,14 @@ class ProfileScreen extends ConsumerWidget {
   /// Sessioni mostrate agli utenti Free.
   static const freeRecentSessions = 8;
 
-  String _deltaLabel(int delta) {
+  String _deltaLabel(AppLocalizations l10n, int delta) {
     if (delta > 0) {
-      return '+$delta st rispetto al precedente';
+      return l10n.profileRangeDeltaUp(delta);
     }
     if (delta == 0) {
-      return 'invariato';
+      return l10n.profileRangeUnchanged;
     }
-    return '$delta st rispetto al precedente';
+    return l10n.profileRangeDeltaDown(-delta);
   }
 
   Future<void> _confirmDeleteRange(
@@ -302,11 +305,15 @@ class ProfileScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminare il test?'),
-        content: Text('Il test del ${formatShortDate(record.timestamp)} verrà rimosso.'),
+        title: Text(context.l10n.profileDeleteRangeTitle),
+        content: Text(context.l10n.profileDeleteRangeBody(formatShortDate(record.timestamp))),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(context.l10n.commonCancel)),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(context.l10n.commonDelete)),
         ],
       ),
     );
@@ -323,14 +330,18 @@ class ProfileScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminare la sessione?'),
-        content: Text(
-          '"${record.exerciseName}" del ${formatShortDate(record.timestamp)} '
-          'verrà rimossa da statistiche, streak ed estensione vocale.',
-        ),
+        title: Text(context.l10n.profileDeleteSessionTitle),
+        content: Text(context.l10n.profileDeleteSessionBody(
+          context.l10n.exerciseNameById(record.exerciseId, record.exerciseName),
+          formatShortDate(record.timestamp),
+        )),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(context.l10n.commonCancel)),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(context.l10n.commonDelete)),
         ],
       ),
     );
@@ -461,7 +472,7 @@ class _StreakCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  streak == 1 ? '1 giorno di fila' : '$streak giorni di fila',
+                  context.l10n.profileStreakDays(streak),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     color: decor.onFeature,
                     fontWeight: FontWeight.w800,
@@ -469,9 +480,7 @@ class _StreakCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  streak == 0
-                      ? 'Allenati oggi per far partire la streak!'
-                      : 'Continua così, non spezzarla!',
+                  streak == 0 ? context.l10n.profileStreakStart : context.l10n.profileStreakKeep,
                   style: theme.textTheme.bodyMedium
                       ?.copyWith(color: decor.onFeature.withValues(alpha: 0.85)),
                 ),

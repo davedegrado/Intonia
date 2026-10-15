@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/l10n.dart';
 import '../../../app/note_text.dart';
 import '../../../core/music/note.dart';
-import '../../../core/session/range_record.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/confetti.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
@@ -12,14 +12,18 @@ enum RangeResultAction { done, retry }
 
 /// Confronto con il test precedente.
 enum RangeComparison {
-  first('Ecco la tua estensione!'),
-  better('Nuovo record!'),
-  same('Estensione confermata!'),
-  worse('Ecco la tua estensione di oggi');
+  first,
+  better,
+  same,
+  worse;
 
-  const RangeComparison(this.title);
-
-  final String title;
+  /// Titolo del riepilogo nella lingua attiva.
+  String title(AppLocalizations l10n) => switch (this) {
+        first => l10n.rangeResultFirst,
+        better => l10n.rangeResultBetter,
+        same => l10n.rangeResultSame,
+        worse => l10n.rangeResultWorse,
+      };
 
   bool get celebrates => this == first || this == better;
 
@@ -106,6 +110,7 @@ class _RangeResultScreenState extends State<RangeResultScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final comparison = RangeComparison.of(widget.span, widget.previousSpan);
     final reveal = CurvedAnimation(parent: _intro, curve: const Interval(0, 0.3));
     final opening = CurvedAnimation(
@@ -156,7 +161,7 @@ class _RangeResultScreenState extends State<RangeResultScreen> with SingleTicker
                     FadeTransition(
                       opacity: reveal,
                       child: Text(
-                        comparison.title,
+                        comparison.title(l10n),
                         key: const ValueKey('range-result-title'),
                         textAlign: TextAlign.center,
                         style: theme.textTheme.headlineMedium?.copyWith(
@@ -199,7 +204,7 @@ class _RangeResultScreenState extends State<RangeResultScreen> with SingleTicker
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${formatSpan(shownSpan)} ($shownSpan semitoni)',
+                              l10n.rangeSpanDetail(l10n.span(shownSpan), shownSpan),
                               key: const ValueKey('range-result-span'),
                               style: theme.textTheme.titleMedium?.copyWith(color: _soft),
                             ),
@@ -213,10 +218,10 @@ class _RangeResultScreenState extends State<RangeResultScreen> with SingleTicker
                         opacity: details,
                         child: Text(
                           delta > 0
-                              ? '+$delta ${delta == 1 ? 'semitono' : 'semitoni'} rispetto all\'ultimo test'
+                              ? l10n.rangeProgressBetter(delta)
                               : delta == 0
-                                  ? 'Stessa ampiezza dell\'ultimo test'
-                                  : '$delta ${delta == -1 ? 'semitono' : 'semitoni'} rispetto all\'ultimo test: capita, la voce cambia di giorno in giorno',
+                                  ? l10n.rangeProgressSame
+                                  : l10n.rangeProgressWorseEncouraging(-delta),
                           textAlign: TextAlign.center,
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: delta > 0 ? const Color(0xFF34D399) : _soft,
@@ -236,7 +241,7 @@ class _RangeResultScreenState extends State<RangeResultScreen> with SingleTicker
                               theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         onPressed: () => Navigator.of(context).pop(RangeResultAction.done),
-                        child: const Text('Continua'),
+                        child: Text(l10n.rangeContinue),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -244,7 +249,7 @@ class _RangeResultScreenState extends State<RangeResultScreen> with SingleTicker
                       style: TextButton.styleFrom(foregroundColor: _soft),
                       onPressed: () => Navigator.of(context).pop(RangeResultAction.retry),
                       icon: const Icon(Icons.replay),
-                      label: const Text('Riprova il test'),
+                      label: Text(l10n.rangeRetryTest),
                     ),
                   ],
                 ),

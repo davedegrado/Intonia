@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/music/note.dart';
 import '../core/music/note_spelling.dart';
+import '../l10n/app_localizations.dart';
 
 /// Rapporto tra la dimensione dell'ottava e quella del nome della nota.
 const _octaveScale = 0.5;
@@ -58,10 +59,16 @@ class NoteText extends StatelessWidget {
     return Text.rich(
       noteSpan(note, notation, style: base, octaveColor: octaveColor),
       textAlign: textAlign,
-      semanticsLabel: '${note.label(notation)}, ottava ${note.letterOctave}',
+      semanticsLabel: _l10n(context).noteSemanticsLabel(note.label(notation), note.letterOctave),
     );
   }
 }
+
+/// Testi nella lingua attiva; inglese se manca la localizzazione (es. widget
+/// mostrati fuori da MaterialApp nei test).
+AppLocalizations _l10n(BuildContext context) =>
+    Localizations.of<AppLocalizations>(context, AppLocalizations) ??
+    lookupAppLocalizations(const Locale('en'));
 
 /// Intervallo tra due note ("DO3 – SOL5") con le ottave piccole.
 class NoteRangeText extends StatelessWidget {

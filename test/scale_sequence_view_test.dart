@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/note_progress.dart';
+import 'package:vocal_scale_trainer/l10n/app_localizations.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/widgets/scale_sequence_view.dart';
 
 void main() {
@@ -16,6 +17,9 @@ void main() {
     final tapped = <int>[];
     await tester.pumpWidget(ProviderScope(
       child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('it'),
         home: Scaffold(
           body: ScaleSequenceView(
             sequence: sequence,
@@ -52,5 +56,16 @@ void main() {
     // Sulla chiave di violino: la nota corrente.
     await tester.tapAt(staff + const Offset(20, 60));
     expect(tapped, [2, 1]);
+  });
+
+  testWidgets('screen readers hear each note with its state', (tester) async {
+    await pump(tester);
+    expect(find.bySemanticsLabel('C, corretta'), findsOneWidget);
+    expect(find.bySemanticsLabel('E, nota corrente'), findsOneWidget);
+    expect(find.bySemanticsLabel('G, da cantare'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.queue_music));
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel('Pentagramma: C4, E4, G4'), findsOneWidget);
   });
 }
