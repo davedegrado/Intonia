@@ -63,80 +63,89 @@ class _ChargesTickerState extends ConsumerState<_ChargesTicker> {
   }
 }
 
-/// Riquadro delle cariche nella Home (o "Intonia Pro" per gli utenti Pro).
-class ChargesCard extends ConsumerWidget {
-  const ChargesCard({super.key});
+/// Indicatore compatto delle cariche ("5/7") per le barre in alto; apre la
+/// spiegazione con il tempo alla prossima carica. Per Pro: "Pro".
+class ChargesChip extends ConsumerWidget {
+  const ChargesChip({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final entitlement = ref.watch(entitlementProvider);
-
     if (entitlement.isPro) {
-      return Card(
-        child: ListTile(
-          leading: const Icon(Icons.workspace_premium, color: chargeColor),
-          title: const Text('Intonia Pro'),
-          subtitle: Text(
-            entitlement.developer
-                ? 'Esercizi illimitati · build sviluppatore'
-                : 'Esercizi illimitati',
-          ),
-          onTap: () => context.push('/pro'),
-        ),
+      return StatusPill(
+        key: const ValueKey('charges-chip'),
+        icon: Icons.workspace_premium,
+        iconColor: chargeColor,
+        label: 'Pro',
+        semanticLabel: entitlement.developer
+            ? 'Intonia Pro, build sviluppatore: esercizi illimitati'
+            : 'Intonia Pro: esercizi illimitati',
+        onTap: () => context.push('/pro'),
       );
     }
-
     return _ChargesTicker(
-      builder: (context, ledger, now) {
-        final wait = ledger.timeToNext(now);
-        return Card(
-          key: const ValueKey('charges-card'),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () => showChargesInfo(context),
+      builder: (context, ledger, now) => StatusPill(
+        key: const ValueKey('charges-chip'),
+        icon: Icons.bolt,
+        iconColor: chargeColor,
+        label: '${ledger.charges}/${ChargeLedger.max}',
+        semanticLabel: 'Cariche esercizi: ${ledger.charges} su ${ChargeLedger.max}',
+        onTap: () => showChargesInfo(context),
+      ),
+    );
+  }
+}
+
+/// Pillola compatta (icona + valore) delle barre in alto: serie, cariche.
+class StatusPill extends StatelessWidget {
+  const StatusPill({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.iconColor,
+    this.semanticLabel,
+    super.key,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? iconColor;
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      excludeSemantics: semanticLabel != null,
+      child: Material(
+        color: colors.surface,
+        shape: StadiumBorder(side: BorderSide(color: colors.outlineVariant)),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 40, minWidth: 48),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.bolt, color: chargeColor, size: 28),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text.rich(
-                          TextSpan(children: [
-                            TextSpan(
-                              text: '${ledger.charges}/${ChargeLedger.max}',
-                              style: const TextStyle(fontWeight: FontWeight.w800),
-                            ),
-                            const TextSpan(text: '  cariche esercizi'),
-                          ]),
-                          key: const ValueKey('charges-count'),
-                          style: theme.textTheme.titleMedium,
-                        ),
-                        Text(
-                          wait == null
-                              ? 'Cariche al completo'
-                              : ledger.charges == 0
-                                  ? 'Esaurite: la prossima tra ${formatWait(wait)}'
-                                  : 'Prossima carica tra ${formatWait(wait)}',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => context.push('/pro'),
-                    child: const Text('Pro'),
+                  Icon(icon, size: 20, color: iconColor ?? colors.primary),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
                   ),
                 ],
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -259,9 +268,12 @@ class ChargesHint extends ConsumerWidget {
           children: [
             const Icon(Icons.bolt, size: 16, color: chargeColor),
             const SizedBox(width: 4),
-            Text(
-              'Ogni sessione usa 1 carica · ${ledger.charges}/${ChargeLedger.max} disponibili',
-              style: theme.textTheme.labelMedium,
+            Flexible(
+              child: Text(
+                'Ogni sessione usa 1 carica · ${ledger.charges}/${ChargeLedger.max} disponibili',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelMedium,
+              ),
             ),
           ],
         ),

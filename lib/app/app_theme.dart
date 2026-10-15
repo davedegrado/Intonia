@@ -5,6 +5,11 @@ enum AppThemeSetting { system, light, dark, neon }
 
 const _seed = Color(0xFF4F46E5); // Indigo
 
+/// Accenti neon del marchio, leggibili sia sui temi chiari sia sugli scuri.
+const brandCyan = Color(0xFF22D3EE);
+const brandIndigo = Color(0xFF6366F1);
+const brandViolet = Color(0xFFA855F7);
+
 ThemeData buildLightTheme() {
   final scheme = ColorScheme.fromSeed(seedColor: _seed, brightness: Brightness.light);
   return _decorate(scheme, const Color(0xFFF6F6FB));
@@ -91,6 +96,24 @@ ThemeData _decorate(ColorScheme scheme, Color scaffoldBackground) {
     bottomSheetTheme: const BottomSheetThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: scheme.surface,
+      surfaceTintColor: Colors.transparent,
+      indicatorColor: scheme.primary.withValues(alpha: 0.18),
+      height: 68,
+      labelTextStyle: WidgetStateProperty.resolveWith(
+        (states) => TextStyle(
+          fontSize: 12,
+          fontWeight: states.contains(WidgetState.selected) ? FontWeight.w800 : FontWeight.w500,
+          color: states.contains(WidgetState.selected) ? scheme.primary : scheme.onSurfaceVariant,
+        ),
+      ),
+      iconTheme: WidgetStateProperty.resolveWith(
+        (states) => IconThemeData(
+          color: states.contains(WidgetState.selected) ? scheme.primary : scheme.onSurfaceVariant,
+        ),
       ),
     ),
     expansionTileTheme: const ExpansionTileThemeData(

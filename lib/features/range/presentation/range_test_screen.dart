@@ -133,6 +133,7 @@ class _SetupView extends StatelessWidget {
           children: [
             Expanded(
               child: DropdownButtonFormField<int>(
+                isExpanded: true,
                 initialValue: state.toleranceCents,
                 decoration: const InputDecoration(
                   labelText: 'Tolleranza',
@@ -150,6 +151,7 @@ class _SetupView extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: DropdownButtonFormField<int>(
+                isExpanded: true,
                 initialValue: state.stabilityMs,
                 decoration: const InputDecoration(
                   labelText: 'Durata stabilità',
@@ -473,7 +475,7 @@ class _ResultView extends StatelessWidget {
         const SizedBox(height: 10),
         OutlinedButton(
           onPressed: () => context.pop(),
-          child: const Text('Torna alla libreria'),
+          child: const Text('Chiudi'),
         ),
       ],
     );

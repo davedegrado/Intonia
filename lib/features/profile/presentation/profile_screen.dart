@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/app_theme.dart' show brandCyan, brandIndigo;
+import '../../../app/date_format.dart';
+import '../../../app/status_chips.dart' show streakColor;
 import '../../access/application/access_providers.dart';
 import '../../access/domain/entitlement.dart';
 import '../../../app/note_text.dart';
@@ -25,7 +28,7 @@ class ProfileScreen extends ConsumerWidget {
 
     if (records.isEmpty && ranges.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Profilo')),
+        appBar: _appBar(context),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -95,7 +98,7 @@ class ProfileScreen extends ConsumerWidget {
         : records.reversed.take(freeRecentSessions).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profilo')),
+      appBar: _appBar(context),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -108,55 +111,56 @@ class ProfileScreen extends ConsumerWidget {
                 child: Row(
                   children: [
                     Icon(Icons.local_fire_department,
-                        size: 44, color: theme.colorScheme.onPrimaryContainer),
+                        size: 44,
+                        color: streak > 0 ? streakColor : theme.colorScheme.onPrimaryContainer),
                     const SizedBox(width: 14),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          streak == 1 ? '1 giorno di fila' : '$streak giorni di fila',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.w800,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            streak == 1 ? '1 giorno di fila' : '$streak giorni di fila',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: theme.colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
-                        Text(
-                          streak == 0
-                              ? 'Allenati oggi per far partire la streak!'
-                              : 'Continua così, non spezzarla!',
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: theme.colorScheme.onPrimaryContainer),
-                        ),
-                      ],
+                          Text(
+                            streak == 0
+                                ? 'Allenati oggi per far partire la streak!'
+                                : 'Continua così, non spezzarla!',
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: theme.colorScheme.onPrimaryContainer),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _StatCard(label: 'Sessioni', value: '${records.length}'),
-                _StatCard(label: 'Minuti totali', value: '$totalMinutes'),
-                _StatCard(
-                    label: 'Accuratezza media',
-                    value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
-                _StatCard(
-                  label: 'Estensione',
-                  value: '—',
-                  valueWidget: lowMidi != null && highMidi != null
-                      ? NoteRangeText(
-                          low: spelledMidi(lowMidi),
-                          high: spelledMidi(highMidi),
-                          notation: notation,
-                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-                        )
-                      : null,
-                ),
-              ],
-            ),
+            _StatRow(children: [
+              _StatCard(label: 'Sessioni', value: '${records.length}'),
+              _StatCard(label: 'Minuti totali', value: '$totalMinutes'),
+            ]),
+            const SizedBox(height: 10),
+            _StatRow(children: [
+              _StatCard(
+                  label: 'Accuratezza media', value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
+              _StatCard(
+                label: 'Estensione',
+                value: '—',
+                valueWidget: lowMidi != null && highMidi != null
+                    ? NoteRangeText(
+                        low: spelledMidi(lowMidi),
+                        high: spelledMidi(highMidi),
+                        notation: notation,
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                      )
+                    : null,
+              ),
+            ]),
             if (rated.isNotEmpty) ...[
               const SizedBox(height: 20),
               Text('Note migliori e peggiori',
@@ -177,13 +181,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ),
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: LinearProgressIndicator(
-                            minHeight: 10,
-                            value: item.accuracy,
-                          ),
-                        ),
+                        child: _AccuracyBar(value: item.accuracy),
                       ),
                       const SizedBox(width: 10),
                       Text('${(item.accuracy * 100).toStringAsFixed(0)}%',
@@ -208,7 +206,7 @@ class ProfileScreen extends ConsumerWidget {
                     notation: notation,
                     suffix: '  (${formatSpan(ranges[i].spanSemitones)})',
                   ),
-                  subtitle: Text(_formatDate(ranges[i].timestamp) +
+                  subtitle: Text(formatShortDate(ranges[i].timestamp) +
                       (i > 0
                           ? '  ·  ${_deltaLabel(ranges[i].spanSemitones - ranges[i - 1].spanSemitones)}'
                           : '')),
@@ -229,7 +227,7 @@ class ProfileScreen extends ConsumerWidget {
                 dense: true,
                 leading: Icon(record.isCustomExercise ? Icons.edit_note : Icons.history),
                 title: Text(record.exerciseName),
-                subtitle: Text(_formatDate(record.timestamp)),
+                subtitle: Text(formatShortDate(record.timestamp)),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -269,6 +267,18 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
+  PreferredSizeWidget _appBar(BuildContext context) => AppBar(
+        title: const Text('Profilo'),
+        actions: [
+          IconButton(
+            key: const ValueKey('profile-settings'),
+            tooltip: 'Impostazioni',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
+          ),
+        ],
+      );
+
   /// Sessioni mostrate agli utenti Free.
   static const freeRecentSessions = 8;
 
@@ -291,7 +301,7 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminare il test?'),
-        content: Text('Il test del ${_formatDate(record.timestamp)} verrà rimosso.'),
+        content: Text('Il test del ${formatShortDate(record.timestamp)} verrà rimosso.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
           FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina')),
@@ -313,7 +323,7 @@ class ProfileScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Eliminare la sessione?'),
         content: Text(
-          '"${record.exerciseName}" del ${_formatDate(record.timestamp)} '
+          '"${record.exerciseName}" del ${formatShortDate(record.timestamp)} '
           'verrà rimossa da statistiche, streak ed estensione vocale.',
         ),
         actions: [
@@ -325,11 +335,6 @@ class ProfileScreen extends ConsumerWidget {
     if (confirmed == true) {
       await ref.read(sessionHistoryProvider.notifier).remove(record);
     }
-  }
-
-  String _formatDate(DateTime timestamp) {
-    String pad(int value) => value.toString().padLeft(2, '0');
-    return '${pad(timestamp.day)}/${pad(timestamp.month)} ${pad(timestamp.hour)}:${pad(timestamp.minute)}';
   }
 }
 
@@ -346,7 +351,7 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SizedBox(
-      width: 165,
+      width: double.infinity,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(14),
@@ -359,6 +364,56 @@ class _StatCard extends StatelessWidget {
                   Text(value,
                       style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Due statistiche affiancate, della stessa altezza.
+class _StatRow extends StatelessWidget {
+  const _StatRow({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: children[0]),
+          const SizedBox(width: 10),
+          Expanded(child: children[1]),
+        ],
+      ),
+    );
+  }
+}
+
+/// Barra di accuratezza con sfumatura ciano → viola.
+class _AccuracyBar extends StatelessWidget {
+  const _AccuracyBar({required this.value});
+
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      height: 10,
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(5),
+      ),
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: value.clamp(0.0, 1.0),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            gradient: const LinearGradient(colors: [brandCyan, brandIndigo]),
           ),
         ),
       ),

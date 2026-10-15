@@ -31,21 +31,24 @@ void main() {
     expect(formatWait(Duration.zero), 'meno di 1 min');
   });
 
-  testWidgets('home card: available charges and time to the next one', (tester) async {
+  testWidgets('charges chip: available charges, tap shows the time to the next one',
+      (tester) async {
     final stored = ChargeLedger(charges: 5, regenStartedAt: DateTime(2026, 10, 14, 11, 15));
-    await tester.pumpWidget(_app(const ChargesCard(), overrides: overrides(stored)));
+    await tester.pumpWidget(_app(const ChargesChip(), overrides: overrides(stored)));
     await tester.pump();
-    expect(find.textContaining('5/7'), findsOneWidget);
-    expect(find.text('Prossima carica tra 2 h 15 min'), findsOneWidget);
+    expect(find.text('5/7'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('charges-chip')));
+    await tester.pumpAndSettle();
+    expect(find.text('Cariche esercizi'), findsOneWidget);
+    expect(find.text('Prossima carica tra 2 h 15 min.'), findsOneWidget);
   });
 
-  testWidgets('home card shows Pro instead of charges for Pro users', (tester) async {
-    await tester.pumpWidget(_app(const ChargesCard(),
+  testWidgets('charges chip shows Pro instead of charges for Pro users', (tester) async {
+    await tester.pumpWidget(_app(const ChargesChip(),
         overrides: overrides(ChargeLedger.full, entitlement: const Entitlement(plan: Plan.pro))));
     await tester.pump();
-    expect(find.text('Intonia Pro'), findsOneWidget);
+    expect(find.text('Pro'), findsOneWidget);
     expect(find.textContaining('/7'), findsNothing);
-    expect(find.textContaining('build sviluppatore'), findsNothing);
   });
 
   testWidgets('developer Pro build: unlimited and labelled as such', (tester) async {
@@ -53,10 +56,17 @@ void main() {
         reason: 'i test e le build normali non sono Pro sviluppatore');
     final entitlement = await const DeveloperProEntitlementSource().load();
     expect(entitlement.allows(ProFeature.unlimitedExercises), isTrue);
-    await tester.pumpWidget(_app(const ChargesCard(),
-        overrides: overrides(ChargeLedger.full, entitlement: entitlement)));
+    tester.view.physicalSize = const Size(400, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [...overrides(ChargeLedger.full, entitlement: entitlement)],
+      child: const MaterialApp(home: ProScreen()),
+    ));
     await tester.pump();
-    expect(find.text('Esercizi illimitati · build sviluppatore'), findsOneWidget);
+    await tester.pump();
+    expect(find.text('Hai Intonia Pro'), findsOneWidget);
+    expect(find.textContaining('Build sviluppatore'), findsOneWidget);
   });
 
   testWidgets('exhausted sheet: wait time, free features and Pro', (tester) async {

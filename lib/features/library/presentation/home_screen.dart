@@ -1,111 +1,35 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../../app/note_text.dart';
 
-import '../../../core/music/exercise.dart';
+import '../../../app/app_theme.dart' show AppThemeSetting, brandCyan, brandIndigo, brandViolet;
+import '../../../app/main_shell.dart';
+import '../../../app/note_text.dart';
+import '../../../app/status_chips.dart';
+import '../../../core/music/note.dart';
 import '../../../core/music/note_spelling.dart';
+import '../../../core/pitch/pitch_detection_result.dart';
 import '../../../core/pitch/pitch_recognition_config.dart';
-import '../../../core/session/range_record.dart';
-import '../../../core/session/session_record.dart';
-import '../../access/application/access_providers.dart';
-import '../../access/domain/entitlement.dart';
-import '../../access/presentation/charges_widgets.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
-import '../../profile/application/history_providers.dart';
-import '../../range/application/range_providers.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../tuner/application/tuner_controller.dart';
-import '../application/exercise_providers.dart';
 
-/// Naviga fermando prima il riconoscimento in tempo reale, se attivo.
-void _go(BuildContext context, WidgetRef ref, String route, {Object? extra}) {
-  ref.read(tunerControllerProvider.notifier).stop();
-  context.push(route, extra: extra);
-}
-
-class HomeScreen extends ConsumerWidget {
+/// Home: la mascotte e il riconoscimento delle note in tempo reale.
+/// Il microfono parte solo col pulsante e si ferma su stop, cambio di
+/// sezione o schermata, app in background.
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final library = ref.watch(exerciseLibraryProvider);
-    final customAsync = ref.watch(customExercisesProvider);
-    final custom = customAsync.value ?? const <ExerciseDefinition>[];
-    final sessions = ref.watch(sessionHistoryProvider).value ?? const <SessionRecord>[];
-    final streak = computeStreak(sessions.map((r) => r.timestamp), DateTime.now());
-
-    final sections = <ExerciseCategory, List<ExerciseDefinition>>{
-      for (final category in ExerciseCategory.values) category: [],
-    };
-    for (final exercise in library.builtIn) {
-      sections[exercise.category]!.add(exercise);
-    }
-    sections[ExerciseCategory.custom]!.addAll(custom);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Intonia'),
-        actions: [
-          if (streak > 0)
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: ActionChip(
-                avatar: const Icon(Icons.local_fire_department, size: 18, color: Color(0xFFF97316)),
-                label: Text('$streak', style: const TextStyle(fontWeight: FontWeight.w800)),
-                onPressed: () => _go(context, ref, '/profile'),
-              ),
-            ),
-          IconButton(
-            tooltip: 'Profilo e statistiche',
-            icon: const Icon(Icons.person_outline),
-            onPressed: () => _go(context, ref, '/profile'),
-          ),
-          IconButton(
-            tooltip: 'Impostazioni',
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => _go(context, ref, '/settings'),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          children: [
-            const _TunerCard(),
-            const SizedBox(height: 8),
-            const _RangeCard(),
-            const SizedBox(height: 8),
-            // Cariche degli esercizi (sotto: le sezioni che le consumano).
-            const ChargesCard(),
-            const SizedBox(height: 8),
-            _CustomSection(exercises: sections[ExerciseCategory.custom]!),
-            const SizedBox(height: 8),
-            for (final category in ExerciseCategory.values)
-              if (category != ExerciseCategory.custom)
-                _CategoryAccordion(
-                  category: category,
-                  exercises: sections[category]!,
-                  initiallyExpanded: category == ExerciseCategory.triads,
-                ),
-          ],
-        ),
-      ),
-    );
-  }
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-/// Riconoscimento in tempo reale: parte solo col bottone, si ferma su stop,
-/// cambio schermata o app in background.
-class _TunerCard extends ConsumerStatefulWidget {
-  const _TunerCard();
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
+  /// Ultima nota riconosciuta in questa apertura dell'app (non salvata).
+  PitchDetectionResult? _lastNote;
 
-  @override
-  ConsumerState<_TunerCard> createState() => _TunerCardState();
-}
-
-class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -129,197 +53,318 @@ class _TunerCardState extends ConsumerState<_TunerCard> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(tunerControllerProvider, (previous, next) {
+      final detection = next.detection;
+      if (detection != null && detection.isStable) {
+        setState(() => _lastNote = detection);
+      }
+    });
     final theme = Theme.of(context);
     final tuner = ref.watch(tunerControllerProvider);
-    final notation = ref.watch(notationProvider);
     final detection = tuner.detection;
-    final hasPitch = detection != null && detection.isStable;
+    final hasPitch = tuner.active && detection != null && detection.isStable;
+    final inTune = hasPitch && detection.cents.abs() <= PitchRecognitionConfig.inTuneCents;
 
-    // Dimensione FISSA: l'area variabile (sottotitolo/nota rilevata) ha
-    // un'altezza riservata e il pulsante una larghezza riservata, così la
-    // card non "salta" all'avvio o quando aggancia una nota.
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // In ascolto mentre il riconoscimento è attivo, a riposo altrimenti.
-            IntoniaMascot(
-              mood: tuner.active ? MascotMood.listening : MascotMood.idle,
-              size: 56,
-              greetOnAppear: true,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Riconoscimento in tempo reale',
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    height: 40,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: !tuner.active
-                          ? Text(
-                              tuner.permissionDenied
-                                  ? 'Permesso microfono negato: abilitalo nelle impostazioni.'
-                                  : 'Canta o suona una nota: ti dico qual è.',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: tuner.permissionDenied ? theme.colorScheme.error : null,
-                              ),
-                            )
-                          : hasPitch
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                                  textBaseline: TextBaseline.alphabetic,
-                                  children: [
-                                    NoteText(
-                                      NoteSpeller.spellRoot(detection.note),
-                                      notation: notation,
-                                      style: theme.textTheme.headlineMedium?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                        color: theme.colorScheme.primary,
-                                        height: 1,
-                                      ),
-                                      octaveColor: theme.colorScheme.onSurfaceVariant,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      '${detection.cents >= 0 ? '+' : ''}${detection.cents.toStringAsFixed(0)} cent',
-                                      style: theme.textTheme.labelLarge?.copyWith(
-                                        color: detection.cents.abs() <=
-                                                PitchRecognitionConfig.inTuneCents
-                                            ? const Color(0xFF1F8A5B)
-                                            : theme.colorScheme.error,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Text('In ascolto…', style: theme.textTheme.bodySmall),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 112,
-              height: 48,
-              child: Center(
-                child: tuner.active
-                    ? IconButton.filledTonal(
-                        tooltip: 'Ferma',
-                        onPressed: () => ref.read(tunerControllerProvider.notifier).stop(),
-                        icon: const Icon(Icons.stop),
-                      )
-                    : FilledButton.icon(
-                        onPressed: () => ref.read(tunerControllerProvider.notifier).start(),
-                        icon: const Icon(Icons.mic, size: 18),
-                        label: const Text('Avvia'),
-                      ),
-              ),
-            ),
-          ],
-        ),
+    final message = tuner.permissionDenied
+        ? 'Permesso microfono negato: abilitalo nelle impostazioni del telefono.'
+        : !tuner.active
+            ? 'Canta o suona una nota:\nti dico qual è!'
+            : !hasPitch
+                ? 'Ti ascolto…\ncanta o suona una nota.'
+                : inTune
+                    ? 'Perfettamente intonata!'
+                    : 'Ci sei quasi: aggiusta un pochino.';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Intonia'),
+        actions: const [StatusChips()],
       ),
-    );
-  }
-}
+      body: SafeArea(
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Mascotte e microfono si adattano all'altezza disponibile; sotto
+            // una certa altezza la pagina scorre invece di andare in overflow.
+            final height = math.max(constraints.maxHeight, 480.0);
+            final mascotSize = (height * 0.30).clamp(110.0, 260.0);
+            final micSize = (height * 0.17).clamp(84.0, 128.0);
 
-/// Estensione vocale in evidenza: ultimo test + invito a (ri)farlo.
-class _RangeCard extends ConsumerWidget {
-  const _RangeCard();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final notation = ref.watch(notationProvider);
-    final ranges = ref.watch(rangeHistoryProvider).value ?? const <RangeRecord>[];
-    final latest = ranges.isNotEmpty ? ranges.last : null;
-
-    return Card(
-      elevation: 0,
-      color: colors.surface,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => _go(context, ref, '/range-test'),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: latest == null
-              ? Row(
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.height, size: 40, color: colors.onPrimaryContainer),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Test estensione vocale',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                  color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
-                          Text('Scopri la tua nota più grave e più acuta e traccia i progressi.',
-                              style: theme.textTheme.bodySmall
-                                  ?.copyWith(color: colors.onPrimaryContainer)),
-                        ],
-                      ),
+                    _SpeechBubble(
+                      message: message,
+                      isError: tuner.permissionDenied,
                     ),
-                    Icon(Icons.chevron_right, color: colors.onPrimaryContainer),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.height, size: 22, color: colors.onPrimaryContainer),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text('Estensione vocale',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                  color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
-                        ),
-                        Text('Rifai il test',
-                            style: theme.textTheme.labelMedium
-                                ?.copyWith(color: colors.onPrimaryContainer)),
-                        Icon(Icons.chevron_right, size: 18, color: colors.onPrimaryContainer),
-                      ],
+                    const SizedBox(height: 4),
+                    IntoniaMascot(
+                      key: const ValueKey('home-mascot'),
+                      mood: tuner.active ? MascotMood.listening : MascotMood.idle,
+                      size: mascotSize,
+                      greetOnAppear: true,
+                    ),
+                    const SizedBox(height: 8),
+                    _MicButton(
+                      size: micSize,
+                      active: tuner.active,
+                      onPressed: () {
+                        final controller = ref.read(tunerControllerProvider.notifier);
+                        tuner.active ? controller.stop() : controller.start();
+                      },
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      formatSpan(latest.spanSemitones),
-                      style: theme.textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.w800, color: colors.onPrimaryContainer),
+                      tuner.active ? 'Ferma ascolto' : 'Avvia ascolto',
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                     ),
-                    Text('(${latest.spanSemitones} semitoni)',
-                        style:
-                            theme.textTheme.bodySmall?.copyWith(color: colors.onPrimaryContainer)),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        NoteText(spelledMidi(latest.minMidi),
+                    const SizedBox(height: 16),
+                    _NoteCard(
+                      detection: hasPitch ? detection : _lastNote,
+                      live: hasPitch,
+                    ),
+                    const SizedBox(height: 12),
+                    const _QuickActions(),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Fumetto della mascotte.
+class _SpeechBubble extends StatelessWidget {
+  const _SpeechBubble({required this.message, this.isError = false});
+
+  final String message;
+  final bool isError;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 300),
+      child: Container(
+        key: const ValueKey('home-bubble'),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isError ? colors.error : colors.primary.withValues(alpha: 0.6),
+          ),
+        ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: Text(
+            message,
+            key: ValueKey(message),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: isError ? colors.error : null,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Grande pulsante circolare del riconoscimento, con alone luminoso.
+class _MicButton extends StatefulWidget {
+  const _MicButton({required this.size, required this.active, required this.onPressed});
+
+  final double size;
+  final bool active;
+  final VoidCallback onPressed;
+
+  @override
+  State<_MicButton> createState() => _MicButtonState();
+}
+
+class _MicButtonState extends State<_MicButton> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(_MicButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.active != widget.active) {
+      _sync();
+    }
+  }
+
+  /// L'anello pulsa solo durante l'ascolto: a riposo nessuna animazione.
+  void _sync() {
+    if (widget.active) {
+      _pulse.repeat();
+    } else {
+      _pulse
+        ..stop()
+        ..value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = widget.size;
+    final ring = size * 0.15;
+
+    return Semantics(
+      button: true,
+      label: widget.active ? 'Ferma il riconoscimento' : 'Avvia il riconoscimento delle note',
+      child: SizedBox(
+        width: size + ring * 2,
+        height: size + ring * 2,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Onda che si espande durante l'ascolto.
+            AnimatedBuilder(
+              animation: _pulse,
+              builder: (context, _) {
+                final t = _pulse.value;
+                return Opacity(
+                  opacity: widget.active ? (1 - t) * 0.7 : 0,
+                  child: Container(
+                    width: size + ring * 2 * t,
+                    height: size + ring * 2 * t,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: brandCyan, width: 3),
+                    ),
+                  ),
+                );
+              },
+            ),
+            Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: widget.active ? [brandCyan, brandIndigo] : [brandIndigo, brandViolet],
+                ),
+                border: Border.all(color: brandCyan.withValues(alpha: 0.8), width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: (widget.active ? brandCyan : brandIndigo).withValues(alpha: 0.45),
+                    blurRadius: size * 0.3,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  key: const ValueKey('home-mic'),
+                  customBorder: const CircleBorder(),
+                  onTap: widget.onPressed,
+                  child: Icon(
+                    widget.active ? Icons.stop_rounded : Icons.mic,
+                    size: size * 0.42,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Nota riconosciuta (in diretta) o l'ultima riconosciuta, con lo scostamento.
+/// Altezza fissa: la pagina non "salta" quando compare la prima nota.
+class _NoteCard extends ConsumerWidget {
+  const _NoteCard({required this.detection, required this.live});
+
+  final PitchDetectionResult? detection;
+  final bool live;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final notation = ref.watch(notationProvider);
+    final detection = this.detection;
+
+    return SizedBox(
+      height: 76,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: detection == null
+              ? Center(
+                  child: Text(
+                    'Qui vedrai la nota riconosciuta e quanto sei intonato.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          NoteText(
+                            NoteSpeller.spellRoot(detection.note),
                             notation: notation,
-                            style: theme.textTheme.labelLarge?.copyWith(
-                                color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Container(
-                            height: 6,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3),
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF38BDF8), Color(0xFF818CF8), Color(0xFFA855F7)],
-                              ),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: colors.primary,
+                              height: 1.1,
                             ),
+                            octaveColor: colors.onSurfaceVariant,
+                          ),
+                          Text(live ? 'Nota rilevata' : 'Ultima nota',
+                              style: theme.textTheme.labelSmall),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${detection.cents >= 0 ? '+' : ''}${detection.cents.toStringAsFixed(0)} cent',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: detection.cents.abs() <= PitchRecognitionConfig.inTuneCents
+                                ? const Color(0xFF22C55E)
+                                : colors.error,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        NoteText(spelledMidi(latest.maxMidi),
-                            notation: notation,
-                            style: theme.textTheme.labelLarge?.copyWith(
-                                color: colors.onPrimaryContainer, fontWeight: FontWeight.w700)),
+                        Text('Scostamento', style: theme.textTheme.labelSmall),
                       ],
                     ),
                   ],
@@ -330,240 +375,132 @@ class _RangeCard extends ConsumerWidget {
   }
 }
 
-/// Sezione Custom: card in evidenza con invito a creare la propria sequenza
-/// + elenco delle sequenze salvate.
-class _CustomSection extends ConsumerWidget {
-  const _CustomSection({required this.exercises});
-
-  final List<ExerciseDefinition> exercises;
+/// Accesso rapido: notazione, tema, impostazioni.
+class _QuickActions extends ConsumerWidget {
+  const _QuickActions();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final canCreate = ref.watch(entitlementProvider).allows(ProFeature.customSequences);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Card(
-          elevation: 0,
-          color: colors.primaryContainer,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () => _go(context, ref, '/editor'),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(Icons.add_circle, size: 40, color: colors.onPrimaryContainer),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Crea la tua sequenza',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: colors.onPrimaryContainer,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            if (!canCreate) ...[
-                              const SizedBox(width: 8),
-                              const _ProBadge(),
-                            ],
-                          ],
-                        ),
-                        Text(
-                          'Componi qualsiasi giro di note: pattern, vocalizzi, prove di estensione…',
-                          style:
-                              theme.textTheme.bodySmall?.copyWith(color: colors.onPrimaryContainer),
-                        ),
-                      ],
-                    ),
+    final notation = ref.watch(notationProvider);
+    final themeSetting = ref.watch(themeSettingProvider);
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _QuickAction(
+              key: const ValueKey('quick-notation'),
+              icon: Icons.music_note_outlined,
+              label: 'Notazione',
+              value: notation == NoteNotation.italian ? 'DO RE MI' : 'C D E',
+              onTap: () => ref.read(notationProvider.notifier).setNotation(
+                    notation == NoteNotation.italian ? NoteNotation.english : NoteNotation.italian,
                   ),
-                  Icon(Icons.chevron_right, color: colors.onPrimaryContainer),
-                ],
-              ),
             ),
           ),
-        ),
-        // Sequenze senza gruppo: elencate direttamente.
-        for (final exercise in exercises)
-          if (exercise.group == null) _ExerciseTile(exercise: exercise),
-        // Sequenze raggruppate: un accordion per gruppo.
-        ...(() {
-          final grouped = <String, List<ExerciseDefinition>>{};
-          for (final exercise in exercises) {
-            final group = exercise.group;
-            if (group != null) {
-              grouped.putIfAbsent(group, () => []).add(exercise);
-            }
-          }
-          final names = grouped.keys.toList()..sort();
-          return [
-            for (final name in names)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: ExpansionTile(
-                    shape: const Border(),
-                    collapsedShape: const Border(),
-                    leading: const Icon(Icons.folder_outlined),
-                    title: Text(name,
-                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                    subtitle: Text(
-                      grouped[name]!.length == 1
-                          ? '1 sequenza'
-                          : '${grouped[name]!.length} sequenze',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                    children: [
-                      for (final exercise in grouped[name]!)
-                        _ExerciseTile(exercise: exercise, dense: true),
-                      const SizedBox(height: 4),
-                    ],
+          const SizedBox(width: 8),
+          Expanded(
+            child: _QuickAction(
+              key: const ValueKey('quick-theme'),
+              icon: Icons.brightness_6_outlined,
+              label: 'Tema',
+              value: themeLabel(themeSetting),
+              onTap: () => _chooseTheme(context, ref),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _QuickAction(
+              key: const ValueKey('quick-settings'),
+              icon: Icons.settings_outlined,
+              label: 'Impostazioni',
+              onTap: () => pushFullScreen(context, ref, '/settings'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _chooseTheme(BuildContext context, WidgetRef ref) {
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => Consumer(
+        builder: (context, ref, _) {
+          final current = ref.watch(themeSettingProvider);
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final setting in AppThemeSetting.values)
+                  ListTile(
+                    title: Text(themeLabel(setting)),
+                    trailing: setting == current ? const Icon(Icons.check) : null,
+                    onTap: () {
+                      ref.read(themeSettingProvider.notifier).setThemeSetting(setting);
+                      Navigator.of(context).pop();
+                    },
                   ),
-                ),
-              ),
-          ];
-        })(),
-      ],
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
 
-class _CategoryAccordion extends StatelessWidget {
-  const _CategoryAccordion({
-    required this.category,
-    required this.exercises,
-    this.initiallyExpanded = false,
+/// Nome del tema come nelle impostazioni.
+String themeLabel(AppThemeSetting setting) => switch (setting) {
+      AppThemeSetting.system => 'Sistema',
+      AppThemeSetting.light => 'Chiaro',
+      AppThemeSetting.dark => 'Scuro',
+      AppThemeSetting.neon => 'Neon',
+    };
+
+class _QuickAction extends StatelessWidget {
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.value,
+    super.key,
   });
 
-  final ExerciseCategory category;
-  final List<ExerciseDefinition> exercises;
-  final bool initiallyExpanded;
+  final IconData icon;
+  final String label;
+  final String? value;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
       clipBehavior: Clip.antiAlias,
-      child: ExpansionTile(
-        initiallyExpanded: initiallyExpanded,
-        shape: const Border(),
-        collapsedShape: const Border(),
-        title: Text(category.label,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-        subtitle: Text(category.description, style: theme.textTheme.bodySmall),
-        children: [
-          for (final exercise in exercises) _ExerciseTile(exercise: exercise, dense: true),
-          const SizedBox(height: 4),
-        ],
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: theme.colorScheme.primary),
+              const SizedBox(height: 4),
+              Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
+              if (value != null)
+                Text(value!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            ],
+          ),
+        ),
       ),
     );
-  }
-}
-
-/// Etichetta delle funzioni Intonia Pro.
-class _ProBadge extends StatelessWidget {
-  const _ProBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-      decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(6)),
-      child: Text('PRO',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: colors.onPrimary,
-                fontWeight: FontWeight.w800,
-              )),
-    );
-  }
-}
-
-class _ExerciseTile extends ConsumerWidget {
-  const _ExerciseTile({required this.exercise, this.dense = false});
-
-  final ExerciseDefinition exercise;
-  final bool dense;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final tile = ListTile(
-      dense: dense,
-      title: Text(exercise.name),
-      subtitle: Row(
-        children: [
-          Text('${exercise.steps.length} note'),
-          if (exercise.focus != null) ...[
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                exercise.focus!,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-      leading: Icon(exercise.isCustom ? Icons.edit_note : Icons.music_note),
-      trailing: exercise.isCustom
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Modifica',
-                  onPressed: () => _go(context, ref, '/editor', extra: exercise),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Elimina',
-                  onPressed: () => _confirmDelete(context, ref),
-                ),
-              ],
-            )
-          : const Icon(Icons.chevron_right),
-      onTap: () => _go(context, ref, '/trainer', extra: exercise),
-    );
-
-    if (!exercise.isCustom || dense) {
-      return tile;
-    }
-    return Card(margin: const EdgeInsets.only(top: 8), child: tile);
-  }
-
-  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminare la sequenza?'),
-        content: Text('"${exercise.name}" verrà rimossa definitivamente.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina')),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      await ref.read(customExercisesProvider.notifier).remove(exercise.id);
-    }
   }
 }

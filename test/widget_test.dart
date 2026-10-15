@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/app/vocal_scale_trainer_app.dart';
 
 void main() {
-  testWidgets('renders exercise library home screen', (tester) async {
+  testWidgets('renders the home and the exercise catalog', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: VocalScaleTrainerApp()));
     await tester.pump();
 
@@ -17,19 +17,20 @@ void main() {
     }
     expect(find.byKey(const ValueKey('splash')), findsNothing);
 
-    // Parte alta: titolo, tuner e invito custom.
+    // Home: mascotte e riconoscimento in primo piano, barra con 4 sezioni.
     expect(find.text('Intonia'), findsOneWidget);
-    expect(find.text('Riconoscimento in tempo reale'), findsOneWidget);
+    expect(find.text('Avvia ascolto'), findsOneWidget);
+    expect(find.byType(NavigationDestination), findsNWidgets(4));
+
+    // Il catalogo è nella sezione Esercizi.
+    await tester.tap(find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text('Esercizi'),
+    ));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
     expect(find.text('Crea la tua sequenza'), findsOneWidget);
-
-    // La ListView è lazy: le sezioni successive esistono solo dopo lo scroll.
-    await tester.dragUntilVisible(
-      find.text('Triade maggiore'),
-      find.byType(ListView),
-      const Offset(0, -200),
-    );
-    expect(find.text('Triade maggiore'), findsOneWidget);
-
     await tester.dragUntilVisible(
       find.text('Armonizzazioni a 3 voci'),
       find.byType(ListView),

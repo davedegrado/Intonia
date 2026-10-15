@@ -28,7 +28,7 @@ class VocalScaleTrainerApp extends ConsumerWidget {
         AppThemeSetting.dark || AppThemeSetting.neon => ThemeMode.dark,
         AppThemeSetting.system => ThemeMode.system,
       },
-      routerConfig: appRouter,
+      routerConfig: ref.watch(appRouterProvider),
       builder: (context, child) => SplashOverlay(child: child ?? const SizedBox.shrink()),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('it'), Locale('en')],
