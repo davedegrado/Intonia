@@ -1526,6 +1526,444 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{note}, octave {octave}'**
   String noteSemanticsLabel(String note, int octave);
+
+  /// Screen reader label of the streak pill.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Streak: 1 day in a row} other{Streak: {count} days in a row}}'**
+  String statusStreakSemantics(int count);
+
+  /// Mascot speech bubble. Must fit two short lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing or play a note: I\'ll tell you which one!'**
+  String get homeBubbleIdle;
+
+  /// Mascot speech bubble. Must fit two short lines.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m listening… sing or play a note.'**
+  String get homeBubbleListening;
+
+  /// No description provided for @homeBubbleInTune.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfectly in tune!'**
+  String get homeBubbleInTune;
+
+  /// No description provided for @homeBubbleAlmost.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost there: adjust just a little.'**
+  String get homeBubbleAlmost;
+
+  /// Mascot speech bubble. Must fit two short lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone access denied: enable it in Settings.'**
+  String get homeBubblePermissionDenied;
+
+  /// No description provided for @homeStartListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Start listening'**
+  String get homeStartListening;
+
+  /// No description provided for @homeStopListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop listening'**
+  String get homeStopListening;
+
+  /// No description provided for @homeMicStartSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Start live note detection'**
+  String get homeMicStartSemantics;
+
+  /// No description provided for @homeMicStopSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop note detection'**
+  String get homeMicStopSemantics;
+
+  /// No description provided for @homeNotePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Here you\'ll see the detected note and how in tune you are.'**
+  String get homeNotePlaceholder;
+
+  /// No description provided for @homeNoteDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Detected note'**
+  String get homeNoteDetected;
+
+  /// No description provided for @homeLastNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Last note'**
+  String get homeLastNote;
+
+  /// No description provided for @homeDeviation.
+  ///
+  /// In en, this message translates to:
+  /// **'Deviation'**
+  String get homeDeviation;
+
+  /// Signed deviation in cents, e.g. '+3 cents'.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} cents'**
+  String homeCents(String value);
+
+  /// No description provided for @homeQuickNotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Notation'**
+  String get homeQuickNotation;
+
+  /// No description provided for @homeQuickTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get homeQuickTheme;
+
+  /// No description provided for @homeQuickSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get homeQuickSettings;
+
+  /// No description provided for @exercisesCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get exercisesCategories;
+
+  /// No description provided for @exercisesSequenceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 sequence} other{{count} sequences}}'**
+  String exercisesSequenceCount(int count);
+
+  /// No description provided for @exercisesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 exercise} other{{count} exercises}}'**
+  String exercisesCount(int count);
+
+  /// No description provided for @exercisesNoteCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 note} other{{count} notes}}'**
+  String exercisesNoteCount(int count);
+
+  /// No description provided for @exercisesProBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO'**
+  String get exercisesProBadge;
+
+  /// No description provided for @exercisesEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get exercisesEdit;
+
+  /// No description provided for @exercisesDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this sequence?'**
+  String get exercisesDeleteTitle;
+
+  /// No description provided for @exercisesDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'“{name}” will be permanently removed.'**
+  String exercisesDeleteMessage(String name);
+
+  /// No description provided for @exercisesCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your sequence'**
+  String get exercisesCreateTitle;
+
+  /// No description provided for @exercisesCreateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose any run of notes: patterns, vocal warm-ups, range drills…'**
+  String get exercisesCreateSubtitle;
+
+  /// No description provided for @chargesProSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Intonia Pro: unlimited exercises'**
+  String get chargesProSemantics;
+
+  /// No description provided for @chargesProDeveloperSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Intonia Pro, developer build: unlimited exercises'**
+  String get chargesProDeveloperSemantics;
+
+  /// No description provided for @chargesChipSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise charges: {count} of {max}'**
+  String chargesChipSemantics(int count, int max);
+
+  /// No description provided for @chargesWaitUnderMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'less than 1 min'**
+  String get chargesWaitUnderMinute;
+
+  /// No description provided for @chargesWaitMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String chargesWaitMinutes(int minutes);
+
+  /// No description provided for @chargesWaitHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String chargesWaitHours(int hours);
+
+  /// No description provided for @chargesWaitHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String chargesWaitHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @chargesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise charges'**
+  String get chargesTitle;
+
+  /// No description provided for @chargesExhaustedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of charges'**
+  String get chargesExhaustedTitle;
+
+  /// No description provided for @chargesNextIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Next charge in {wait}.'**
+  String chargesNextIn(String wait);
+
+  /// No description provided for @chargesExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Each exercise session uses one charge. {hours, plural, =1{One comes back every hour} other{One comes back every {hours} hours}}, even with the app closed, up to {max}.'**
+  String chargesExplanation(int hours, int max);
+
+  /// No description provided for @chargesFreeFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Live note detection and the vocal range test are always free and unlimited.'**
+  String get chargesFreeFeatures;
+
+  /// No description provided for @chargesDiscoverPro.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover Intonia Pro'**
+  String get chargesDiscoverPro;
+
+  /// No description provided for @chargesWaitForRecharge.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll wait for a recharge'**
+  String get chargesWaitForRecharge;
+
+  /// No description provided for @chargesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Each session uses 1 charge · {count}/{max} available'**
+  String chargesHint(int count, int max);
+
+  /// No description provided for @proTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Intonia Pro'**
+  String get proTitle;
+
+  /// No description provided for @proHeadlinePro.
+  ///
+  /// In en, this message translates to:
+  /// **'You have Intonia Pro'**
+  String get proHeadlinePro;
+
+  /// No description provided for @proHeadlineFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Train without limits'**
+  String get proHeadlineFree;
+
+  /// No description provided for @proDeveloperNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer build: Pro active without a subscription.'**
+  String get proDeveloperNote;
+
+  /// No description provided for @proBenefitUnlimitedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited exercises'**
+  String get proBenefitUnlimitedTitle;
+
+  /// No description provided for @proBenefitUnlimitedText.
+  ///
+  /// In en, this message translates to:
+  /// **'No charges: as many sessions as you like.'**
+  String get proBenefitUnlimitedText;
+
+  /// No description provided for @proBenefitCustomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom sequences'**
+  String get proBenefitCustomTitle;
+
+  /// No description provided for @proBenefitCustomText.
+  ///
+  /// In en, this message translates to:
+  /// **'Create, edit and save your own exercises.'**
+  String get proBenefitCustomText;
+
+  /// No description provided for @proBenefitHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Full history'**
+  String get proBenefitHistoryTitle;
+
+  /// No description provided for @proBenefitHistoryText.
+  ///
+  /// In en, this message translates to:
+  /// **'All your sessions in your profile.'**
+  String get proBenefitHistoryText;
+
+  /// No description provided for @proBenefitComingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get proBenefitComingTitle;
+
+  /// No description provided for @proBenefitComingText.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced statistics, progress charts and personalized paths.'**
+  String get proBenefitComingText;
+
+  /// No description provided for @proFreeForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Free forever: live note detection, the vocal range test, every exercise with {max} recharging charges, profile, essential stats and daily streak.'**
+  String proFreeForever(int max);
+
+  /// No description provided for @proPlanMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get proPlanMonthly;
+
+  /// No description provided for @proPlanYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get proPlanYearly;
+
+  /// Indicative price, formatted for the locale.
+  ///
+  /// In en, this message translates to:
+  /// **'€4.99'**
+  String get proPriceMonthly;
+
+  /// Indicative price, formatted for the locale.
+  ///
+  /// In en, this message translates to:
+  /// **'€39.99'**
+  String get proPriceYearly;
+
+  /// No description provided for @proPeriodMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'per month'**
+  String get proPeriodMonth;
+
+  /// No description provided for @proPeriodYear.
+  ///
+  /// In en, this message translates to:
+  /// **'per year'**
+  String get proPeriodYear;
+
+  /// No description provided for @proYearlySaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Save 33%'**
+  String get proYearlySaving;
+
+  /// No description provided for @proSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get proSubscribe;
+
+  /// No description provided for @proComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions will be available soon through the App Store and Google Play.'**
+  String get proComingSoon;
+
+  /// No description provided for @proRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get proRestore;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsNotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Note names'**
+  String get settingsNotation;
+
+  /// No description provided for @settingsInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsInfo;
+
+  /// No description provided for @settingsAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'Intonia {version} — offline pitch training.'**
+  String settingsAbout(String version);
+
+  /// No description provided for @settingsSoundCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Piano sound: Fluid (R3) SoundFont, © 2000–2002, 2008 Frank Wen, MIT license.'**
+  String get settingsSoundCredit;
+
+  /// No description provided for @settingsLicenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Licenses'**
+  String get settingsLicenses;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

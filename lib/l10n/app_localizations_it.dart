@@ -861,4 +861,289 @@ class AppLocalizationsIt extends AppLocalizations {
   String noteSemanticsLabel(String note, int octave) {
     return '$note, ottava $octave';
   }
+
+  @override
+  String statusStreakSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Serie: $count giorni di fila',
+      one: 'Serie: 1 giorno di fila',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeBubbleIdle => 'Canta o suona una nota: ti dico qual è!';
+
+  @override
+  String get homeBubbleListening => 'Ti ascolto… canta o suona una nota.';
+
+  @override
+  String get homeBubbleInTune => 'Perfettamente intonata!';
+
+  @override
+  String get homeBubbleAlmost => 'Ci sei quasi: aggiusta un pochino.';
+
+  @override
+  String get homeBubblePermissionDenied =>
+      'Permesso microfono negato: attivalo nelle impostazioni.';
+
+  @override
+  String get homeStartListening => 'Avvia ascolto';
+
+  @override
+  String get homeStopListening => 'Ferma ascolto';
+
+  @override
+  String get homeMicStartSemantics => 'Avvia il riconoscimento delle note';
+
+  @override
+  String get homeMicStopSemantics => 'Ferma il riconoscimento';
+
+  @override
+  String get homeNotePlaceholder => 'Qui vedrai la nota riconosciuta e quanto sei intonato.';
+
+  @override
+  String get homeNoteDetected => 'Nota rilevata';
+
+  @override
+  String get homeLastNote => 'Ultima nota';
+
+  @override
+  String get homeDeviation => 'Scostamento';
+
+  @override
+  String homeCents(String value) {
+    return '$value cent';
+  }
+
+  @override
+  String get homeQuickNotation => 'Notazione';
+
+  @override
+  String get homeQuickTheme => 'Tema';
+
+  @override
+  String get homeQuickSettings => 'Impostazioni';
+
+  @override
+  String get exercisesCategories => 'Categorie';
+
+  @override
+  String exercisesSequenceCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sequenze',
+      one: '1 sequenza',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String exercisesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count esercizi',
+      one: '1 esercizio',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String exercisesNoteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count note',
+      one: '1 nota',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get exercisesProBadge => 'PRO';
+
+  @override
+  String get exercisesEdit => 'Modifica';
+
+  @override
+  String get exercisesDeleteTitle => 'Eliminare la sequenza?';
+
+  @override
+  String exercisesDeleteMessage(String name) {
+    return '“$name” verrà rimossa definitivamente.';
+  }
+
+  @override
+  String get exercisesCreateTitle => 'Crea la tua sequenza';
+
+  @override
+  String get exercisesCreateSubtitle =>
+      'Componi qualsiasi giro di note: pattern, vocalizzi, prove di estensione…';
+
+  @override
+  String get chargesProSemantics => 'Intonia Pro: esercizi illimitati';
+
+  @override
+  String get chargesProDeveloperSemantics => 'Intonia Pro, build sviluppatore: esercizi illimitati';
+
+  @override
+  String chargesChipSemantics(int count, int max) {
+    return 'Cariche esercizi: $count su $max';
+  }
+
+  @override
+  String get chargesWaitUnderMinute => 'meno di 1 min';
+
+  @override
+  String chargesWaitMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String chargesWaitHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String chargesWaitHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String get chargesTitle => 'Cariche esercizi';
+
+  @override
+  String get chargesExhaustedTitle => 'Cariche esaurite';
+
+  @override
+  String chargesNextIn(String wait) {
+    return 'Prossima carica tra $wait.';
+  }
+
+  @override
+  String chargesExplanation(int hours, int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'Se ne ricarica una ogni $hours ore',
+      one: 'Se ne ricarica una ogni ora',
+    );
+    return 'Ogni sessione di esercizio usa una carica. $_temp0, anche ad app chiusa, fino a $max.';
+  }
+
+  @override
+  String get chargesFreeFeatures =>
+      'Il riconoscimento in tempo reale e il test di estensione vocale sono sempre gratuiti e illimitati.';
+
+  @override
+  String get chargesDiscoverPro => 'Scopri Intonia Pro';
+
+  @override
+  String get chargesWaitForRecharge => 'Aspetto la ricarica';
+
+  @override
+  String chargesHint(int count, int max) {
+    return 'Ogni sessione usa 1 carica · $count/$max disponibili';
+  }
+
+  @override
+  String get proTitle => 'Intonia Pro';
+
+  @override
+  String get proHeadlinePro => 'Hai Intonia Pro';
+
+  @override
+  String get proHeadlineFree => 'Allenati senza limiti';
+
+  @override
+  String get proDeveloperNote => 'Build sviluppatore: Pro attivo senza abbonamento.';
+
+  @override
+  String get proBenefitUnlimitedTitle => 'Esercizi illimitati';
+
+  @override
+  String get proBenefitUnlimitedText => 'Nessuna carica: tutte le sessioni che vuoi.';
+
+  @override
+  String get proBenefitCustomTitle => 'Sequenze personalizzate';
+
+  @override
+  String get proBenefitCustomText => 'Crea, modifica e salva i tuoi esercizi.';
+
+  @override
+  String get proBenefitHistoryTitle => 'Storico completo';
+
+  @override
+  String get proBenefitHistoryText => 'Tutte le tue sessioni nel profilo.';
+
+  @override
+  String get proBenefitComingTitle => 'In arrivo';
+
+  @override
+  String get proBenefitComingText =>
+      'Statistiche avanzate, grafici dei progressi e percorsi personalizzati.';
+
+  @override
+  String proFreeForever(int max) {
+    return 'Gratis per sempre: riconoscimento delle note in tempo reale, test di estensione vocale, tutti gli esercizi con $max cariche che si ricaricano, profilo, statistiche essenziali e serie giornaliera.';
+  }
+
+  @override
+  String get proPlanMonthly => 'Mensile';
+
+  @override
+  String get proPlanYearly => 'Annuale';
+
+  @override
+  String get proPriceMonthly => '€4,99';
+
+  @override
+  String get proPriceYearly => '€39,99';
+
+  @override
+  String get proPeriodMonth => 'al mese';
+
+  @override
+  String get proPeriodYear => 'all\'anno';
+
+  @override
+  String get proYearlySaving => 'Risparmi il 33%';
+
+  @override
+  String get proSubscribe => 'Abbonati';
+
+  @override
+  String get proComingSoon =>
+      'Gli abbonamenti saranno disponibili a breve tramite App Store e Google Play.';
+
+  @override
+  String get proRestore => 'Ripristina acquisti';
+
+  @override
+  String get settingsTitle => 'Impostazioni';
+
+  @override
+  String get settingsAppearance => 'Aspetto';
+
+  @override
+  String get settingsNotation => 'Notazione delle note';
+
+  @override
+  String get settingsInfo => 'Info';
+
+  @override
+  String settingsAbout(String version) {
+    return 'Intonia $version — allenamento di intonazione offline.';
+  }
+
+  @override
+  String get settingsSoundCredit =>
+      'Suono di pianoforte: Fluid (R3) SoundFont, © 2000–2002, 2008 Frank Wen, licenza MIT.';
+
+  @override
+  String get settingsLicenses => 'Licenze';
 }
