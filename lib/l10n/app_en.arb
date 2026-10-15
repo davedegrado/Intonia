@@ -685,5 +685,8 @@
   "trainerDirectionReverse": "Reverse",
   "trainerDirectionComplete": "Full",
   "trainerRepeatTop": "Repeat the top note",
-  "trainerRepeatTopHint": "Repeats the highest note before going down"
+  "trainerRepeatTopHint": "Repeats the highest note before going down",
+  "exercisesCreateFromScratch": "Start from scratch",
+  "exercisesCreateFromExercise": "Start from an exercise",
+  "exercisesCreateFromExerciseHint": "Copy an exercise and edit it freely"
 }

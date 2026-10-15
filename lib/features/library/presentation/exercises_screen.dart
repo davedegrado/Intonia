@@ -102,7 +102,7 @@ class _CustomSection extends ConsumerWidget {
       children: [
         _CreateSequenceCard(
           showPro: !canCreate,
-          onTap: () => _open(context, ref, '/editor'),
+          onTap: () => _chooseStart(context, ref),
         ),
         if (exercises.isNotEmpty) ...[
           const SizedBox(height: 16),
@@ -376,6 +376,108 @@ class _CreateSequenceCard extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Crea da zero" oppure "Parti da un esercizio".
+Future<void> _chooseStart(BuildContext context, WidgetRef ref) async {
+  final l10n = context.l10n;
+  final fromExercise = await showModalBottomSheet<bool>(
+    context: context,
+    showDragHandle: true,
+    builder: (context) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            key: const ValueKey('create-from-scratch'),
+            leading: const Icon(Icons.add),
+            title: Text(l10n.exercisesCreateFromScratch),
+            onTap: () => Navigator.of(context).pop(false),
+          ),
+          ListTile(
+            key: const ValueKey('create-from-exercise'),
+            leading: const Icon(Icons.content_copy_outlined),
+            title: Text(l10n.exercisesCreateFromExercise),
+            subtitle: Text(l10n.exercisesCreateFromExerciseHint),
+            onTap: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (fromExercise == null || !context.mounted) {
+    return;
+  }
+  if (!fromExercise) {
+    _open(context, ref, '/editor');
+    return;
+  }
+  final source = await showModalBottomSheet<ExerciseDefinition>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) => _ExercisePicker(library: ref.read(exerciseLibraryProvider)),
+  );
+  if (source != null && context.mounted) {
+    _open(context, ref, '/editor',
+        extra: copyForEditing(source, context.l10n.exerciseName(source)));
+  }
+}
+
+/// Copia indipendente di un esercizio da modificare: definizione originale
+/// completa (non la variante Dritto/Al contrario/Completo), id vuoto = nuova
+/// sequenza. Gli esercizi predefiniti non hanno una nota di partenza: si usa
+/// DO4/C4, la tonalità e l'ottava predefinite del trainer.
+ExerciseDefinition copyForEditing(ExerciseDefinition source, String name) => ExerciseDefinition(
+      id: '',
+      name: name,
+      category: ExerciseCategory.custom,
+      steps: List.of(source.steps),
+      isCustom: true,
+      rootMidi: source.rootMidi ?? 60,
+      focus: source.focus,
+      group: source.group,
+    );
+
+class _ExercisePicker extends StatelessWidget {
+  const _ExercisePicker({required this.library});
+
+  final ExerciseLibrary library;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final builtIn = library.builtIn;
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.75),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(l10n.exercisesCreateFromExercise,
+                  style: Theme.of(context).textTheme.titleMedium),
+            ),
+            for (final category in ExerciseCategory.values)
+              if (builtIn.any((e) => e.category == category))
+                ExpansionTile(
+                  leading: Icon(categoryIcon(category)),
+                  title: Text(l10n.categoryLabel(category)),
+                  children: [
+                    for (final exercise in builtIn.where((e) => e.category == category))
+                      ListTile(
+                        title: Text(l10n.exerciseName(exercise)),
+                        subtitle: Text(l10n.exercisesNoteCount(exercise.steps.length)),
+                        onTap: () => Navigator.of(context).pop(exercise),
+                      ),
+                  ],
+                ),
+          ],
         ),
       ),
     );

@@ -1161,4 +1161,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get trainerRepeatTopHint => 'Ripete la nota più alta prima di scendere';
+
+  @override
+  String get exercisesCreateFromScratch => 'Crea da zero';
+
+  @override
+  String get exercisesCreateFromExercise => 'Parti da un esercizio';
+
+  @override
+  String get exercisesCreateFromExerciseHint => 'Copia un esercizio e modificalo liberamente';
 }

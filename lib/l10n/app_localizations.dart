@@ -1994,6 +1994,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Repeats the highest note before going down'**
   String get trainerRepeatTopHint;
+
+  /// No description provided for @exercisesCreateFromScratch.
+  ///
+  /// In en, this message translates to:
+  /// **'Start from scratch'**
+  String get exercisesCreateFromScratch;
+
+  /// No description provided for @exercisesCreateFromExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Start from an exercise'**
+  String get exercisesCreateFromExercise;
+
+  /// No description provided for @exercisesCreateFromExerciseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy an exercise and edit it freely'**
+  String get exercisesCreateFromExerciseHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

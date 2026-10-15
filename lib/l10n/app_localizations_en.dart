@@ -1159,4 +1159,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trainerRepeatTopHint => 'Repeats the highest note before going down';
+
+  @override
+  String get exercisesCreateFromScratch => 'Start from scratch';
+
+  @override
+  String get exercisesCreateFromExercise => 'Start from an exercise';
+
+  @override
+  String get exercisesCreateFromExerciseHint => 'Copy an exercise and edit it freely';
 }

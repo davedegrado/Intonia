@@ -316,5 +316,8 @@
   "trainerDirectionReverse": "Al contrario",
   "trainerDirectionComplete": "Completo",
   "trainerRepeatTop": "Ripeti la nota di vertice",
-  "trainerRepeatTopHint": "Ripete la nota più alta prima di scendere"
+  "trainerRepeatTopHint": "Ripete la nota più alta prima di scendere",
+  "exercisesCreateFromScratch": "Crea da zero",
+  "exercisesCreateFromExercise": "Parti da un esercizio",
+  "exercisesCreateFromExerciseHint": "Copia un esercizio e modificalo liberamente"
 }
