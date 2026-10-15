@@ -98,4 +98,767 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notationItalian => 'DO RE MI';
+
+  @override
+  String get trainerAdvancedSettings => 'Advanced settings';
+
+  @override
+  String get trainerCurrentNote => 'Current note';
+
+  @override
+  String get trainerPlayCurrentNote => 'Play the current note';
+
+  @override
+  String get trainerSessionStats => 'Session stats';
+
+  @override
+  String get trainerStartingNote => 'Starting note:';
+
+  @override
+  String get trainerKey => 'Key';
+
+  @override
+  String get trainerOctave => 'Octave';
+
+  @override
+  String get trainerModeListen => 'Listen';
+
+  @override
+  String get trainerModeTrain => 'Training';
+
+  @override
+  String get trainerPlay => 'Play';
+
+  @override
+  String get trainerStop => 'Stop';
+
+  @override
+  String get trainerBpm => 'BPM';
+
+  @override
+  String trainerSettingValue(String label, String value) {
+    return '$label: $value';
+  }
+
+  @override
+  String get trainerTolerance => 'Tolerance';
+
+  @override
+  String trainerToleranceValue(int cents) {
+    return '± $cents cents';
+  }
+
+  @override
+  String get trainerStabilityTime => 'Stability time';
+
+  @override
+  String trainerMilliseconds(int ms) {
+    return '$ms ms';
+  }
+
+  @override
+  String get trainerGuideEveryNote => 'Play the guide note on every note';
+
+  @override
+  String get trainerGuideEveryNoteHint =>
+      'When off, you only hear the first note: tap a note to hear it again';
+
+  @override
+  String get trainerLoop => 'Loop (Listen mode only)';
+
+  @override
+  String get trainerCalibrate => 'Calibrate background noise';
+
+  @override
+  String get trainerCalibrating => 'Stay silent… (3 s)';
+
+  @override
+  String get trainerCalibrationFailed => 'Calibration failed: check the microphone permission.';
+
+  @override
+  String get trainerCalibrationDone => 'Calibration complete: background noise filtered out.';
+
+  @override
+  String get trainerStatusMicOn => 'Microphone on';
+
+  @override
+  String get trainerStatusPlaying => 'Playing';
+
+  @override
+  String get trainerStatusReady => 'Ready';
+
+  @override
+  String get trainerMicrophoneDenied =>
+      'Microphone permission denied: enable it in your system settings to train.';
+
+  @override
+  String get trainerAudioUnavailable =>
+      'Audio could not start: check the microphone and the piano.sf2 SoundFont.';
+
+  @override
+  String get trainerDetection => 'Detection';
+
+  @override
+  String get trainerDetectedNote => 'Detected note';
+
+  @override
+  String get trainerDeviation => 'Deviation';
+
+  @override
+  String trainerCentsValue(String value) {
+    return '$value cents';
+  }
+
+  @override
+  String get trainerListening => 'Listening';
+
+  @override
+  String get trainerInTune => 'in tune';
+
+  @override
+  String get trainerTooLow => 'too low';
+
+  @override
+  String get trainerTooHigh => 'too high';
+
+  @override
+  String get trainerStatTime => 'Time';
+
+  @override
+  String get trainerStatErrors => 'Errors';
+
+  @override
+  String get trainerStatAccuracy => 'Accuracy';
+
+  @override
+  String get trainerStatCorrect => 'Correct';
+
+  @override
+  String get trainerViewNotes => 'Notes';
+
+  @override
+  String get trainerViewStaff => 'Staff';
+
+  @override
+  String trainerNoteCorrect(String note) {
+    return '$note, correct';
+  }
+
+  @override
+  String trainerNoteWrong(String note) {
+    return '$note, to retry';
+  }
+
+  @override
+  String trainerNoteCurrent(String note) {
+    return '$note, current note';
+  }
+
+  @override
+  String trainerNotePending(String note) {
+    return '$note, to sing';
+  }
+
+  @override
+  String get trainerTapToHear => 'tap to hear it';
+
+  @override
+  String trainerStaffSemantics(String notes) {
+    return 'Staff: $notes';
+  }
+
+  @override
+  String get mascotSemanticLabel => 'Intonia mascot';
+
+  @override
+  String get mascotCompleted => 'Exercise complete! Great job.';
+
+  @override
+  String get mascotSuccess => 'Perfect! Keep it up.';
+
+  @override
+  String get mascotRetry => 'Almost! Try again.';
+
+  @override
+  String get mascotListenSequence => 'Listen closely to the sequence…';
+
+  @override
+  String get mascotSingNote => 'Sing the note: I\'m listening.';
+
+  @override
+  String get mascotIdleListen => 'Press Play and listen to the sequence.';
+
+  @override
+  String get mascotIdleTrain => 'Ready to train your ear?';
+
+  @override
+  String get sessionPerfectTitle => 'Perfect!';
+
+  @override
+  String get sessionPerfectMessage => 'No mistakes: you were perfectly in tune!';
+
+  @override
+  String get sessionGreatTitle => 'Great job!';
+
+  @override
+  String get sessionGreatMessage => 'Almost perfect: your ear is getting better.';
+
+  @override
+  String get sessionGoodTitle => 'Well done!';
+
+  @override
+  String get sessionGoodMessage => 'You\'re nearly there: repeat it to lock in the notes.';
+
+  @override
+  String get sessionRetryTitle => 'Don\'t give up!';
+
+  @override
+  String get sessionRetryMessage => 'Listen to the notes again and retry: you improve every round.';
+
+  @override
+  String get sessionCorrect => 'Correct';
+
+  @override
+  String get sessionErrors => 'Errors';
+
+  @override
+  String get sessionDuration => 'Duration';
+
+  @override
+  String sessionSeconds(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get sessionAccuracy => 'accuracy';
+
+  @override
+  String sessionAccuracySemantics(int percent) {
+    return 'Accuracy $percent percent';
+  }
+
+  @override
+  String get sessionContinue => 'Continue';
+
+  @override
+  String get sessionRepeat => 'Repeat exercise';
+
+  @override
+  String get rangeSectionTitle => 'Vocal range';
+
+  @override
+  String get rangeHeadline => 'Discover your vocal range';
+
+  @override
+  String get rangeIntro =>
+      'Start from a comfortable note: we go down to the lowest and up to the highest note you can sing. The result stays in your profile so you can track your progress.';
+
+  @override
+  String get rangeStartTest => 'Start test';
+
+  @override
+  String get rangeRetakeTest => 'Retake the test';
+
+  @override
+  String get rangeNoTestsYet => 'No tests yet: your result will appear here.';
+
+  @override
+  String get rangePreviousTests => 'Previous tests';
+
+  @override
+  String get rangeHistoryInProfile => 'Test history in your profile';
+
+  @override
+  String get rangeLatestResult => 'Latest result';
+
+  @override
+  String rangeSpanDetail(String span, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count semitones',
+      one: '1 semitone',
+    );
+    return '$span ($_temp0)';
+  }
+
+  @override
+  String get rangeLowest => 'Lowest';
+
+  @override
+  String get rangeHighest => 'Highest';
+
+  @override
+  String rangeDeltaShort(String delta) {
+    return '$delta st';
+  }
+
+  @override
+  String get rangeTestTitle => 'Vocal range test';
+
+  @override
+  String get rangeHowItWorks => 'How it works';
+
+  @override
+  String get rangeHowItWorksBody =>
+      'Tap \"Start the test\" and sing a comfortable note, holding it for a moment: I\'ll recognize it and from there we go down one semitone at a time. You only move on when you hit the note; when you really can\'t reach it, tap \"Low limit reached\" (or skip that single note). Then we go up toward the high notes the same way. At the end your range is saved in your profile.';
+
+  @override
+  String get rangeSensitivity => 'Sensitivity';
+
+  @override
+  String get rangeTolerance => 'Tolerance';
+
+  @override
+  String get rangeStabilityTime => 'Stability time';
+
+  @override
+  String rangeCents(int cents) {
+    return '± $cents cents';
+  }
+
+  @override
+  String get rangeLastTestPrefix => 'Last test: ';
+
+  @override
+  String get rangeStartButton => 'Start the test';
+
+  @override
+  String get rangeTowardLow => 'Going down';
+
+  @override
+  String get rangeTowardHigh => 'Going up';
+
+  @override
+  String get rangeSingThisNote => 'Sing this note (tap to hear it again)';
+
+  @override
+  String get rangeValidatedSoFar => 'Range validated so far: ';
+
+  @override
+  String get rangeSkipNote => 'Skip this note';
+
+  @override
+  String get rangeLowLimitReached => 'Low limit reached';
+
+  @override
+  String get rangeHighLimitReached => 'High limit reached';
+
+  @override
+  String get rangeCancelTest => 'Cancel the test';
+
+  @override
+  String get rangeSingComfortable => 'Sing a comfortable note and hold it';
+
+  @override
+  String get rangeListening => 'Listening…';
+
+  @override
+  String get rangeStartHoldHint => 'When the bar is full, that\'s your starting note.';
+
+  @override
+  String get rangeYourRange => 'Your range';
+
+  @override
+  String rangeProgressBetter(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count semitones',
+      one: '+1 semitone',
+    );
+    return '$_temp0 compared to your last test';
+  }
+
+  @override
+  String get rangeProgressSame => 'Same span as your last test';
+
+  @override
+  String rangeProgressWorse(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '-$count semitones',
+      one: '-1 semitone',
+    );
+    return '$_temp0 compared to your last test';
+  }
+
+  @override
+  String rangeProgressWorseEncouraging(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '-$count semitones',
+      one: '-1 semitone',
+    );
+    return '$_temp0 compared to your last test: it happens, your voice changes from day to day';
+  }
+
+  @override
+  String get rangeSavedToProfile =>
+      'Result saved to your profile: the test history shows your progress over time.';
+
+  @override
+  String get rangeRetryTest => 'Retry the test';
+
+  @override
+  String get rangeContinue => 'Continue';
+
+  @override
+  String get rangeCoachValidated => 'Great! Next note.';
+
+  @override
+  String get rangeCoachSkipped => 'No problem, let\'s try the next one.';
+
+  @override
+  String get rangeCoachSetup =>
+      'Start from a comfortable note: we\'ll go down toward the low notes together.';
+
+  @override
+  String get rangeCoachFindingStart => 'Sing a comfortable note and hold it: I\'ll recognize it.';
+
+  @override
+  String get rangeCoachDescending => 'Sing the note: we\'re heading down.';
+
+  @override
+  String get rangeCoachAscending => 'Now let\'s go up toward the high notes!';
+
+  @override
+  String get rangeCoachDone => 'Here\'s your range! Great job.';
+
+  @override
+  String get rangeCoachRetry => 'Let\'s try again starting from a more comfortable note.';
+
+  @override
+  String get rangeMicDenied => 'Microphone permission denied: enable it in your system settings.';
+
+  @override
+  String get rangeAudioInitFailed =>
+      'Audio not initialized: check the microphone and the SoundFont.';
+
+  @override
+  String get rangeNothingValidated => 'No notes validated: the test was not saved.';
+
+  @override
+  String get rangeResultFirst => 'Here\'s your vocal range!';
+
+  @override
+  String get rangeResultBetter => 'New record!';
+
+  @override
+  String get rangeResultSame => 'Range confirmed!';
+
+  @override
+  String get rangeResultWorse => 'Here\'s your range today';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileSettingsTooltip => 'Settings';
+
+  @override
+  String get profileEmptyTitle => 'No sessions yet';
+
+  @override
+  String get profileEmptyBody =>
+      'Complete a workout: here you\'ll find your streak, accuracy, vocal range and history.';
+
+  @override
+  String get profileStatSessions => 'Sessions';
+
+  @override
+  String get profileStatMinutes => 'Total minutes';
+
+  @override
+  String get profileStatAccuracy => 'Average accuracy';
+
+  @override
+  String get profileStatRange => 'Vocal range';
+
+  @override
+  String get profileBestWorstNotes => 'Best and worst notes';
+
+  @override
+  String get profileRangeTests => 'Vocal range tests';
+
+  @override
+  String profileRangeDeltaUp(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count semitones',
+      one: '+1 semitone',
+    );
+    return '$_temp0 vs. previous';
+  }
+
+  @override
+  String profileRangeDeltaDown(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '-$count semitones',
+      one: '-1 semitone',
+    );
+    return '$_temp0 vs. previous';
+  }
+
+  @override
+  String get profileRangeUnchanged => 'unchanged';
+
+  @override
+  String get profileDeleteRangeTooltip => 'Delete test';
+
+  @override
+  String get profileDeleteSessionTooltip => 'Delete session';
+
+  @override
+  String get profileAllSessions => 'All sessions';
+
+  @override
+  String get profileRecentSessions => 'Recent sessions';
+
+  @override
+  String profileFullHistoryPro(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions',
+      one: '1 session',
+    );
+    return 'Full history ($_temp0) with Intonia Pro';
+  }
+
+  @override
+  String get profileDeleteRangeTitle => 'Delete this test?';
+
+  @override
+  String profileDeleteRangeBody(String date) {
+    return 'The test from $date will be removed.';
+  }
+
+  @override
+  String get profileDeleteSessionTitle => 'Delete this session?';
+
+  @override
+  String profileDeleteSessionBody(String name, String date) {
+    return '\"$name\" from $date will be removed from your stats, streak and vocal range.';
+  }
+
+  @override
+  String profileStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count-day streak',
+      one: '1-day streak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileStreakStart => 'Practice today to start your streak!';
+
+  @override
+  String get profileStreakKeep => 'Keep it up, don\'t break it!';
+
+  @override
+  String get exerciseNameTriadMajor => 'Major triad';
+
+  @override
+  String get exerciseNameTriadMinor => 'Minor triad';
+
+  @override
+  String get exerciseNameTriadAugmented => 'Augmented triad';
+
+  @override
+  String get exerciseNameTriadDiminished => 'Diminished triad';
+
+  @override
+  String get exerciseNameArpeggioMajorOctave => 'Major arpeggio (octave)';
+
+  @override
+  String get exerciseNameArpeggioMinorOctave => 'Minor arpeggio (octave)';
+
+  @override
+  String get exerciseNameMajorPentatonic => 'Major pentatonic';
+
+  @override
+  String get exerciseNameMinorPentatonic => 'Minor pentatonic';
+
+  @override
+  String get exerciseNameMajor => 'Major scale';
+
+  @override
+  String get exerciseNameNaturalMinor => 'Natural minor scale';
+
+  @override
+  String get exerciseNameHarmonicMinor => 'Harmonic minor scale';
+
+  @override
+  String get exerciseNameMelodicMinor => 'Melodic minor scale';
+
+  @override
+  String get exerciseNameBlues => 'Blues scale';
+
+  @override
+  String get exerciseNameHarmonizedMajor => 'Harmonized major scale';
+
+  @override
+  String get exerciseNameHarmonizedNaturalMinor => 'Harmonized natural minor scale';
+
+  @override
+  String get exerciseNameHarmonizedHarmonicMinor => 'Harmonized harmonic minor scale';
+
+  @override
+  String get exerciseNameHarmonizedMelodicMinor => 'Harmonized melodic minor scale';
+
+  @override
+  String get exerciseNameFiveNotePattern => '5-note pattern (1-2-3-4-5)';
+
+  @override
+  String get exerciseNameThirdLeaps => 'Leaps in thirds (1-3, 2-4...)';
+
+  @override
+  String get categoryLabelCustom => 'Your sequences';
+
+  @override
+  String get categoryDescriptionCustom => 'Create and practice your own custom sequences';
+
+  @override
+  String get categoryLabelTriads => 'Triads';
+
+  @override
+  String get categoryDescriptionTriads => 'Major, minor, augmented and diminished';
+
+  @override
+  String get categoryLabelArpeggios => 'Arpeggios';
+
+  @override
+  String get categoryDescriptionArpeggios => 'Triads extended to the octave';
+
+  @override
+  String get categoryLabelPentatonics => 'Pentatonic scales';
+
+  @override
+  String get categoryDescriptionPentatonics => 'Major and minor';
+
+  @override
+  String get categoryLabelScales => 'Scales';
+
+  @override
+  String get categoryDescriptionScales => 'Major, minor and blues';
+
+  @override
+  String get categoryLabelHarmonizations => 'Three-part harmonies';
+
+  @override
+  String get categoryDescriptionHarmonizations => 'Diatonic triads on every scale degree';
+
+  @override
+  String get categoryLabelPatterns => 'Patterns';
+
+  @override
+  String get categoryDescriptionPatterns => 'Melodic warm-up sequences';
+
+  @override
+  String get focusAccuracy => 'Accuracy';
+
+  @override
+  String get focusEar => 'Ear training';
+
+  @override
+  String get focusAgility => 'Agility';
+
+  @override
+  String get focusControl => 'Control';
+
+  @override
+  String get focusRange => 'Range';
+
+  @override
+  String get editorTitleNew => 'New sequence';
+
+  @override
+  String get editorTitleEdit => 'Edit sequence';
+
+  @override
+  String get editorNameLabel => 'Name';
+
+  @override
+  String get editorNameHint => 'e.g. Octave sirens / Vocalise 1-3-5-8';
+
+  @override
+  String get editorGroupLabel => 'Group (optional)';
+
+  @override
+  String get editorGroupHint => 'e.g. Warm-up, Lesson 3…';
+
+  @override
+  String get editorTagLabel => 'Tag (optional)';
+
+  @override
+  String get editorAddNotesTitle => 'Add notes';
+
+  @override
+  String get editorAddNotesHint =>
+      'You can start from any note, repeat the same note and go below the first one. In the trainer you can still transpose the whole sequence.';
+
+  @override
+  String editorOctaveShort(int octave) {
+    return 'Oct. $octave';
+  }
+
+  @override
+  String editorSequenceTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sequence ($count notes)',
+      one: 'Sequence (1 note)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get editorPreview => 'Preview';
+
+  @override
+  String get editorRemoveLast => 'Remove last note';
+
+  @override
+  String get editorEmptySequence => 'Tap the notes above to build the sequence.';
+
+  @override
+  String get editorErrorNoName => 'Give the sequence a name.';
+
+  @override
+  String get editorErrorTooFewNotes => 'Add at least 2 notes.';
+
+  @override
+  String get editorAudioUnavailable => 'Audio unavailable: check the piano.sf2 SoundFont.';
+
+  @override
+  String get editorProTitle => 'Create your sequence';
+
+  @override
+  String get editorProHeadline => 'Your sequences, made to measure';
+
+  @override
+  String get editorProBody =>
+      'Compose any run of notes, starting from any note you like: vocalises, patterns, leaps, range work. Sequences are saved on the Home screen, grouped the way you prefer, and you practice them just like the built-in exercises.';
+
+  @override
+  String get editorProNote =>
+      'Creating, editing and saving sequences is an Intonia Pro feature. Sequences you have already saved remain available.';
+
+  @override
+  String get editorProCta => 'Discover Intonia Pro';
+
+  @override
+  String noteSemanticsLabel(String note, int octave) {
+    return '$note, octave $octave';
+  }
 }
