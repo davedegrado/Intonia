@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/app_theme.dart' show brandCyan, brandIndigo, brandViolet;
+import '../../../app/app_theme.dart';
 import '../../../app/main_shell.dart';
+import '../../../app/neon_scene.dart';
 import '../../../app/status_chips.dart';
 import '../../../core/music/exercise.dart';
 import '../../access/application/access_providers.dart';
@@ -33,33 +34,29 @@ class ExercisesScreen extends ConsumerWidget {
         if (category != ExerciseCategory.custom && sections[category]!.isNotEmpty) category,
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Esercizi'),
-        actions: const [StatusChips()],
-      ),
+    final decor = context.decor;
+    return SectionScaffold(
+      title: 'Esercizi',
+      actions: const [StatusChips()],
       body: ListView(
         key: const PageStorageKey('exercises-list'),
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           _CustomSection(exercises: sections[ExerciseCategory.custom]!),
-          const SizedBox(height: 20),
+          const SizedBox(height: 22),
           Text('Categorie',
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 10),
           for (final (index, category) in categories.indexed)
             _CategoryAccordion(
               category: category,
               exercises: sections[category]!,
-              accent: _accents[index % _accents.length],
+              accent: decor.accent(index),
             ),
         ],
       ),
     );
   }
-
-  /// Accenti alternati (ciano / viola / indaco) per distinguere le categorie.
-  static const _accents = [brandCyan, brandViolet, brandIndigo];
 }
 
 /// Icona di ogni categoria predefinita.
@@ -85,7 +82,6 @@ class _CustomSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final canCreate = ref.watch(entitlementProvider).allows(ProFeature.customSequences);
 
     final grouped = <String, List<ExerciseDefinition>>{};
@@ -100,55 +96,9 @@ class _CustomSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Card(
-          key: const ValueKey('create-sequence'),
-          color: colors.primaryContainer,
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () => _open(context, ref, '/editor'),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(colors: [brandIndigo, brandViolet]),
-                    ),
-                    child: const Icon(Icons.add, size: 30, color: Colors.white),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Crea la tua sequenza',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colors.onPrimaryContainer,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Componi qualsiasi giro di note: pattern, vocalizzi, prove di estensione…',
-                          style:
-                              theme.textTheme.bodySmall?.copyWith(color: colors.onPrimaryContainer),
-                        ),
-                        if (!canCreate) ...[
-                          const SizedBox(height: 6),
-                          const ProBadge(),
-                        ],
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.chevron_right, color: colors.onPrimaryContainer),
-                ],
-              ),
-            ),
-          ),
+        _CreateSequenceCard(
+          showPro: !canCreate,
+          onTap: () => _open(context, ref, '/editor'),
         ),
         if (exercises.isNotEmpty) ...[
           const SizedBox(height: 16),
@@ -205,21 +155,23 @@ class _CategoryAccordion extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         key: PageStorageKey('category-${category.name}'),
-        tilePadding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(categoryIcon(category), color: accent),
-        ),
+        tilePadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+        iconColor: accent,
+        leading: AccentIcon(icon: categoryIcon(category), color: accent, size: 50),
         title: Text(category.label,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-        subtitle: Text(
-          '${category.description} · ${exercises.length} esercizi',
-          style: theme.textTheme.bodySmall,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Text.rich(
+            TextSpan(children: [
+              TextSpan(text: category.description),
+              TextSpan(
+                text: '  ·  ${exercises.length} esercizi',
+                style: TextStyle(color: accent, fontWeight: FontWeight.w700),
+              ),
+            ]),
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
         ),
         children: [
           for (final exercise in exercises) _ExerciseTile(exercise: exercise, dense: true),
@@ -326,5 +278,93 @@ class _ExerciseTile extends ConsumerWidget {
     if (confirmed == true) {
       await ref.read(customExercisesProvider.notifier).remove(exercise.id);
     }
+  }
+}
+
+/// "Crea la tua sequenza": l'elemento più in evidenza del catalogo.
+class _CreateSequenceCard extends StatelessWidget {
+  const _CreateSequenceCard({required this.showPro, required this.onTap});
+
+  final bool showPro;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final decor = context.decor;
+    final radius = BorderRadius.circular(22);
+    return Container(
+      key: const ValueKey('create-sequence'),
+      decoration: BoxDecoration(
+        gradient: decor.featureGradient,
+        borderRadius: radius,
+        border: Border.all(
+          color: decor.ambient ? decor.featureBorder.withValues(alpha: 0.7) : decor.featureBorder,
+        ),
+        boxShadow: decor.ambient
+            ? [
+                BoxShadow(
+                  color: decor.glow.withValues(alpha: 0.3),
+                  blurRadius: 24,
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: radius,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 20, 14, 20),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: decor.heroGradient,
+                    border: Border.all(
+                      color:
+                          decor.ambient ? Colors.white.withValues(alpha: 0.35) : Colors.transparent,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Icon(Icons.add_rounded, size: 36, color: decor.onHero),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Crea la tua sequenza',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: decor.onFeature,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Componi qualsiasi giro di note: pattern, vocalizzi, prove di estensione…',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: decor.onFeature.withValues(alpha: 0.85),
+                        ),
+                      ),
+                      if (showPro) ...[
+                        const SizedBox(height: 8),
+                        const ProBadge(),
+                      ],
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 28, color: decor.onFeature),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

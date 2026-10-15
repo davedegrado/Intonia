@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/app_theme.dart';
 import '../application/access_providers.dart';
 import '../domain/charge_ledger.dart';
-
-/// Colore delle cariche: distinto dall'arancione della serie giornaliera.
-const chargeColor = Color(0xFF22D3EE);
 
 /// "2 h 15 min", "45 min", "meno di 1 min".
 String formatWait(Duration wait) {
@@ -75,7 +73,7 @@ class ChargesChip extends ConsumerWidget {
       return StatusPill(
         key: const ValueKey('charges-chip'),
         icon: Icons.workspace_premium,
-        iconColor: chargeColor,
+        iconColor: context.decor.charge,
         label: 'Pro',
         semanticLabel: entitlement.developer
             ? 'Intonia Pro, build sviluppatore: esercizi illimitati'
@@ -87,7 +85,7 @@ class ChargesChip extends ConsumerWidget {
       builder: (context, ledger, now) => StatusPill(
         key: const ValueKey('charges-chip'),
         icon: Icons.bolt,
-        iconColor: chargeColor,
+        iconColor: context.decor.charge,
         label: '${ledger.charges}/${ChargeLedger.max}',
         semanticLabel: 'Cariche esercizi: ${ledger.charges} su ${ChargeLedger.max}',
         onTap: () => showChargesInfo(context),
@@ -192,7 +190,7 @@ class _ChargesSheet extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.bolt, color: chargeColor, size: 30),
+                      Icon(Icons.bolt, color: context.decor.charge, size: 30),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -266,7 +264,7 @@ class ChargesHint extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.bolt, size: 16, color: chargeColor),
+            Icon(Icons.bolt, size: 16, color: context.decor.charge),
             const SizedBox(width: 4),
             Flexible(
               child: Text(

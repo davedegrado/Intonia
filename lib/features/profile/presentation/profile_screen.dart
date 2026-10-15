@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/app_theme.dart' show brandCyan, brandIndigo;
+import '../../../app/app_theme.dart';
 import '../../../app/date_format.dart';
-import '../../../app/status_chips.dart' show streakColor;
+import '../../../app/neon_scene.dart';
 import '../../access/application/access_providers.dart';
 import '../../access/domain/entitlement.dart';
 import '../../../app/note_text.dart';
@@ -27,8 +27,9 @@ class ProfileScreen extends ConsumerWidget {
     final ranges = ref.watch(rangeHistoryProvider).value ?? const <RangeRecord>[];
 
     if (records.isEmpty && ranges.isEmpty) {
-      return Scaffold(
-        appBar: _appBar(context),
+      return SectionScaffold(
+        title: 'Profilo',
+        actions: _actions(context),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -97,58 +98,38 @@ class ProfileScreen extends ConsumerWidget {
         ? records.reversed.toList()
         : records.reversed.take(freeRecentSessions).toList();
 
-    return Scaffold(
-      appBar: _appBar(context),
+    final decor = context.decor;
+    return SectionScaffold(
+      title: 'Profilo',
+      actions: _actions(context),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Streak in evidenza.
-            Card(
-              color: theme.colorScheme.primaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(Icons.local_fire_department,
-                        size: 44,
-                        color: streak > 0 ? streakColor : theme.colorScheme.onPrimaryContainer),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            streak == 1 ? '1 giorno di fila' : '$streak giorni di fila',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              color: theme.colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          Text(
-                            streak == 0
-                                ? 'Allenati oggi per far partire la streak!'
-                                : 'Continua così, non spezzarla!',
-                            style: theme.textTheme.bodySmall
-                                ?.copyWith(color: theme.colorScheme.onPrimaryContainer),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _StreakCard(streak: streak),
             const SizedBox(height: 12),
             _StatRow(children: [
-              _StatCard(label: 'Sessioni', value: '${records.length}'),
-              _StatCard(label: 'Minuti totali', value: '$totalMinutes'),
+              _StatCard(
+                  icon: Icons.event_repeat_rounded,
+                  accent: decor.accent(0),
+                  label: 'Sessioni',
+                  value: '${records.length}'),
+              _StatCard(
+                  icon: Icons.timer_outlined,
+                  accent: decor.accent(1),
+                  label: 'Minuti totali',
+                  value: '$totalMinutes'),
             ]),
             const SizedBox(height: 10),
             _StatRow(children: [
               _StatCard(
-                  label: 'Accuratezza media', value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
+                  icon: Icons.track_changes_rounded,
+                  accent: decor.accent(3),
+                  label: 'Accuratezza media',
+                  value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
               _StatCard(
+                icon: Icons.height_rounded,
+                accent: decor.accent(2),
                 label: 'Estensione',
                 value: '—',
                 valueWidget: lowMidi != null && highMidi != null
@@ -163,96 +144,119 @@ class ProfileScreen extends ConsumerWidget {
             ]),
             if (rated.isNotEmpty) ...[
               const SizedBox(height: 20),
-              Text('Note migliori e peggiori',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              for (final item in rated.length <= 6
-                  ? rated
-                  : [...rated.take(3), ...rated.skip(rated.length - 3)])
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 52,
-                        child: Text(
-                          NoteSpeller.keyLabel(item.pitch, notation),
-                          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              _SectionTitle('Note migliori e peggiori'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  child: Column(children: [
+                    for (final item in rated.length <= 6
+                        ? rated
+                        : [...rated.take(3), ...rated.skip(rated.length - 3)])
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 52,
+                              child: Text(
+                                NoteSpeller.keyLabel(item.pitch, notation),
+                                style: theme.textTheme.titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                            Expanded(
+                              child: _AccuracyBar(value: item.accuracy),
+                            ),
+                            const SizedBox(width: 12),
+                            SizedBox(
+                              width: 44,
+                              child: Text('${(item.accuracy * 100).toStringAsFixed(0)}%',
+                                  textAlign: TextAlign.end,
+                                  style: theme.textTheme.labelLarge
+                                      ?.copyWith(fontWeight: FontWeight.w700)),
+                            ),
+                          ],
                         ),
                       ),
-                      Expanded(
-                        child: _AccuracyBar(value: item.accuracy),
-                      ),
-                      const SizedBox(width: 10),
-                      Text('${(item.accuracy * 100).toStringAsFixed(0)}%',
-                          style: theme.textTheme.bodySmall),
-                    ],
-                  ),
+                  ]),
                 ),
+              ),
             ],
             if (ranges.isNotEmpty) ...[
               const SizedBox(height: 20),
-              Text('Test estensione vocale',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              for (var i = ranges.length - 1; i >= 0 && i >= ranges.length - 5; i--)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  leading: const Icon(Icons.height),
-                  title: NoteRangeText(
-                    low: spelledMidi(ranges[i].minMidi),
-                    high: spelledMidi(ranges[i].maxMidi),
-                    notation: notation,
-                    suffix: '  (${formatSpan(ranges[i].spanSemitones)})',
-                  ),
-                  subtitle: Text(formatShortDate(ranges[i].timestamp) +
-                      (i > 0
-                          ? '  ·  ${_deltaLabel(ranges[i].spanSemitones - ranges[i - 1].spanSemitones)}'
-                          : '')),
-                  trailing: IconButton(
-                    tooltip: 'Elimina test',
-                    icon: const Icon(Icons.delete_outline, size: 20),
-                    onPressed: () => _confirmDeleteRange(context, ref, ranges[i]),
-                  ),
-                ),
-            ],
-            const SizedBox(height: 20),
-            Text(fullHistory ? 'Tutte le sessioni' : 'Ultime sessioni',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            for (final record in recent)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-                leading: Icon(record.isCustomExercise ? Icons.edit_note : Icons.history),
-                title: Text(record.exerciseName),
-                subtitle: Text(formatShortDate(record.timestamp)),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${record.accuracyPercent}%',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: record.accuracy >= 0.8
-                            ? const Color(0xFF1F8A5B)
-                            : record.accuracy >= 0.5
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.error,
+              _SectionTitle('Test estensione vocale'),
+              Card(
+                child: Column(children: [
+                  for (var i = ranges.length - 1; i >= 0 && i >= ranges.length - 5; i--) ...[
+                    if (i != ranges.length - 1) const Divider(height: 1, indent: 16, endIndent: 16),
+                    ListTile(
+                      leading:
+                          AccentIcon(icon: Icons.height_rounded, color: decor.accent(2), size: 40),
+                      title: NoteRangeText(
+                        low: spelledMidi(ranges[i].minMidi),
+                        high: spelledMidi(ranges[i].maxMidi),
+                        notation: notation,
+                        suffix: '  (${formatSpan(ranges[i].spanSemitones)})',
+                      ),
+                      subtitle: Text(formatShortDate(ranges[i].timestamp) +
+                          (i > 0
+                              ? '  ·  ${_deltaLabel(ranges[i].spanSemitones - ranges[i - 1].spanSemitones)}'
+                              : '')),
+                      trailing: IconButton(
+                        tooltip: 'Elimina test',
+                        icon: const Icon(Icons.delete_outline, size: 20),
+                        onPressed: () => _confirmDeleteRange(context, ref, ranges[i]),
                       ),
                     ),
-                    // Solo le sessioni su esercizi custom sono eliminabili:
-                    // servono a non sporcare le statistiche con sequenze
-                    // sbagliate o impossibili create per prova.
-                    if (record.isCustomExercise)
-                      IconButton(
-                        tooltip: 'Elimina sessione',
-                        icon: const Icon(Icons.delete_outline, size: 20),
-                        onPressed: () => _confirmDeleteSession(context, ref, record),
-                      ),
                   ],
-                ),
+                ]),
+              ),
+            ],
+            const SizedBox(height: 20),
+            _SectionTitle(fullHistory ? 'Tutte le sessioni' : 'Ultime sessioni'),
+            if (recent.isNotEmpty)
+              Card(
+                child: Column(children: [
+                  for (final (index, record) in recent.indexed) ...[
+                    if (index > 0) const Divider(height: 1, indent: 16, endIndent: 16),
+                    ListTile(
+                      leading: AccentIcon(
+                        icon: record.isCustomExercise
+                            ? Icons.edit_note_rounded
+                            : Icons.music_note_rounded,
+                        color: decor.accent(index),
+                        size: 40,
+                      ),
+                      title: Text(record.exerciseName),
+                      subtitle: Text(formatShortDate(record.timestamp)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${record.accuracyPercent}%',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: record.accuracy >= 0.8
+                                  ? decor.success
+                                  : record.accuracy >= 0.5
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.error,
+                            ),
+                          ),
+                          // Solo le sessioni su esercizi custom sono eliminabili:
+                          // servono a non sporcare le statistiche con sequenze
+                          // sbagliate o impossibili create per prova.
+                          if (record.isCustomExercise)
+                            IconButton(
+                              tooltip: 'Elimina sessione',
+                              icon: const Icon(Icons.delete_outline, size: 20),
+                              onPressed: () => _confirmDeleteSession(context, ref, record),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ]),
               ),
             if (!fullHistory && records.length > freeRecentSessions)
               TextButton.icon(
@@ -267,17 +271,15 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  PreferredSizeWidget _appBar(BuildContext context) => AppBar(
-        title: const Text('Profilo'),
-        actions: [
-          IconButton(
-            key: const ValueKey('profile-settings'),
-            tooltip: 'Impostazioni',
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/settings'),
-          ),
-        ],
-      );
+  List<Widget> _actions(BuildContext context) => [
+        IconButton(
+          key: const ValueKey('profile-settings'),
+          tooltip: 'Impostazioni',
+          icon: const Icon(Icons.settings_outlined),
+          onPressed: () => context.push('/settings'),
+        ),
+        const SizedBox(width: 4),
+      ];
 
   /// Sessioni mostrate agli utenti Free.
   static const freeRecentSessions = 8;
@@ -339,8 +341,16 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.label, required this.value, this.valueWidget});
+  const _StatCard({
+    required this.icon,
+    required this.accent,
+    required this.label,
+    required this.value,
+    this.valueWidget,
+  });
 
+  final IconData icon;
+  final Color accent;
   final String label;
   final String value;
 
@@ -358,14 +368,117 @@ class _StatCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: theme.textTheme.labelMedium),
-              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(icon, size: 18, color: accent),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelMedium
+                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               valueWidget ??
                   Text(value,
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Titolo di sezione del profilo.
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(text,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+    );
+  }
+}
+
+/// Serie giornaliera in evidenza.
+class _StreakCard extends StatelessWidget {
+  const _StreakCard({required this.streak});
+
+  final int streak;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final decor = context.decor;
+    return Container(
+      key: const ValueKey('streak-card'),
+      decoration: BoxDecoration(
+        gradient: decor.featureGradient,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: decor.ambient ? decor.featureBorder.withValues(alpha: 0.6) : decor.featureBorder,
+        ),
+        boxShadow: decor.ambient
+            ? [
+                BoxShadow(
+                  color: decor.glow.withValues(alpha: 0.3),
+                  blurRadius: 22,
+                ),
+              ]
+            : null,
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 18, 18, 18),
+      child: Row(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: decor.streak.withValues(alpha: 0.16),
+              boxShadow: decor.ambient && streak > 0
+                  ? [BoxShadow(color: decor.streak.withValues(alpha: 0.45), blurRadius: 18)]
+                  : null,
+            ),
+            child: Icon(
+              Icons.local_fire_department_rounded,
+              size: 38,
+              color: streak > 0 ? decor.streak : decor.onFeature.withValues(alpha: 0.6),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  streak == 1 ? '1 giorno di fila' : '$streak giorni di fila',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: decor.onFeature,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  streak == 0
+                      ? 'Allenati oggi per far partire la streak!'
+                      : 'Continua così, non spezzarla!',
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: decor.onFeature.withValues(alpha: 0.85)),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -413,7 +526,7 @@ class _AccuracyBar extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            gradient: const LinearGradient(colors: [brandCyan, brandIndigo]),
+            gradient: context.decor.spectrum,
           ),
         ),
       ),
