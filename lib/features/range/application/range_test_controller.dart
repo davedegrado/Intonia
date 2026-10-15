@@ -9,6 +9,7 @@ import '../../../core/pitch/pitch_stabilizer.dart';
 import '../../../core/session/range_record.dart';
 import '../../../services/audio/piano_audio_service.dart';
 import '../../../services/pitch/microphone_pitch_service.dart';
+import '../../settings/application/settings_providers.dart';
 import '../../trainer/domain/training_state_machine.dart';
 import '../../trainer/presentation/controllers/trainer_controller.dart';
 import 'range_providers.dart';
@@ -226,7 +227,7 @@ class RangeTestController extends Notifier<RangeTestState> {
         state = state.copyWith(
           phase: RangePhase.setup,
           isListening: false,
-          message: 'Permesso microfono negato: abilitalo nelle impostazioni di sistema.',
+          message: ref.read(l10nProvider).rangeMicDenied,
         );
         return;
       }
@@ -238,7 +239,7 @@ class RangeTestController extends Notifier<RangeTestState> {
       state = state.copyWith(
         phase: RangePhase.setup,
         isListening: false,
-        message: 'Audio non inizializzato: verifica microfono e SoundFont.',
+        message: ref.read(l10nProvider).rangeAudioInitFailed,
       );
     }
   }
@@ -398,7 +399,7 @@ class RangeTestController extends Notifier<RangeTestState> {
     state = state.copyWith(
       phase: RangePhase.done,
       isListening: false,
-      message: lowest == null ? 'Nessuna nota convalidata: il test non è stato salvato.' : null,
+      message: lowest == null ? ref.read(l10nProvider).rangeNothingValidated : null,
     );
   }
 

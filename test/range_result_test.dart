@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vocal_scale_trainer/app/l10n.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
 import 'package:vocal_scale_trainer/features/range/presentation/range_result_screen.dart';
 
@@ -14,11 +15,17 @@ void main() {
   });
 
   Future<RangeResultAction?> open(WidgetTester tester,
-      {int? previousSpan, bool reduceMotion = false, String? tap}) async {
+      {int? previousSpan,
+      bool reduceMotion = false,
+      String? tap,
+      Locale locale = const Locale('it')}) async {
     tester.view.physicalSize = const Size(1080, 2340);
     addTearDown(tester.view.reset);
     RangeResultAction? result;
     await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(disableAnimations: reduceMotion),
         child: child!,
@@ -60,6 +67,29 @@ void main() {
     await open(tester, reduceMotion: true);
     expect(find.text('Ecco la tua estensione!'), findsOneWidget);
     expect(find.text('2 ottave + 5 semitoni (29 semitoni)'), findsOneWidget);
+  });
+
+  testWidgets('a smaller range is reported kindly', (tester) async {
+    await open(tester, previousSpan: 30);
+    expect(find.text('Ecco la tua estensione di oggi'), findsOneWidget);
+    expect(
+      find.text("-1 semitono rispetto all'ultimo test: capita, la voce cambia di giorno in giorno"),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('speaks English when the app is in English', (tester) async {
+    await open(tester, previousSpan: 26, locale: const Locale('en'));
+    expect(find.text('New record!'), findsOneWidget);
+    expect(find.text('2 octaves + 5 semitones (29 semitones)'), findsOneWidget);
+    expect(find.text('+3 semitones compared to your last test'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
+    expect(find.text('Retry the test'), findsOneWidget);
+  });
+
+  testWidgets('English titles for first and same span', (tester) async {
+    await open(tester, reduceMotion: true, locale: const Locale('en'));
+    expect(find.text("Here's your vocal range!"), findsOneWidget);
   });
 
   testWidgets('continue and retry report the choice', (tester) async {
