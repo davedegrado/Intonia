@@ -5,6 +5,7 @@ import '../core/session/session_record.dart';
 import '../features/access/presentation/charges_widgets.dart';
 import '../features/profile/application/history_providers.dart';
 import 'app_theme.dart';
+import 'l10n.dart';
 import 'main_shell.dart';
 
 /// Serie giornaliera e cariche, per la barra in alto delle sezioni principali.
@@ -40,7 +41,7 @@ class StreakChip extends ConsumerWidget {
       icon: Icons.local_fire_department,
       iconColor: streak > 0 ? context.decor.streak : Theme.of(context).colorScheme.outline,
       label: '$streak',
-      semanticLabel: streak == 1 ? 'Serie: 1 giorno di fila' : 'Serie: $streak giorni di fila',
+      semanticLabel: context.l10n.statusStreakSemantics(streak),
       onTap: () => goToSection(context, ref, '/profile'),
     );
   }
