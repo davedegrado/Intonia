@@ -1144,4 +1144,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLicenses => 'Licenses';
+
+  @override
+  String get trainerDirectionForward => 'Straight';
+
+  @override
+  String get trainerDirectionReverse => 'Reverse';
+
+  @override
+  String get trainerDirectionComplete => 'Full';
+
+  @override
+  String get trainerRepeatTop => 'Repeat the top note';
+
+  @override
+  String get trainerRepeatTopHint => 'Repeats the highest note before going down';
+
+  @override
+  String get exercisesCreateFromScratch => 'Start from scratch';
+
+  @override
+  String get exercisesCreateFromExercise => 'Start from an exercise';
+
+  @override
+  String get exercisesCreateFromExerciseHint => 'Copy an exercise and edit it freely';
+
+  @override
+  String profileSessionKeyOctave(String key, int octave) {
+    return '$key · Octave $octave';
+  }
+
+  @override
+  String get profileSessionTopRepeated => 'top note repeated';
+
+  @override
+  String get guideTitle => 'Intonia guide';
+
+  @override
+  String get guideOpenHint => 'Replay the tour of the app\'s features';
+
+  @override
+  String get guideNext => 'Next';
+
+  @override
+  String get guideDone => 'Done';
+
+  @override
+  String get guideSkip => 'Skip';
+
+  @override
+  String guideProgress(int current, int total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get guideHome =>
+      'Tap the microphone and sing or play a note: I\'ll tell you which note it is and how many cents off you are. At the top you\'ll find your streak and your exercise charges; at the bottom, quick access to note names, theme and settings.';
+
+  @override
+  String get guideExercises =>
+      'Pick a category (triads, arpeggios, scales and more), open an exercise and press Play to train with your voice. Each session uses one charge. With Create your sequence you can write your own (Intonia Pro).';
+
+  @override
+  String get guideExerciseSettingsTitle => 'Exercise settings';
+
+  @override
+  String get guideExerciseSettings =>
+      'In an exercise you choose the key and octave, the mode (Straight, Reverse or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.';
+
+  @override
+  String get guideRange =>
+      'The range test starts from a comfortable note, goes down to your lowest note and then up to your highest. The result shows the two extreme notes and the span in octaves and semitones; past tests are listed here and in your profile.';
+
+  @override
+  String get guideProfile =>
+      'Your streak, sessions, total minutes, average accuracy, vocal range, best and worst notes, range tests and your recent sessions with key and octave.';
+
+  @override
+  String get guideSettingsTitle => 'Settings';
+
+  @override
+  String get guideSettings =>
+      'Choose the language, the theme (System, Light, Dark or Neon) and the note names (C D E or DO RE MI). You can reopen this guide from here at any time.';
+
+  @override
+  String get guideKey => 'The note the exercise starts from.';
+
+  @override
+  String get guideOctave =>
+      'How high or low the exercise is: pick one that\'s comfortable for your voice.';
+
+  @override
+  String get guideDirectionTitle => 'Mode';
+
+  @override
+  String get guideDirection =>
+      'Straight plays the sequence forwards, Reverse plays it backwards, Full goes forwards and then comes back.';
+
+  @override
+  String get guideRepeatTop =>
+      'Only in Full mode: you sing the highest note twice before going down.';
 }

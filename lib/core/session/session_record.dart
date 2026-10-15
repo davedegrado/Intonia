@@ -12,12 +12,20 @@ class SessionRecord {
     required this.perNote,
     this.minCorrectMidi,
     this.maxCorrectMidi,
+    this.keySemitone,
+    this.octave,
+    this.direction,
+    this.repeatTop,
   });
 
   factory SessionRecord.fromStats({
     required SessionStats stats,
     required String exerciseId,
     required String exerciseName,
+    int? keySemitone,
+    int? octave,
+    String? direction,
+    bool? repeatTop,
   }) {
     final perNote = <int, List<int>>{};
     int? minCorrect;
@@ -44,6 +52,10 @@ class SessionRecord {
       perNote: perNote,
       minCorrectMidi: minCorrect,
       maxCorrectMidi: maxCorrect,
+      keySemitone: keySemitone,
+      octave: octave,
+      direction: direction,
+      repeatTop: repeatTop,
     );
   }
 
@@ -63,6 +75,11 @@ class SessionRecord {
       },
       minCorrectMidi: json['minCorrectMidi'] as int?,
       maxCorrectMidi: json['maxCorrectMidi'] as int?,
+      // Assenti nelle sessioni salvate prima di questa versione.
+      keySemitone: json['keySemitone'] as int?,
+      octave: json['octave'] as int?,
+      direction: json['direction'] as String?,
+      repeatTop: json['repeatTop'] as bool?,
     );
   }
 
@@ -78,6 +95,14 @@ class SessionRecord {
 
   final int? minCorrectMidi;
   final int? maxCorrectMidi;
+
+  /// Tonalità (semitono della tonica, 0 = DO/C), ottava, modalità
+  /// ("forward" / "reverse" / "complete") e ripetizione del vertice usate
+  /// nella sessione. Null per le sessioni salvate da versioni precedenti.
+  final int? keySemitone;
+  final int? octave;
+  final String? direction;
+  final bool? repeatTop;
 
   int get totalAttempts => correct + errors;
 
@@ -102,6 +127,10 @@ class SessionRecord {
         },
         if (minCorrectMidi != null) 'minCorrectMidi': minCorrectMidi,
         if (maxCorrectMidi != null) 'maxCorrectMidi': maxCorrectMidi,
+        if (keySemitone != null) 'keySemitone': keySemitone,
+        if (octave != null) 'octave': octave,
+        if (direction != null) 'direction': direction,
+        if (repeatTop != null) 'repeatTop': repeatTop,
       };
 }
 

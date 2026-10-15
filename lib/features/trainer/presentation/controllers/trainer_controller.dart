@@ -105,7 +105,8 @@ class TrainerController extends Notifier<TrainerState> {
   Future<void> selectExercise(ExerciseDefinition exercise) async {
     await stop();
     _exercise = exercise;
-    var settings = state.settings;
+    // Ogni esercizio riparte dalla sua modalità originale.
+    var settings = state.settings.copyWith(clearDirection: true);
     final rootMidi = exercise.rootMidi;
     if (rootMidi != null) {
       // Le custom partono ESATTAMENTE dalla nota con cui sono state create.
@@ -128,6 +129,12 @@ class TrainerController extends Notifier<TrainerState> {
       _updateSettings(state.settings.copyWith(stabilityMs: milliseconds));
 
   void updateMode(TrainerMode mode) => _updateSettings(state.settings.copyWith(mode: mode));
+
+  void updateDirection(PlaybackDirection direction) =>
+      _updateSettings(state.settings.copyWith(direction: direction));
+
+  void updateRepeatTop(bool repeatTop) =>
+      _updateSettings(state.settings.copyWith(repeatTop: repeatTop));
 
   void updateLoop(bool loop) => _updateSettings(state.settings.copyWith(loop: loop));
 
@@ -181,6 +188,10 @@ class TrainerController extends Notifier<TrainerState> {
     _pitchSubscription = null;
     await _microphone.stop();
     await _audio.stopAll();
+    // Il provider può essere eliminato durante le attese (es. uscita).
+    if (!ref.mounted) {
+      return;
+    }
     if (state.isPlaying || state.isListening) {
       final finished = state.sessionStats.finish();
       _recordSession(finished);
@@ -202,6 +213,10 @@ class TrainerController extends Notifier<TrainerState> {
       stats: stats,
       exerciseId: _exercise.id,
       exerciseName: _exercise.name,
+      keySemitone: state.settings.key.semitone,
+      octave: state.settings.octave,
+      direction: (state.settings.direction ?? _exercise.defaultDirection).name,
+      repeatTop: state.settings.repeatTop,
     );
     unawaited(ref.read(sessionHistoryProvider.notifier).add(record));
     return record;
@@ -246,7 +261,12 @@ class TrainerController extends Notifier<TrainerState> {
   }
 
   List<MusicalNote> _buildSequence(TrainingSettings settings) {
-    return _exercise.buildSequence(key: settings.key, octave: settings.octave);
+    return _exercise.buildSequence(
+      key: settings.key,
+      octave: settings.octave,
+      direction: settings.direction,
+      repeatTop: settings.repeatTop,
+    );
   }
 
   void _updateSettings(TrainingSettings settings) {

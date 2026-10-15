@@ -21,6 +21,9 @@ enum ExerciseCategory {
 /// nota (la "tonica" scelta nel trainer). Gli offset possono essere negativi
 /// e ripetuti: questo permette scale, triadi arpeggiate, armonizzazioni e
 /// qualsiasi sequenza custom (anche note tutte uguali).
+/// Modalità di esecuzione: in avanti, al contrario, andata e ritorno.
+enum PlaybackDirection { forward, reverse, complete }
+
 class ExerciseDefinition {
   const ExerciseDefinition({
     required this.id,
@@ -71,12 +74,77 @@ class ExerciseDefinition {
         if (group != null) 'group': group,
       };
 
+  /// Parte "di andata" della sequenza, ricavata dagli step reali: se la
+  /// sequenza è già salita + discesa speculare (con o senza vertice ripetuto)
+  /// è la sola salita fino al vertice; altrimenti è la sequenza intera.
+  List<int> get baseSteps {
+    final n = steps.length;
+    bool mirrorsFrom(int apex, int descentStart) {
+      if (n - descentStart != apex) {
+        return false;
+      }
+      for (var i = 0; i < apex; i++) {
+        if (steps[descentStart + i] != steps[apex - 1 - i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    if (n >= 3) {
+      // Salita e discesa senza ripetere il vertice: a b c b a.
+      if (n.isOdd && mirrorsFrom(n ~/ 2, n ~/ 2 + 1)) {
+        return steps.sublist(0, n ~/ 2 + 1);
+      }
+      // Con il vertice ripetuto: a b c c b a.
+      if (n.isEven && steps[n ~/ 2 - 1] == steps[n ~/ 2] && mirrorsFrom(n ~/ 2 - 1, n ~/ 2 + 1)) {
+        return steps.sublist(0, n ~/ 2);
+      }
+    }
+    return steps;
+  }
+
+  /// True se la sequenza originale contiene già salita e discesa.
+  bool get isRoundTrip => baseSteps.length != steps.length;
+
+  /// Modalità che riproduce la sequenza originale.
+  PlaybackDirection get defaultDirection =>
+      isRoundTrip ? PlaybackDirection.complete : PlaybackDirection.forward;
+
+  /// Il vertice ha senso (e si può ripetere) solo se la parte di andata
+  /// termina sulla nota più alta.
+  bool get hasApex {
+    final base = baseSteps;
+    return base.length >= 2 && base.last == base.reduce((a, b) => a > b ? a : b);
+  }
+
+  /// Step da eseguire per [direction]. [repeatTop] vale solo in
+  /// [PlaybackDirection.complete] e solo con un vertice ([hasApex]).
+  List<int> stepsFor(PlaybackDirection direction, {bool repeatTop = false}) {
+    final base = baseSteps;
+    return switch (direction) {
+      PlaybackDirection.forward => List.of(base),
+      PlaybackDirection.reverse => base.reversed.toList(),
+      PlaybackDirection.complete => [
+          ...base,
+          if (repeatTop && hasApex) base.last,
+          ...base.reversed.skip(1),
+        ],
+    };
+  }
+
+  /// Sequenza di note nella tonalità/ottava date. Senza [direction] usa la
+  /// modalità originale dell'esercizio.
   List<MusicalNote> buildSequence({
     required PitchClass key,
     required int octave,
+    PlaybackDirection? direction,
+    bool repeatTop = false,
   }) {
     final root = MusicalNote(pitchClass: key, octave: octave);
-    return steps.map(root.transpose).toList(growable: false);
+    return stepsFor(direction ?? defaultDirection, repeatTop: repeatTop)
+        .map(root.transpose)
+        .toList(growable: false);
   }
 }
 

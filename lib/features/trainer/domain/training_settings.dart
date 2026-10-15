@@ -1,3 +1,4 @@
+import '../../../core/music/exercise.dart';
 import '../../../core/music/note.dart';
 import '../../../core/pitch/pitch_recognition_config.dart';
 
@@ -13,6 +14,8 @@ class TrainingSettings {
     required this.mode,
     required this.loop,
     required this.guideEveryNote,
+    this.direction,
+    this.repeatTop = false,
   });
 
   factory TrainingSettings.defaults() {
@@ -42,6 +45,13 @@ class TrainingSettings {
   /// se false suona solo la prima nota dell'esercizio.
   final bool guideEveryNote;
 
+  /// Modalità scelta (avanti / al contrario / completo); null = quella
+  /// originale dell'esercizio.
+  final PlaybackDirection? direction;
+
+  /// In modalità completa ripete la nota di vertice prima di scendere.
+  final bool repeatTop;
+
   TrainingSettings copyWith({
     PitchClass? key,
     int? octave,
@@ -51,6 +61,9 @@ class TrainingSettings {
     TrainerMode? mode,
     bool? loop,
     bool? guideEveryNote,
+    PlaybackDirection? direction,
+    bool clearDirection = false,
+    bool? repeatTop,
   }) {
     return TrainingSettings(
       key: key ?? this.key,
@@ -61,6 +74,8 @@ class TrainingSettings {
       mode: mode ?? this.mode,
       loop: loop ?? this.loop,
       guideEveryNote: guideEveryNote ?? this.guideEveryNote,
+      direction: clearDirection ? null : direction ?? this.direction,
+      repeatTop: repeatTop ?? this.repeatTop,
     );
   }
 }

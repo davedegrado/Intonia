@@ -96,6 +96,8 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
     }
   }
 
+  bool get _isNew => widget.initial == null || widget.initial!.id.isEmpty;
+
   Future<void> _save() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
@@ -112,7 +114,8 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
     final root = _midis.first;
     final group = _groupController.text.trim();
     final exercise = ExerciseDefinition(
-      id: widget.initial?.id ?? 'custom_${DateTime.now().millisecondsSinceEpoch}',
+      // Una copia da un esercizio arriva con id vuoto: è una sequenza nuova.
+      id: _isNew ? 'custom_${DateTime.now().millisecondsSinceEpoch}' : widget.initial!.id,
       name: name,
       category: ExerciseCategory.custom,
       steps: [for (final midi in _midis) midi - root],
@@ -138,7 +141,7 @@ class _CustomExerciseEditorScreenState extends ConsumerState<CustomExerciseEdito
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initial == null ? l10n.editorTitleNew : l10n.editorTitleEdit),
+        title: Text(_isNew ? l10n.editorTitleNew : l10n.editorTitleEdit),
         actions: [
           TextButton.icon(
             onPressed: _save,

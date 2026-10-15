@@ -5,9 +5,11 @@ import 'package:vocal_scale_trainer/core/music/note.dart';
 void main() {
   const library = ExerciseLibrary();
 
-  test('major scale keeps ascending/descending shape with repeated top note', () {
+  test('major scale: full mode repeats the top note only when asked', () {
     final exercise = library.byId('major')!;
-    final sequence = exercise.buildSequence(key: PitchClass.c, octave: 4);
+    final plain = exercise.buildSequence(key: PitchClass.c, octave: 4);
+    expect(plain.length, 15, reason: 'di default il vertice non si ripete');
+    final sequence = exercise.buildSequence(key: PitchClass.c, octave: 4, repeatTop: true);
 
     expect(sequence.map((note) => note.label), [
       'DO',

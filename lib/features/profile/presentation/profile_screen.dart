@@ -9,7 +9,9 @@ import '../../../app/neon_scene.dart';
 import '../../access/application/access_providers.dart';
 import '../../access/domain/entitlement.dart';
 import '../../../app/note_text.dart';
+import '../../../core/music/exercise.dart';
 import '../../../core/music/note.dart';
+import '../../library/presentation/exercises_screen.dart' show categoryIcon;
 import '../../../core/music/note_spelling.dart';
 import '../../../core/session/range_record.dart';
 import '../../../core/session/session_record.dart';
@@ -224,14 +226,16 @@ class ProfileScreen extends ConsumerWidget {
                     if (index > 0) const Divider(height: 1, indent: 16, endIndent: 16),
                     ListTile(
                       leading: AccentIcon(
-                        icon: record.isCustomExercise
-                            ? Icons.edit_note_rounded
-                            : Icons.music_note_rounded,
+                        icon: _sessionIcon(record),
                         color: decor.accent(index),
                         size: 40,
                       ),
                       title: Text(l10n.exerciseNameById(record.exerciseId, record.exerciseName)),
-                      subtitle: Text(formatShortDate(record.timestamp)),
+                      subtitle: Text([
+                        if (_sessionDetails(l10n, notation, record) case final details?) details,
+                        formatShortDate(record.timestamp),
+                      ].join('\n')),
+                      isThreeLine: _sessionDetails(l10n, notation, record) != null,
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -283,6 +287,44 @@ class ProfileScreen extends ConsumerWidget {
         ),
         const SizedBox(width: 4),
       ];
+
+  /// Icona della categoria reale dell'esercizio (sequenze personali a parte).
+  static IconData _sessionIcon(SessionRecord record) {
+    if (record.isCustomExercise) {
+      return Icons.edit_note_rounded;
+    }
+    final exercise = const ExerciseLibrary().byId(record.exerciseId);
+    return exercise == null ? Icons.music_note_rounded : categoryIcon(exercise.category);
+  }
+
+  /// "C · Ottava 3 · Completo" dai dati salvati nella sessione; null per le
+  /// sessioni di versioni precedenti che non li contengono.
+  static String? _sessionDetails(
+    AppLocalizations l10n,
+    NoteNotation notation,
+    SessionRecord record,
+  ) {
+    final key = record.keySemitone;
+    final octave = record.octave;
+    if (key == null || octave == null) {
+      return null;
+    }
+    final direction = switch (record.direction) {
+      'forward' => l10n.trainerDirectionForward,
+      'reverse' => l10n.trainerDirectionReverse,
+      'complete' => l10n.trainerDirectionComplete,
+      _ => null,
+    };
+    return [
+      l10n.profileSessionKeyOctave(
+        NoteSpeller.keyLabel(PitchClass.fromSemitone(key), notation),
+        octave,
+      ),
+      if (direction != null) direction,
+      if (record.direction == 'complete' && record.repeatTop == true)
+        l10n.profileSessionTopRepeated,
+    ].join(' · ');
+  }
 
   /// Sessioni mostrate agli utenti Free.
   static const freeRecentSessions = 8;
