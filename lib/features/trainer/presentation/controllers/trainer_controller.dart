@@ -66,9 +66,6 @@ class TrainerController extends Notifier<TrainerState> {
   /// Run id dell'ultimo avvio del microfono richiesto.
   int _latestMicrophoneStart = 0;
 
-  static const microphoneDeniedMessage =
-      'Permesso microfono negato: abilitalo nelle impostazioni di sistema per allenarti.';
-
   /// Fino a questo istante le rilevazioni del mic vengono ignorate:
   /// evita che il piano della guida venga scambiato per la voce.
   DateTime _ignoreDetectionUntil = DateTime.fromMillisecondsSinceEpoch(0);
@@ -297,9 +294,9 @@ class TrainerController extends Notifier<TrainerState> {
       if (completed && runId == _runId) {
         state = state.copyWith(isPlaying: false, sessionStats: state.sessionStats.finish());
       }
-    } catch (error) {
+    } catch (_) {
       if (runId == _runId) {
-        state = state.copyWith(isPlaying: false, message: _friendlyAudioError(error));
+        state = state.copyWith(isPlaying: false, message: TrainerMessage.audioUnavailable);
       }
     }
   }
@@ -326,7 +323,7 @@ class TrainerController extends Notifier<TrainerState> {
         state = state.copyWith(
           isPlaying: false,
           isListening: false,
-          message: microphoneDeniedMessage,
+          message: TrainerMessage.microphoneDenied,
         );
         return true;
       }
@@ -340,14 +337,14 @@ class TrainerController extends Notifier<TrainerState> {
         return false;
       }
       _pitchSubscription = _microphone.pitchStream.listen(_handlePitch);
-    } catch (error) {
+    } catch (_) {
       if (runId != _runId) {
         return true;
       }
       state = state.copyWith(
         isPlaying: false,
         isListening: false,
-        message: _friendlyAudioError(error),
+        message: TrainerMessage.audioUnavailable,
       );
     }
     return true;
@@ -453,9 +450,5 @@ class TrainerController extends Notifier<TrainerState> {
           NoteProgressStatus.pending,
     ];
     state = state.copyWith(progress: progress, currentIndex: index);
-  }
-
-  String _friendlyAudioError(Object error) {
-    return 'Audio non inizializzato: verifica microfono e SoundFont piano.sf2.';
   }
 }

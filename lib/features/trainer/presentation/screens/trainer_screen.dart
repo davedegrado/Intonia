@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/l10n.dart';
 import '../../../../app/note_text.dart';
 import '../../../access/presentation/charges_widgets.dart';
 import '../../../../core/music/exercise.dart';
@@ -8,6 +9,7 @@ import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
 import '../../../../core/pitch/pitch_recognition_config.dart';
 import '../../../../core/session/session_record.dart';
+import '../../../../l10n/exercise_l10n.dart';
 import '../../../settings/application/settings_providers.dart';
 import '../../../mascot/presentation/mascot_coach.dart';
 import '../../domain/trainer_mascot_mood.dart';
@@ -90,6 +92,7 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
     final controller = ref.read(trainerControllerProvider.notifier);
     final notation = ref.watch(notationProvider);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final spelled = NoteSpeller.spellSequence(state.sequence);
     final currentNote = state.currentIndex < spelled.length
         ? spelled[state.currentIndex]
@@ -97,10 +100,10 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.exercise.name),
+        title: Text(l10n.exerciseName(widget.exercise)),
         actions: [
           IconButton(
-            tooltip: 'Impostazioni avanzate',
+            tooltip: l10n.trainerAdvancedSettings,
             icon: const Icon(Icons.tune),
             onPressed: state.isPlaying ? null : _openAdvancedSettings,
           ),
@@ -125,7 +128,8 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Nota corrente', style: theme.textTheme.labelLarge),
+                                    Text(l10n.trainerCurrentNote,
+                                        style: theme.textTheme.labelLarge),
                                     NoteText(
                                       currentNote,
                                       notation: notation,
@@ -136,7 +140,7 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                                 ),
                               ),
                               IconButton.filledTonal(
-                                tooltip: 'Ascolta la nota corrente',
+                                tooltip: l10n.trainerPlayCurrentNote,
                                 onPressed: controller.listenCurrentNote,
                                 icon: const Icon(Icons.volume_up),
                               ),
@@ -161,7 +165,7 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                   // convalidata o da riprovare, esercizio completato).
                   MascotCoach(
                     mood: mascotMoodForTrainer(state),
-                    message: mascotMessageForTrainer(state),
+                    message: mascotMessageForTrainer(state, l10n),
                   ),
                   const SizedBox(height: 12),
                   if (state.settings.mode == TrainerMode.train)
@@ -174,13 +178,13 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
-                        state.message!,
+                        _messageText(l10n, state.message!),
                         style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
                       ),
                     ),
                   const SizedBox(height: 12),
                   ExpansionTile(
-                    title: const Text('Statistiche sessione'),
+                    title: Text(l10n.trainerSessionStats),
                     tilePadding: EdgeInsets.zero,
                     childrenPadding: EdgeInsets.zero,
                     shape: const Border(),
@@ -212,6 +216,7 @@ class _BottomControlBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notation = ref.watch(notationProvider);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     // Le sequenze custom sono costruite su note assolute: niente selettori
     // di tonalità/ottava, si parte dalla nota con cui sono state create.
     final fixedRoot = exercise.isCustom && exercise.rootMidi != null
@@ -234,7 +239,7 @@ class _BottomControlBar extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Text.rich(
                     TextSpan(children: [
-                      const TextSpan(text: 'Nota di partenza: '),
+                      TextSpan(text: '${l10n.trainerStartingNote} '),
                       noteSpan(fixedRoot, notation,
                           style: theme.textTheme.labelLarge ?? const TextStyle()),
                     ]),
@@ -248,8 +253,8 @@ class _BottomControlBar extends ConsumerWidget {
                   Expanded(
                     child: DropdownButtonFormField<PitchClass>(
                       initialValue: state.settings.key,
-                      decoration: const InputDecoration(
-                        labelText: 'Tonalità',
+                      decoration: InputDecoration(
+                        labelText: l10n.trainerKey,
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
@@ -269,17 +274,24 @@ class _BottomControlBar extends ConsumerWidget {
                   Expanded(
                     child: DropdownButtonFormField<int>(
                       initialValue: state.settings.octave,
-                      decoration: const InputDecoration(
-                        labelText: 'Ottava',
+                      decoration: InputDecoration(
+                        labelText: l10n.trainerOctave,
                         isDense: true,
                         border: OutlineInputBorder(),
                       ),
-                      items: const [
-                        DropdownMenuItem(value: 2, child: Text('2')),
-                        DropdownMenuItem(value: 3, child: Text('3')),
-                        DropdownMenuItem(value: 4, child: Text('4')),
-                        DropdownMenuItem(value: 5, child: Text('5')),
-                        DropdownMenuItem(value: 6, child: Text('6')),
+                      // Ogni ottava mostra la tonica in quell'ottava (es. DO4 o
+                      // C4), con la notazione scelta dall'utente.
+                      items: [
+                        for (final octave in _octaves)
+                          DropdownMenuItem(
+                            value: octave,
+                            child: NoteText(
+                              NoteSpeller.spellRoot(
+                                MusicalNote(pitchClass: state.settings.key, octave: octave),
+                              ),
+                              notation: notation,
+                            ),
+                          ),
                       ],
                       onChanged: state.isPlaying
                           ? null
@@ -293,16 +305,16 @@ class _BottomControlBar extends ConsumerWidget {
               children: [
                 SegmentedButton<TrainerMode>(
                   showSelectedIcon: false,
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: TrainerMode.listen,
-                      icon: Icon(Icons.headphones),
-                      tooltip: 'Ascolto',
+                      icon: const Icon(Icons.headphones),
+                      tooltip: l10n.trainerModeListen,
                     ),
                     ButtonSegment(
                       value: TrainerMode.train,
-                      icon: Icon(Icons.mic),
-                      tooltip: 'Allenamento',
+                      icon: const Icon(Icons.mic),
+                      tooltip: l10n.trainerModeTrain,
                     ),
                   ],
                   selected: {state.settings.mode},
@@ -321,13 +333,13 @@ class _BottomControlBar extends ConsumerWidget {
                           ),
                           onPressed: controller.stop,
                           icon: const Icon(Icons.stop),
-                          label: const Text('Stop'),
+                          label: Text(l10n.trainerStop),
                         )
                       : FilledButton.icon(
                           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
                           onPressed: () => startTrainerSession(context, ref),
                           icon: const Icon(Icons.play_arrow),
-                          label: const Text('Play'),
+                          label: Text(l10n.trainerPlay),
                         ),
                 ),
               ],
@@ -359,8 +371,8 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
     setState(() => _calibrating = false);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(threshold == null
-          ? 'Calibrazione non riuscita: controlla il permesso microfono.'
-          : 'Calibrazione completata: rumore di fondo filtrato.'),
+          ? context.l10n.trainerCalibrationFailed
+          : context.l10n.trainerCalibrationDone),
     ));
   }
 
@@ -383,6 +395,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
     final state = ref.watch(trainerControllerProvider);
     final controller = ref.read(trainerControllerProvider.notifier);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final disabled = state.isPlaying;
 
     return Padding(
@@ -396,10 +409,10 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Impostazioni avanzate', style: theme.textTheme.titleLarge),
+          Text(l10n.trainerAdvancedSettings, style: theme.textTheme.titleLarge),
           const SizedBox(height: 8),
           _SliderRow(
-            label: 'BPM',
+            label: l10n.trainerBpm,
             value: state.settings.bpm,
             min: 40,
             max: 140,
@@ -408,21 +421,21 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
             onChanged: disabled ? null : controller.updateBpm,
           ),
           _SliderRow(
-            label: 'Tolleranza',
+            label: l10n.trainerTolerance,
             value: state.settings.toleranceCents,
             min: PitchRecognitionConfig.minExerciseToleranceCents.toDouble(),
             max: PitchRecognitionConfig.maxExerciseToleranceCents.toDouble(),
             divisions: 8,
-            format: (value) => '± $value cent',
+            format: l10n.trainerToleranceValue,
             onChanged: disabled ? null : controller.updateTolerance,
           ),
           _SliderRow(
-            label: 'Durata stabilità',
+            label: l10n.trainerStabilityTime,
             value: state.settings.stabilityMs,
             min: 100,
             max: 300,
             divisions: 4,
-            format: (value) => '$value ms',
+            format: l10n.trainerMilliseconds,
             onChanged: disabled ? null : controller.updateStability,
           ),
           SwitchListTile.adaptive(
@@ -430,9 +443,8 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
             onChanged: state.settings.mode == TrainerMode.train && !disabled
                 ? controller.updateGuideEveryNote
                 : null,
-            title: const Text('Suona la guida su ogni nota'),
-            subtitle: const Text(
-                'Se disattivo, senti solo la prima nota: tocca una nota per riascoltarla'),
+            title: Text(l10n.trainerGuideEveryNote),
+            subtitle: Text(l10n.trainerGuideEveryNoteHint),
             contentPadding: EdgeInsets.zero,
           ),
           SwitchListTile.adaptive(
@@ -440,7 +452,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
             onChanged: state.settings.mode == TrainerMode.listen && !disabled
                 ? controller.updateLoop
                 : null,
-            title: const Text('Loop (solo modalità Ascolto)'),
+            title: Text(l10n.trainerLoop),
             contentPadding: EdgeInsets.zero,
           ),
           const SizedBox(height: 4),
@@ -453,7 +465,7 @@ class _AdvancedSettingsSheetState extends ConsumerState<_AdvancedSettingsSheet> 
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.graphic_eq),
-            label: Text(_calibrating ? 'Resta in silenzio… (3 s)' : 'Calibra rumore di fondo'),
+            label: Text(_calibrating ? l10n.trainerCalibrating : l10n.trainerCalibrate),
           ),
         ],
       ),
@@ -485,7 +497,8 @@ class _SliderRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('$label: ${format(value)}', style: Theme.of(context).textTheme.labelLarge),
+        Text(context.l10n.trainerSettingValue(label, format(value)),
+            style: Theme.of(context).textTheme.labelLarge),
         Slider(
           value: value.toDouble(),
           min: min,
@@ -508,11 +521,12 @@ class _StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final label = isListening
-        ? 'Microfono attivo'
+        ? l10n.trainerStatusMicOn
         : isPlaying
-            ? 'Riproduzione'
-            : 'Pronta';
+            ? l10n.trainerStatusPlaying
+            : l10n.trainerStatusReady;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: isPlaying ? colors.primaryContainer : colors.surfaceContainerHighest,
@@ -525,6 +539,15 @@ class _StatusPill extends StatelessWidget {
     );
   }
 }
+
+/// Ottave selezionabili per la tonica dell'esercizio.
+const _octaves = [2, 3, 4, 5, 6];
+
+/// Testo dell'avviso del trainer nella lingua attiva.
+String _messageText(AppLocalizations l10n, TrainerMessage message) => switch (message) {
+      TrainerMessage.microphoneDenied => l10n.trainerMicrophoneDenied,
+      TrainerMessage.audioUnavailable => l10n.trainerAudioUnavailable,
+    };
 
 /// Avvia una sessione; con le cariche esaurite spiega come continuare.
 Future<void> startTrainerSession(BuildContext context, WidgetRef ref) async {

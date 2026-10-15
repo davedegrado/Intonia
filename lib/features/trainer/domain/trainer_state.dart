@@ -6,6 +6,15 @@ import 'note_progress.dart';
 import 'training_settings.dart';
 import 'training_state_machine.dart';
 
+/// Avviso mostrato nel trainer; il testo è tradotto nella schermata.
+enum TrainerMessage {
+  /// Permesso microfono negato: la sessione non parte.
+  microphoneDenied,
+
+  /// Audio (microfono o piano) non inizializzato.
+  audioUnavailable,
+}
+
 class TrainerState {
   const TrainerState({
     required this.settings,
@@ -49,7 +58,7 @@ class TrainerState {
   final TrainingValidationState validationState;
   final PitchDetectionResult? detectedPitch;
   final SessionStats sessionStats;
-  final String? message;
+  final TrainerMessage? message;
 
   /// Riepilogo dell'esercizio appena completato (tutte le note convalidate);
   /// null durante l'esercizio o se interrotto.
@@ -71,7 +80,7 @@ class TrainerState {
     TrainingValidationState? validationState,
     PitchDetectionResult? detectedPitch,
     SessionStats? sessionStats,
-    String? message,
+    TrainerMessage? message,
     bool clearMessage = false,
     SessionRecord? completedSession,
     bool clearCompletedSession = false,

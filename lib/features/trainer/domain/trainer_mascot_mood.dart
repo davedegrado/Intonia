@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import 'trainer_state.dart';
 import 'training_settings.dart';
@@ -32,18 +33,18 @@ MascotMood mascotMoodForTrainer(TrainerState state) {
   return MascotMood.idle;
 }
 
-/// Messaggio del fumetto della mascotte nel trainer.
-String mascotMessageForTrainer(TrainerState state) {
+/// Messaggio del fumetto della mascotte nel trainer, nella lingua di [l10n].
+String mascotMessageForTrainer(TrainerState state, AppLocalizations l10n) {
   final listenMode = state.settings.mode == TrainerMode.listen;
   if (state.isFinished) {
-    return 'Esercizio completato! Grande lavoro.';
+    return l10n.mascotCompleted;
   }
   return switch (mascotMoodForTrainer(state)) {
-    MascotMood.success => 'Perfetto! Continua così.',
-    MascotMood.retry => 'Quasi! Prova ancora.',
-    MascotMood.listening => listenMode ? 'Ascolta bene la sequenza…' : 'Canta la nota: ti ascolto.',
+    MascotMood.success => l10n.mascotSuccess,
+    MascotMood.retry => l10n.mascotRetry,
+    MascotMood.listening => listenMode ? l10n.mascotListenSequence : l10n.mascotSingNote,
     MascotMood.idle ||
     MascotMood.greeting =>
-      listenMode ? 'Premi Play e ascolta la sequenza.' : 'Pronto ad allenare il tuo orecchio?',
+      listenMode ? l10n.mascotIdleListen : l10n.mascotIdleTrain,
   };
 }

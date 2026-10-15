@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/l10n.dart';
 import '../../../../core/music/note.dart';
 import '../../../../core/music/note_spelling.dart';
 import '../../../settings/application/settings_providers.dart';
@@ -84,10 +85,17 @@ class _ScaleSequenceViewState extends ConsumerState<ScaleSequenceView> {
                 visualDensity: VisualDensity.compact,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              segments: const [
-                ButtonSegment(value: false, icon: Icon(Icons.view_week, size: 18), tooltip: 'Note'),
+              segments: [
                 ButtonSegment(
-                    value: true, icon: Icon(Icons.queue_music, size: 18), tooltip: 'Pentagramma'),
+                  value: false,
+                  icon: const Icon(Icons.view_week, size: 18),
+                  tooltip: context.l10n.trainerViewNotes,
+                ),
+                ButtonSegment(
+                  value: true,
+                  icon: const Icon(Icons.queue_music, size: 18),
+                  tooltip: context.l10n.trainerViewStaff,
+                ),
               ],
               selected: {_staffMode},
               onSelectionChanged: (selection) {
@@ -103,6 +111,7 @@ class _ScaleSequenceViewState extends ConsumerState<ScaleSequenceView> {
             spelled: spelled,
             progress: widget.progress,
             controller: _scrollController,
+            notation: notation,
             noteExtent: _staffNoteExtent,
             leadWidth: _staffLeadWidth,
             currentIndex: widget.currentIndex,
@@ -142,6 +151,7 @@ class _ChipsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return SizedBox(
       height: 44,
@@ -157,23 +167,29 @@ class _ChipsRow extends StatelessWidget {
             child: GestureDetector(
               key: ValueKey('sequence-note-$i'),
               onTap: onTapNote == null ? null : () => onTapNote!(i),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOut,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: sequenceStatusColor(status, colors, background: true),
-                  border: Border.all(color: sequenceStatusColor(status, colors)),
-                ),
-                child: Text(
-                  spelled[i].label(notation),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: status == NoteProgressStatus.pending
-                            ? colors.onSurfaceVariant
-                            : Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
+              child: Semantics(
+                button: onTapNote != null,
+                label: _noteSemantics(l10n, spelled[i].label(notation), status),
+                hint: onTapNote != null ? l10n.trainerTapToHear : null,
+                excludeSemantics: true,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: sequenceStatusColor(status, colors, background: true),
+                    border: Border.all(color: sequenceStatusColor(status, colors)),
+                  ),
+                  child: Text(
+                    spelled[i].label(notation),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: status == NoteProgressStatus.pending
+                              ? colors.onSurfaceVariant
+                              : Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
                 ),
               ),
             ),
@@ -184,11 +200,22 @@ class _ChipsRow extends StatelessWidget {
   }
 }
 
+/// Etichetta per i lettori di schermo di una nota della sequenza.
+String _noteSemantics(AppLocalizations l10n, String note, NoteProgressStatus status) {
+  return switch (status) {
+    NoteProgressStatus.correct => l10n.trainerNoteCorrect(note),
+    NoteProgressStatus.error => l10n.trainerNoteWrong(note),
+    NoteProgressStatus.current => l10n.trainerNoteCurrent(note),
+    NoteProgressStatus.pending => l10n.trainerNotePending(note),
+  };
+}
+
 class _StaffView extends StatelessWidget {
   const _StaffView({
     required this.spelled,
     required this.progress,
     required this.controller,
+    required this.notation,
     required this.noteExtent,
     required this.leadWidth,
     required this.currentIndex,
@@ -198,6 +225,7 @@ class _StaffView extends StatelessWidget {
   final List<SpelledNote> spelled;
   final List<NoteProgressStatus> progress;
   final ScrollController controller;
+  final NoteNotation notation;
   final double noteExtent;
   final double leadWidth;
   final int currentIndex;
@@ -220,19 +248,25 @@ class _StaffView extends StatelessWidget {
       child: SingleChildScrollView(
         controller: controller,
         scrollDirection: Axis.horizontal,
-        child: GestureDetector(
-          key: const ValueKey('sequence-staff'),
-          onTapUp: onTapNote == null
-              ? null
-              : (details) => onTapNote!(_indexAt(details.localPosition.dx)),
-          child: CustomPaint(
-            size: Size(width, 130),
-            painter: _StaffPainter(
-              spelled: spelled,
-              progress: progress,
-              colors: colors,
-              noteExtent: noteExtent,
-              leadWidth: leadWidth,
+        child: Semantics(
+          label: context.l10n.trainerStaffSemantics(
+            [for (final note in spelled) note.fullLabel(notation)].join(', '),
+          ),
+          hint: onTapNote != null ? context.l10n.trainerTapToHear : null,
+          child: GestureDetector(
+            key: const ValueKey('sequence-staff'),
+            onTapUp: onTapNote == null
+                ? null
+                : (details) => onTapNote!(_indexAt(details.localPosition.dx)),
+            child: CustomPaint(
+              size: Size(width, 130),
+              painter: _StaffPainter(
+                spelled: spelled,
+                progress: progress,
+                colors: colors,
+                noteExtent: noteExtent,
+                leadWidth: leadWidth,
+              ),
             ),
           ),
         ),
