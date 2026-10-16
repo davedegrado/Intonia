@@ -81,6 +81,9 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
     }
   }
 
+  /// Sequenza come chips (false) o sul pentagramma (true).
+  bool _staffMode = false;
+
   @override
   Widget build(BuildContext context) {
     ref.listen(trainerControllerProvider.select((state) => state.completedSession),
@@ -95,6 +98,9 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
     final theme = Theme.of(context);
     final l10n = context.l10n;
     final spelled = NoteSpeller.spellSequence(state.sequence);
+    // Schermi bassi (es. iPhone SE): nota e mascotte più piccole, così tutto
+    // resta in una schermata.
+    final compact = MediaQuery.sizeOf(context).height < 700;
     final currentNote = state.currentIndex < spelled.length
         ? spelled[state.currentIndex]
         : NoteSpeller.spellRoot(state.currentNote);
@@ -137,25 +143,32 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                 children: [
                   Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.fromLTRB(14, 10, 10, 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(l10n.trainerCurrentNote,
-                                        style: theme.textTheme.labelLarge),
-                                    NoteText(
-                                      currentNote,
-                                      notation: notation,
-                                      style: theme.textTheme.displaySmall
-                                          ?.copyWith(fontWeight: FontWeight.w800),
-                                    ),
-                                  ],
+                                child: Text(l10n.trainerCurrentNote,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.labelLarge),
+                              ),
+                              _StatusPill(
+                                  isPlaying: state.isPlaying, isListening: state.isListening),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: NoteText(
+                                  currentNote,
+                                  notation: notation,
+                                  style: (compact
+                                          ? theme.textTheme.headlineLarge
+                                          : theme.textTheme.displaySmall)
+                                      ?.copyWith(fontWeight: FontWeight.w800),
                                 ),
                               ),
                               IconButton.filledTonal(
@@ -163,30 +176,35 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
                                 onPressed: controller.listenCurrentNote,
                                 icon: const Icon(Icons.volume_up),
                               ),
-                              const SizedBox(width: 8),
-                              _StatusPill(
-                                  isPlaying: state.isPlaying, isListening: state.isListening),
+                              IconButton(
+                                key: const ValueKey('trainer-view'),
+                                tooltip: _staffMode ? l10n.trainerViewNotes : l10n.trainerViewStaff,
+                                onPressed: () => setState(() => _staffMode = !_staffMode),
+                                icon: Icon(_staffMode ? Icons.view_week : Icons.queue_music),
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 6),
                           ScaleSequenceView(
                             sequence: state.sequence,
                             progress: state.progress,
                             currentIndex: state.currentIndex,
                             onTapNote: controller.listenNote,
+                            staffMode: _staffMode,
                           ),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   // Mascotte guidata dallo stato del trainer (ascolto, nota
                   // convalidata o da riprovare, esercizio completato).
                   MascotCoach(
                     mood: mascotMoodForTrainer(state),
                     message: mascotMessageForTrainer(state, l10n),
+                    mascotSize: compact ? 44 : 56,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   if (state.settings.mode == TrainerMode.train)
                     PitchFeedbackPanel(
                       detection: state.detectedPitch,
@@ -235,6 +253,7 @@ class _BottomControlBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notation = ref.watch(notationProvider);
     final theme = Theme.of(context);
+    final compact = MediaQuery.sizeOf(context).height < 700;
     final l10n = context.l10n;
     // Le sequenze custom sono costruite su note assolute: niente selettori
     // di tonalità/ottava, si parte dalla nota con cui sono state create.
@@ -246,7 +265,7 @@ class _BottomControlBar extends ConsumerWidget {
       elevation: 8,
       color: theme.colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -319,9 +338,9 @@ class _BottomControlBar extends ConsumerWidget {
                   ),
                 ],
               ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             _DirectionRow(state: state, controller: controller),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Row(
               children: [
                 SegmentedButton<TrainerMode>(
@@ -348,7 +367,7 @@ class _BottomControlBar extends ConsumerWidget {
                   child: state.isPlaying
                       ? FilledButton.icon(
                           style: FilledButton.styleFrom(
-                            minimumSize: const Size.fromHeight(52),
+                            minimumSize: Size.fromHeight(compact ? 44 : 52),
                             backgroundColor: theme.colorScheme.error,
                             foregroundColor: theme.colorScheme.onError,
                           ),
@@ -357,7 +376,8 @@ class _BottomControlBar extends ConsumerWidget {
                           label: Text(l10n.trainerStop),
                         )
                       : FilledButton.icon(
-                          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                          style: FilledButton.styleFrom(
+                              minimumSize: Size.fromHeight(compact ? 44 : 52)),
                           onPressed: () => startTrainerSession(context, ref),
                           icon: const Icon(Icons.play_arrow),
                           label: Text(l10n.trainerPlay),
@@ -554,8 +574,8 @@ class _StatusPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Text(label, maxLines: 1, style: Theme.of(context).textTheme.labelMedium),
       ),
     );
   }
@@ -578,8 +598,10 @@ Future<void> startTrainerSession(BuildContext context, WidgetRef ref) async {
   }
 }
 
-/// Modalità di esecuzione (avanti / al contrario / completo) e, in modalità
-/// completa per esercizi con un vertice, ripetizione della nota più alta.
+/// Modalità di esecuzione (ascendente / discendente / completo) a tutta
+/// larghezza e, in modalità completa per esercizi con un vertice, la
+/// ripetizione della nota più alta su una riga sua: comparendo non toglie
+/// spazio ai tre pulsanti.
 class _DirectionRow extends StatelessWidget {
   const _DirectionRow({required this.state, required this.controller});
 
@@ -594,47 +616,85 @@ class _DirectionRow extends StatelessWidget {
     final showRepeatTop = direction == PlaybackDirection.complete && exercise.hasApex;
     final disabled = state.isPlaying;
 
-    return Row(
+    // Un'etichetta resta sempre su una riga: se lo spazio non basta si
+    // rimpicciolisce invece di andare a capo.
+    Widget label(String text) => FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(text, maxLines: 1, softWrap: false),
+        );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(
-          child: SegmentedButton<PlaybackDirection>(
-            key: const ValueKey('trainer-direction'),
-            showSelectedIcon: false,
-            segments: [
-              ButtonSegment(
-                value: PlaybackDirection.forward,
-                icon: const Icon(Icons.arrow_forward),
-                label: Text(l10n.trainerDirectionForward),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Icone solo se c'è posto anche per le parole intere.
+            final icons = constraints.maxWidth >= 400;
+            return SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<PlaybackDirection>(
+                key: const ValueKey('trainer-direction'),
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(
+                    value: PlaybackDirection.forward,
+                    icon: icons ? const Icon(Icons.trending_up) : null,
+                    label: label(l10n.trainerDirectionForward),
+                  ),
+                  ButtonSegment(
+                    value: PlaybackDirection.reverse,
+                    icon: icons ? const Icon(Icons.trending_down) : null,
+                    label: label(l10n.trainerDirectionReverse),
+                  ),
+                  ButtonSegment(
+                    value: PlaybackDirection.complete,
+                    icon: icons ? const Icon(Icons.swap_vert) : null,
+                    label: label(l10n.trainerDirectionComplete),
+                  ),
+                ],
+                style: const ButtonStyle(
+                  visualDensity: VisualDensity.compact,
+                  padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+                ),
+                selected: {direction},
+                onSelectionChanged:
+                    disabled ? null : (selection) => controller.updateDirection(selection.first),
               ),
-              ButtonSegment(
-                value: PlaybackDirection.reverse,
-                icon: const Icon(Icons.arrow_back),
-                label: Text(l10n.trainerDirectionReverse),
-              ),
-              ButtonSegment(
-                value: PlaybackDirection.complete,
-                icon: const Icon(Icons.swap_horiz),
-                label: Text(l10n.trainerDirectionComplete),
-              ),
-            ],
-            style: const ButtonStyle(visualDensity: VisualDensity.compact),
-            selected: {direction},
-            onSelectionChanged:
-                disabled ? null : (selection) => controller.updateDirection(selection.first),
-          ),
+            );
+          },
         ),
-        if (showRepeatTop) ...[
-          const SizedBox(width: 6),
-          IconButton(
-            key: const ValueKey('trainer-repeat-top'),
-            isSelected: state.settings.repeatTop,
-            tooltip: '${l10n.trainerRepeatTop}: ${l10n.trainerRepeatTopHint}',
-            icon: const Icon(Icons.repeat_one),
-            selectedIcon: const Icon(Icons.repeat_one_on),
-            onPressed:
-                disabled ? null : () => controller.updateRepeatTop(!state.settings.repeatTop),
+        if (showRepeatTop)
+          Tooltip(
+            message: l10n.trainerRepeatTopHint,
+            child: InkWell(
+              key: const ValueKey('trainer-repeat-top'),
+              borderRadius: BorderRadius.circular(8),
+              onTap: disabled ? null : () => controller.updateRepeatTop(!state.settings.repeatTop),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Row(
+                  children: [
+                    Icon(Icons.repeat_one,
+                        size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.trainerRepeatTop,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    Switch(
+                      value: state.settings.repeatTop,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      onChanged: disabled ? null : controller.updateRepeatTop,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ],
       ],
     );
   }

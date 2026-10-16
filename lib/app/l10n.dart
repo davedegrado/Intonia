@@ -22,4 +22,24 @@ extension SpanL10n on AppLocalizations {
     }
     return spanOctavesAndSemitones(spanOctaves(octaves), spanSemitones(rest));
   }
+
+  /// Come [span], ma "2 ottave" e "7 semitoni" non si spezzano mai a metà:
+  /// se serve si va a capo solo attorno al "+".
+  String spanUnbroken(int semitones) {
+    final octaves = semitones ~/ 12;
+    final rest = semitones % 12;
+    if (octaves == 0) {
+      return spanSemitones(rest).noBreak;
+    }
+    if (rest == 0) {
+      return spanOctaves(octaves).noBreak;
+    }
+    return spanOctavesAndSemitones(spanOctaves(octaves).noBreak, spanSemitones(rest).noBreak);
+  }
+}
+
+extension NoBreakText on String {
+  /// Stesso testo con spazi non divisibili: un'etichetta breve come
+  /// "4 esercizi" o "3 ottave" va a capo tutta intera, mai a metà.
+  String get noBreak => replaceAll(' ', '\u00A0');
 }

@@ -1148,10 +1148,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsLicenses => 'Licenze';
 
   @override
-  String get trainerDirectionForward => 'Dritto';
+  String get trainerDirectionForward => 'Ascendente';
 
   @override
-  String get trainerDirectionReverse => 'Al contrario';
+  String get trainerDirectionReverse => 'Discendente';
 
   @override
   String get trainerDirectionComplete => 'Completo';
@@ -1212,7 +1212,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get guideExerciseSettings =>
-      'Nell\'esercizio scegli tonalità e ottava, la modalità (Dritto, Al contrario o Completo) e, in Completo, se ripetere la nota di vertice. Il pulsante ? dell\'esercizio spiega queste opzioni.';
+      'Nell\'esercizio scegli tonalità e ottava, la modalità (Ascendente, Discendente o Completo) e, in Completo, se ripetere la nota di vertice. Il pulsante ? dell\'esercizio spiega queste opzioni.';
 
   @override
   String get guideRange =>
@@ -1241,7 +1241,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get guideDirection =>
-      'Dritto esegue la sequenza in avanti, Al contrario all\'indietro, Completo in avanti e poi a ritroso.';
+      'Ascendente esegue la sequenza dal basso verso l\'alto, Discendente dall\'alto verso il basso, Completo sale e poi riscende.';
 
   @override
   String get guideRepeatTop =>

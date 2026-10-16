@@ -32,6 +32,9 @@ class RangeScreen extends ConsumerWidget {
     final notation = ref.watch(notationProvider);
     final ranges = ref.watch(rangeHistoryProvider).value ?? const <RangeRecord>[];
     final latest = ranges.isNotEmpty ? ranges.last : null;
+    // Mascotte più piccola sugli schermi bassi: l'ultimo risultato resta
+    // visibile senza scorrere.
+    final mascotSize = (MediaQuery.sizeOf(context).height * 0.14).clamp(80.0, 150.0);
     final previous = [
       for (var i = ranges.length - 2; i >= 0 && i >= ranges.length - 1 - previousShown; i--)
         (record: ranges[i], before: i > 0 ? ranges[i - 1] : null),
@@ -45,17 +48,20 @@ class RangeScreen extends ConsumerWidget {
         key: const PageStorageKey('range-list'),
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
-          const Center(
+          Center(
             child: MascotStage(
-              size: 150,
-              child: IntoniaMascot(mood: MascotMood.idle, size: 150),
+              size: mascotSize,
+              child: IntoniaMascot(mood: MascotMood.idle, size: mascotSize),
             ),
           ),
-          const SizedBox(height: 22),
-          Text(
-            l10n.rangeHeadline,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+          const SizedBox(height: 18),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              l10n.rangeHeadline,
+              maxLines: 1,
+              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -66,7 +72,7 @@ class RangeScreen extends ConsumerWidget {
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 18),
           HeroButton(
             key: const ValueKey('range-start'),
             icon: Icons.graphic_eq_rounded,
@@ -290,7 +296,7 @@ class _HistoryTile extends StatelessWidget {
         high: spelledMidi(record.maxMidi),
         notation: notation,
         style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-        suffix: '  (${context.l10n.span(record.spanSemitones)})',
+        suffix: '  (${context.l10n.spanUnbroken(record.spanSemitones)})',
       ),
       subtitle: Text(formatShortDate(record.timestamp)),
       trailing: Row(

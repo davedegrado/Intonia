@@ -201,7 +201,7 @@ class ProfileScreen extends ConsumerWidget {
                         low: spelledMidi(ranges[i].minMidi),
                         high: spelledMidi(ranges[i].maxMidi),
                         notation: notation,
-                        suffix: '  (${l10n.span(ranges[i].spanSemitones)})',
+                        suffix: '  (${l10n.spanUnbroken(ranges[i].spanSemitones)})',
                       ),
                       subtitle: Text(formatShortDate(ranges[i].timestamp) +
                           (i > 0
@@ -426,11 +426,15 @@ class _StatCard extends StatelessWidget {
                   Icon(icon, size: 18, color: accent),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.labelMedium
-                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                    // Su una riga, rimpicciolita se serve: mai troncata.
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(label,
+                          maxLines: 1,
+                          style: theme.textTheme.labelMedium
+                              ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                    ),
                   ),
                 ],
               ),

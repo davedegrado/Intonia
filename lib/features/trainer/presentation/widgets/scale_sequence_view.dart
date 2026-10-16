@@ -15,6 +15,7 @@ class ScaleSequenceView extends ConsumerStatefulWidget {
     required this.progress,
     required this.currentIndex,
     this.onTapNote,
+    this.staffMode,
     super.key,
   });
 
@@ -24,6 +25,10 @@ class ScaleSequenceView extends ConsumerStatefulWidget {
 
   /// Chiamato con l'indice della nota toccata (per ascoltarla).
   final ValueChanged<int>? onTapNote;
+
+  /// Vista scelta da fuori (chips o pentagramma): in quel caso il selettore
+  /// interno non compare e la vista segue questo valore.
+  final bool? staffMode;
 
   @override
   ConsumerState<ScaleSequenceView> createState() => _ScaleSequenceViewState();
@@ -35,11 +40,16 @@ class _ScaleSequenceViewState extends ConsumerState<ScaleSequenceView> {
   static const _staffLeadWidth = 56.0;
 
   final _scrollController = ScrollController();
-  bool _staffMode = false;
+  bool _ownStaffMode = false;
+
+  bool get _staffMode => widget.staffMode ?? _ownStaffMode;
 
   @override
   void didUpdateWidget(ScaleSequenceView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.staffMode != widget.staffMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToCurrent());
+    }
     if (oldWidget.currentIndex != widget.currentIndex ||
         oldWidget.sequence.length != widget.sequence.length) {
       _scrollToCurrent();
@@ -76,36 +86,38 @@ class _ScaleSequenceViewState extends ConsumerState<ScaleSequenceView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SegmentedButton<bool>(
-              showSelectedIcon: false,
-              style: const ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        if (widget.staffMode == null) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SegmentedButton<bool>(
+                showSelectedIcon: false,
+                style: const ButtonStyle(
+                  visualDensity: VisualDensity.compact,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                segments: [
+                  ButtonSegment(
+                    value: false,
+                    icon: const Icon(Icons.view_week, size: 18),
+                    tooltip: context.l10n.trainerViewNotes,
+                  ),
+                  ButtonSegment(
+                    value: true,
+                    icon: const Icon(Icons.queue_music, size: 18),
+                    tooltip: context.l10n.trainerViewStaff,
+                  ),
+                ],
+                selected: {_staffMode},
+                onSelectionChanged: (selection) {
+                  setState(() => _ownStaffMode = selection.first);
+                  WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToCurrent());
+                },
               ),
-              segments: [
-                ButtonSegment(
-                  value: false,
-                  icon: const Icon(Icons.view_week, size: 18),
-                  tooltip: context.l10n.trainerViewNotes,
-                ),
-                ButtonSegment(
-                  value: true,
-                  icon: const Icon(Icons.queue_music, size: 18),
-                  tooltip: context.l10n.trainerViewStaff,
-                ),
-              ],
-              selected: {_staffMode},
-              onSelectionChanged: (selection) {
-                setState(() => _staffMode = selection.first);
-                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToCurrent());
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
         if (_staffMode)
           _StaffView(
             spelled: spelled,

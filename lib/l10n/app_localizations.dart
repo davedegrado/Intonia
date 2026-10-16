@@ -1968,13 +1968,13 @@ abstract class AppLocalizations {
   /// No description provided for @trainerDirectionForward.
   ///
   /// In en, this message translates to:
-  /// **'Straight'**
+  /// **'Ascending'**
   String get trainerDirectionForward;
 
   /// No description provided for @trainerDirectionReverse.
   ///
   /// In en, this message translates to:
-  /// **'Reverse'**
+  /// **'Descending'**
   String get trainerDirectionReverse;
 
   /// No description provided for @trainerDirectionComplete.
@@ -2082,7 +2082,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideExerciseSettings.
   ///
   /// In en, this message translates to:
-  /// **'In an exercise you choose the key and octave, the mode (Straight, Reverse or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.'**
+  /// **'In an exercise you choose the key and octave, the mode (Ascending, Descending or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.'**
   String get guideExerciseSettings;
 
   /// No description provided for @guideRange.
@@ -2130,7 +2130,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideDirection.
   ///
   /// In en, this message translates to:
-  /// **'Straight plays the sequence forwards, Reverse plays it backwards, Full goes forwards and then comes back.'**
+  /// **'Ascending plays the sequence from the bottom up, Descending from the top down, Full goes up and then comes back down.'**
   String get guideDirection;
 
   /// No description provided for @guideRepeatTop.
