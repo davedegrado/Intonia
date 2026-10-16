@@ -1146,10 +1146,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLicenses => 'Licenses';
 
   @override
-  String get trainerDirectionForward => 'Straight';
+  String get trainerDirectionForward => 'Ascending';
 
   @override
-  String get trainerDirectionReverse => 'Reverse';
+  String get trainerDirectionReverse => 'Descending';
 
   @override
   String get trainerDirectionComplete => 'Full';
@@ -1210,7 +1210,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideExerciseSettings =>
-      'In an exercise you choose the key and octave, the mode (Straight, Reverse or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.';
+      'In an exercise you choose the key and octave, the mode (Ascending, Descending or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.';
 
   @override
   String get guideRange =>
@@ -1239,7 +1239,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideDirection =>
-      'Straight plays the sequence forwards, Reverse plays it backwards, Full goes forwards and then comes back.';
+      'Ascending plays the sequence from the bottom up, Descending from the top down, Full goes up and then comes back down.';
 
   @override
   String get guideRepeatTop =>

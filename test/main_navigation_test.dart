@@ -480,13 +480,56 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('guide-close')));
     await _frames(tester, 5);
 
-    // In modalità Dritto il vertice non si ripete: niente spiegazione.
-    await tester.tap(find.text('Dritto'));
+    // In modalità Ascendente il vertice non si ripete: niente spiegazione.
+    await tester.tap(find.text('Ascendente'));
     await _frames(tester, 2);
     expect(find.byKey(const ValueKey('trainer-repeat-top')), findsNothing);
     await tester.tap(find.byKey(const ValueKey('trainer-guide')));
     await _frames(tester, 5);
     expect(find.text('1 di 3'), findsOneWidget);
+  });
+
+  testWidgets('home fits one screen on a short phone, even with larger text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.15;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await _launch(tester, size: const Size(360, 640));
+    final navTop = tester.getTopLeft(find.byType(NavigationBar)).dy;
+    for (final key in [
+      'home-bubble',
+      'home-mascot',
+      'home-mic',
+      'home-note-card',
+      'quick-settings'
+    ]) {
+      expect(tester.getRect(find.byKey(ValueKey(key))).bottom, lessThanOrEqualTo(navTop),
+          reason: key);
+    }
+    expect(
+        find.descendant(of: find.byType(HomeScreen), matching: find.byType(SingleChildScrollView)),
+        findsNothing,
+        reason: 'niente scorrimento');
+  });
+
+  testWidgets('"repeat the top note" has its own row and leaves the modes full width',
+      (tester) async {
+    await _launch(tester);
+    await _openTab(tester, 'Esercizi');
+    await tester.tap(find.text('Triadi'));
+    await _frames(tester, 5);
+    await tester.tap(find.widgetWithText(ListTile, 'Triade maggiore'));
+    await _frames(tester, 5);
+    final modes = find.byKey(const ValueKey('trainer-direction'));
+    final repeat = find.byKey(const ValueKey('trainer-repeat-top'));
+    expect(find.text('Completo'), findsOneWidget);
+    expect(repeat, findsOneWidget);
+    final width = tester.getSize(modes).width;
+    expect(tester.getRect(repeat).top, greaterThanOrEqualTo(tester.getRect(modes).bottom));
+
+    await tester.tap(find.text('Ascendente'));
+    await _frames(tester, 2);
+    expect(repeat, findsNothing);
+    expect(tester.getSize(modes).width, width, reason: 'i pulsanti non cambiano larghezza');
+    expect(find.text('Discendente'), findsOneWidget);
   });
 
   testWidgets('"Not me" removes a range test from the results and the history', (tester) async {

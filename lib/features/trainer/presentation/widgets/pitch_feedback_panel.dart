@@ -39,12 +39,25 @@ class PitchFeedbackPanel extends ConsumerWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.trainerDetection, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 12),
+            // Titolo e stato sulla stessa riga: il pannello resta basso.
+            Row(
+              children: [
+                Expanded(
+                  child: Text(l10n.trainerDetection,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium),
+                ),
+                Text(label,
+                    maxLines: 1,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.primary)),
+              ],
+            ),
+            const SizedBox(height: 6),
             Row(
               children: [
                 Expanded(
@@ -68,9 +81,9 @@ class PitchFeedbackPanel extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 6),
             SizedBox(
-              height: 42,
+              height: 32,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -88,7 +101,7 @@ class PitchFeedbackPanel extends ConsumerWidget {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 120),
                       width: 4,
-                      height: 34,
+                      height: 26,
                       decoration: BoxDecoration(
                         color: colors.onSurface,
                         borderRadius: BorderRadius.circular(2),
@@ -98,8 +111,6 @@ class PitchFeedbackPanel extends ConsumerWidget {
                 ],
               ),
             ),
-            Text(label,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colors.primary)),
           ],
         ),
       ),
@@ -121,8 +132,7 @@ class _Metric extends StatelessWidget {
         Text(label, style: Theme.of(context).textTheme.labelMedium),
         const SizedBox(height: 2),
         Text(value,
-            style:
-                Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
       ],
     );
   }

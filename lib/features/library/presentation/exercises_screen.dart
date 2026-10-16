@@ -163,18 +163,26 @@ class _CategoryAccordion extends StatelessWidget {
         tilePadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
         iconColor: accent,
         leading: AccentIcon(icon: categoryIcon(category), color: accent, size: 50),
-        title: Text(l10n.categoryLabel(category),
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        // Il numero di esercizi sta accanto al nome, o tutto intero sotto se
+        // non c'è posto: né il nome né "2 esercizi" vengono mai spezzati.
+        title: Wrap(
+          spacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.end,
+          children: [
+            Text(l10n.categoryLabel(category),
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Text(l10n.exercisesCount(exercises.length).noBreak,
+                  style: theme.textTheme.labelMedium
+                      ?.copyWith(color: accent, fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Text.rich(
-            TextSpan(children: [
-              TextSpan(text: l10n.categoryDescription(category)),
-              TextSpan(
-                text: '  ·  ${l10n.exercisesCount(exercises.length)}',
-                style: TextStyle(color: accent, fontWeight: FontWeight.w700),
-              ),
-            ]),
+          child: Text(
+            l10n.categoryDescription(category),
             style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
@@ -351,11 +359,16 @@ class _CreateSequenceCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        context.l10n.exercisesCreateTitle,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: decor.onFeature,
-                          fontWeight: FontWeight.w800,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          context.l10n.exercisesCreateTitle,
+                          maxLines: 1,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: decor.onFeature,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -429,7 +442,7 @@ Future<void> _chooseStart(BuildContext context, WidgetRef ref) async {
 }
 
 /// Copia indipendente di un esercizio da modificare: definizione originale
-/// completa (non la variante Dritto/Al contrario/Completo), id vuoto = nuova
+/// completa (non la variante Ascendente/Discendente/Completo), id vuoto = nuova
 /// sequenza. Gli esercizi predefiniti non hanno una nota di partenza: si usa
 /// DO4/C4, la tonalità e l'ottava predefinite del trainer.
 ExerciseDefinition copyForEditing(ExerciseDefinition source, String name) => ExerciseDefinition(

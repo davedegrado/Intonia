@@ -128,34 +128,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         bottom: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Mascotte e microfono si adattano all'altezza disponibile; sotto
-            // una certa altezza la pagina scorre invece di andare in overflow.
-            final height = math.max(constraints.maxHeight, 480.0);
-            final mascotSize = (height * 0.31).clamp(110.0, 270.0);
-            final micSize = (height * 0.16).clamp(84.0, 124.0);
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 20),
+            // Tutto sta in una schermata: fumetto, scritta, nota e scorciatoie
+            // hanno altezza fissa, mascotte e microfono si prendono lo spazio
+            // che resta. Solo su schermi minuscoli la pagina scorre.
+            const minHeight = 460.0;
+            final height = math.max(constraints.maxHeight, minHeight);
+            final micSize = (height * 0.13).clamp(64.0, 120.0);
+            final labelStyle = theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800);
+            final labelHeight =
+                MediaQuery.textScalerOf(context).scale(labelStyle?.fontSize ?? 22) * 1.3;
+            final page = SizedBox(
+              height: height,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _SpeechBubble(message: message, isError: tuner.permissionDenied),
-                    const SizedBox(height: 6),
-                    MascotStage(
-                      size: mascotSize,
-                      child: IntoniaMascot(
-                        key: const ValueKey('home-mascot'),
-                        mood: tuner.active ? MascotMood.listening : MascotMood.idle,
-                        reaction: _reactionId == 0
-                            ? null
-                            : MascotReaction(mood: MascotMood.success, id: _reactionId),
-                        size: mascotSize,
-                        greetOnAppear: true,
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, box) {
+                          final mascotSize = math.min(box.maxHeight - 8, 270.0).clamp(60.0, 270.0);
+                          return Center(
+                            child: MascotStage(
+                              size: mascotSize,
+                              child: IntoniaMascot(
+                                key: const ValueKey('home-mascot'),
+                                mood: tuner.active ? MascotMood.listening : MascotMood.idle,
+                                reaction: _reactionId == 0
+                                    ? null
+                                    : MascotReaction(mood: MascotMood.success, id: _reactionId),
+                                size: mascotSize,
+                                greetOnAppear: true,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    const SizedBox(height: 14),
                     _MicButton(
                       size: micSize,
                       active: tuner.active,
@@ -164,19 +173,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         tuner.active ? controller.stop() : controller.start();
                       },
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      tuner.active ? l10n.homeStopListening : l10n.homeStartListening,
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                    const SizedBox(height: 2),
+                    // Una riga di altezza fissa: se la scritta è lunga si
+                    // rimpicciolisce, ma la mascotte sopra non si sposta.
+                    SizedBox(
+                      height: labelHeight,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          tuner.active ? l10n.homeStopListening : l10n.homeStartListening,
+                          maxLines: 1,
+                          style: labelStyle,
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     _NoteCard(detection: hasPitch ? detection : _lastNote, live: hasPitch),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     const _QuickActions(),
                   ],
                 ),
               ),
             );
+            return constraints.maxHeight >= minHeight ? page : SingleChildScrollView(child: page);
           },
         ),
       ),
