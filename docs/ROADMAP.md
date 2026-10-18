@@ -1,8 +1,66 @@
 # Roadmap
 
 La panoramica per fasi è in [`intonia_roadmap_v2.svg`](intonia_roadmap_v2.svg)
-(Karaoke Mode: [`karaoke-architecture.md`](karaoke-architecture.md)). Qui sono
-elencati i miglioramenti puntuali decisi ma rimandati.
+(Karaoke Mode: [`karaoke-architecture.md`](karaoke-architecture.md)). Questo
+file è la fonte testuale dello stato; le attività per la pubblicazione sono in
+[`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md). Il foglio
+`outputs/roadmap-vocal-scale-trainer/` è un artefatto della prima
+impostazione del progetto e non è aggiornato.
+
+## Stato verificato (audit del 18/10/2026, commit `65b92a7`)
+
+Legenda: `[x]` completato e verificato (codice + test automatici; i test non
+coprono microfono e altoparlante reali) · `[ ]` da fare · `[!]` richiede una
+verifica esterna · `[?]` non determinabile.
+
+**Fondamenta**
+- [x] Motore di riconoscimento YIN con rilevamento delle note gravi
+  (`yin_pitch_detector.dart`; `pitch_recognition_test`, `low_pitch_test`).
+- [x] Libreria di esercizi ed editor di sequenze personalizzate, con modalità
+  Ascendente/Discendente/Completo (`exercise_test`, `exercise_copy_test`,
+  `playback_direction_test`).
+- [x] Test di estensione vocale (`range_record_test`, `range_result_test`).
+- [x] Icona, splash e mascotte (`mascot_test`, `splash_overlay_test`).
+
+**Pre-lancio**
+- [x] Impostazioni: tema, notazione, lingua (`localization_test`).
+- [x] Profilo, statistiche, serie giornaliera, widget Home
+  (`session_record_test`, `widget_streak_test`, `home_widget_sync_test`).
+- [x] Calibrazione del rumore di fondo (`measureAmbientRms`); efficacia reale
+  non verificata su dispositivo.
+- [x] SoundFont con licenza: FluidR3 (MIT), notice nell'app
+  (`soundfont_asset_test`).
+- [!] Test su dispositivi reali: solo avvio e microfono apparentemente
+  funzionante su un iPhone (TestFlight) e un Samsung Android, confermati dal
+  titolare; checklist audio non eseguita.
+- [x] Distribuzione di test iOS: workflow TestFlight riuscito dal run #3
+  (ultimo #26, 16/10/2026).
+- [ ] Build Android pubblicabile (AAB con upload key).
+
+**Apertura al pubblico**
+- [x] Localizzazione inglese (app e widget, `docs/LOCALIZATION.md`).
+- [ ] Onboarding con obiettivo: esiste la *Guida di Intonia* (tutorial delle
+  funzioni, `lib/features/guide/`), ma nessuna scelta di obiettivo.
+- [ ] Percorsi guidati per principianti: non esistono.
+- [ ] Spike K0 di fattibilità del Karaoke Mode: non avviato.
+
+**Karaoke Mode (K1–K3)** — [ ] non avviato, vedi `karaoke-architecture.md`.
+
+**Store e monetizzazione**
+- Il modello è cambiato: non più "acquisto unico", ma **Free con cariche +
+  abbonamento Pro** (mensile/annuale). Sistema delle cariche ed entitlement
+  implementati e testati (`charge_ledger_test`, `free_pro_access_test`,
+  `free_pro_ui_test`); acquisti reali [ ] non integrati (sotto).
+- [ ] Privacy policy pubblica e link nell'app.
+- [ ] Schede store, screenshot e dichiarazioni (vedi `RELEASE_CHECKLIST.md`).
+
+**Futuro (opzionale)** — ear training, intervalli, accordi, altri strumenti,
+K4 cloud, cloud sync: [ ] non avviati; `lib/features/future_modules/`
+contiene solo il registro dei moduli, senza funzionalità.
+
+---
+
+Di seguito i miglioramenti puntuali decisi ma rimandati.
 
 ## Miglioramenti pianificati
 

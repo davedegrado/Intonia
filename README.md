@@ -22,8 +22,22 @@ flutter test
 ```
 
 Release builds, Android signing (`android/key.properties`, never committed),
-iOS checks on macOS: `docs/BUILD_AND_RELEASE.md`.
+iOS TestFlight workflow (`.github/workflows/ios-testflight.yml`, manual):
+`docs/BUILD_AND_RELEASE.md`.
 Manual audio checks on real devices: `docs/AUDIO_MANUAL_TEST_CHECKLIST.md`.
+Release status and remaining store work: `docs/RELEASE_CHECKLIST.md`;
+roadmap: `docs/ROADMAP.md`.
+
+## Status (audit 2026-10-18)
+
+- CI green on `main`; TestFlight builds uploaded by the workflow and installed
+  on an iPhone; app also tried on a Samsung Android phone (launch and
+  microphone only: recognition accuracy not yet verified on devices).
+- Not yet published on any store. Open blockers (privacy policy, paywall
+  without working purchases, signed Android AAB, device audio checklist, store
+  listings) are tracked in `docs/RELEASE_CHECKLIST.md`.
+- Offline: no network, analytics or crash-reporting dependencies; audio is
+  analysed in memory and never stored.
 
 ## Audio asset
 
@@ -32,19 +46,26 @@ Fluid (R3) GM SoundFont by Frank Wen, MIT license) through `flutter_midi_pro`.
 The license text is bundled and shown in Settings → Info → Licenses.
 See `assets/soundfonts/soundfont-info.txt`.
 
-Android builds for `flutter_midi_pro` require CMake 3.22.1 because the plugin builds FluidSynth.
+Android builds for `flutter_midi_pro` require CMake 3.22.1 because the plugin builds a JNI
+wrapper around prebuilt FluidSynth libraries (LGPL-2.1; their notices are not yet shown in the
+app, see `docs/RELEASE_CHECKLIST.md` §4.7). On iOS the plugin uses AVFoundation.
 
 ## Architecture
 
 The project uses a feature-first layout:
 
 - `lib/core`: music theory (`exercise.dart` defines the generic exercise model and built-in library), pitch detection, and session models.
-- `lib/services`: platform-facing audio and microphone services, plus JSON persistence for custom exercises (`services/storage`).
-- `lib/features/library`: home screen with the exercise library grouped by type (Custom first, then Triads, Arpeggios, Pentatonics, Scales, 3-voice Harmonizations, Patterns as expandable accordions) and the custom sequence editor (absolute notes, any octave, repeated/descending notes allowed).
-- `lib/features/settings`: settings screen and global preferences (theme mode, note notation DO-RE-MI vs C-D-E, persisted).
+- `lib/app`: app shell, router (bottom navigation: Home, Exercises, Range, Profile), themes, licenses, splash.
+- `lib/services`: platform-facing audio and microphone services, home-screen widget bridge, and JSON persistence (`services/storage`: settings, custom exercises, session and range history, charges).
+- `lib/features/library`: Home (mascot, live note recognition via the microphone button), the Exercises catalogue grouped by type (Custom first, then Triads, Arpeggios, Pentatonics, Scales, 3-voice Harmonizations, Patterns) and the custom sequence editor (absolute notes, any octave, repeated/descending notes allowed, copy from a built-in exercise).
+- `lib/features/tuner`: live recognition controller used by Home.
+- `lib/features/range`: vocal range test and its history.
+- `lib/features/settings`: settings and global preferences (theme, language, note notation C-D-E vs DO-RE-MI, persisted).
 - `lib/features/profile`: profile screen with practice streak, per-note accuracy, detected vocal range, and session history (persisted to `session_history.json`, last 500 sessions).
-- `lib/features/trainer`: training feature with domain state machine, controller, and the mobile-first trainer screen (notes on top, controls pinned at the bottom, advanced settings in a bottom sheet).
-- `lib/features/future_modules`: module registry for intervals, chords, progressions, vocalises, ear training, profile, cloud sync, and in-app purchases.
+- `lib/features/trainer`: training feature with domain state machine, controller, and the trainer screen (Ascending/Descending/Full modes, guide on every note or first note only).
+- `lib/features/access`: Free/Pro model (exercise charges, entitlement, Pro screen; real purchases not integrated, see `docs/ROADMAP.md`).
+- `lib/features/guide`, `lib/features/mascot`, `lib/features/home_widget`: in-app guide, animated mascot, home-screen widget data.
+- `lib/features/future_modules`: registry of planned modules only (no implementation).
 
 ## Exercises
 

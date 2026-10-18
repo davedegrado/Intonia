@@ -1,14 +1,16 @@
 # Build, test e preparazione al rilascio
 
 Guida operativa per sviluppare, verificare e preparare le build di Intonia.
-Lo stato delle verifiche ancora aperte è riassunto in fondo.
+Lo stato delle verifiche è riassunto al §6; le attività rimanenti prima della
+pubblicazione sono in [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md).
 
 ## 1. Ambiente di sviluppo
 
 - **Flutter 3.44.3** (stable, Dart 3.12.2): è la versione con cui è stato creato
   il progetto (`.metadata`), generato `pubspec.lock` e configurata la CI.
 - **Android**: Android SDK con la piattaforma indicata da Flutter, JDK 17+ e
-  CMake 3.22.1 (richiesto da `flutter_midi_pro`, che compila FluidSynth).
+  CMake 3.22.1 (richiesto da `flutter_midi_pro`, che compila il proprio
+  wrapper JNI e include FluidSynth come librerie precompilate).
 - **iOS**: macOS con Xcode e CocoaPods (`flutter_midi_pro` non supporta Swift
   Package Manager, quindi Flutter genera il `Podfile` al primo build iOS).
 
@@ -58,14 +60,15 @@ Non richiedono credenziali.
 ### Release (firma di produzione)
 
 L'identificativo Android è **`io.github.davedegrado.intonia`**, identico al
-Bundle ID iOS. L'app non è ancora registrata sugli store: dopo il primo upload
-su Google Play l'applicationId non potrà più essere cambiato.
+Bundle ID iOS. Su Google Play non risulta ancora alcun upload (da confermare
+in Play Console): dopo il primo upload l'applicationId non potrà più essere
+cambiato. targetSdk/compileSdk 36 e minSdk 24 sono i default di Flutter 3.44.3.
 
 La build release viene firmata solo con la upload key fornita localmente;
 **senza credenziali fallisce** (task `checkReleaseSigning`) invece di usare la
 chiave debug.
 
-1. Creare la upload key (l'app non è ancora su Play), ad esempio:
+1. Creare la upload key (se non esiste già), ad esempio:
    `keytool -genkeypair -v -keystore intonia-upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`.
    Con Play App Signing Google conserva la chiave di distribuzione; la upload
    key, se persa, può essere reimpostata dalla Play Console. Conservarla
@@ -121,7 +124,8 @@ Il workflow `.github/workflows/ios-testflight.yml` compila su un runner macOS
 di GitHub e carica la build su TestFlight. Si avvia **solo a mano** e richiede
 l'iscrizione all'Apple Developer Program.
 
-Configurazione, una sola volta:
+Configurazione, una sola volta (già completata: i run dal #3 caricano le
+build, quindi Bundle ID, app in App Store Connect e secret esistono):
 
 1. **Bundle ID** — [developer.apple.com](https://developer.apple.com/account) →
    *Certificates, Identifiers & Profiles → Identifiers → +* → *App IDs → App*:
@@ -169,9 +173,14 @@ Per ogni build di test:
    l'invito e installare Intonia.
 
 Il numero di build è il numero progressivo del run del workflow; la versione
-(`0.1.0`) viene da `pubspec.yaml`. Il primo run è anche la prima build iOS in
-assoluto del progetto: eventuali errori di compilazione vanno letti nei log
-del job.
+(`0.1.0`) viene da `pubspec.yaml`. In caso di errori leggere i log del job.
+
+Storico: i run #1 e #2 (13/10/2026) sono falliti per la firma
+(corretta nei commit successivi del branch `fix/ios-config-no-codesign`); dal run #3
+(13/10/2026) gli upload riescono. Al 18/10/2026 l'ultimo run riuscito è il #26
+su `65b92a7` (16/10/2026). Il workflow riuscito conferma l'upload, non
+l'elaborazione di Apple né quale build sia installata sui telefoni: questo si
+verifica in App Store Connect → *TestFlight*.
 
 ### 4.1.1 Pro sviluppatore
 
@@ -193,6 +202,10 @@ sull'app dello store.
 
 ### 4.2 Verifiche su dispositivo
 
+Stato: su un iPhone (TestFlight) l'app si avvia e il microfono sembra
+funzionare (confermato dal titolare); i punti seguenti non risultano
+eseguiti in modo documentato.
+
 1. Avvio: la Home deve comparire (ciclo di vita UIScene, `Info.plist` +
    `SceneDelegate`).
 2. Prima richiesta microfono: compare il testo di `NSMicrophoneUsageDescription`;
@@ -213,20 +226,30 @@ Ogni asset distribuito con l'app deve avere origine e licenza documentate.
 - `assets/soundfonts/intonia_piano_bright.sf2` resta nel repository ma non è incluso
   nell'app (non è dichiarato in `pubspec.yaml`).
 
+- **Librerie native Android** di `flutter_midi_pro`: l'APK include FluidSynth,
+  GLib, libinstpatch e libsndfile (LGPL-2.1) e altre librerie BSD/Apache
+  precompilate, i cui avvisi di licenza **non** sono ancora mostrati
+  nell'app (vedi `RELEASE_CHECKLIST.md` §4.7). Su iOS il plugin usa
+  AVFoundation.
+
 Per aggiungere o sostituire un asset audio: dichiararlo in `pubspec.yaml`,
 conservare la licenza originale in `assets/soundfonts/licenses/`, registrarla in
 `registerThirdPartyLicenses()` e aggiornare i crediti in *Impostazioni → Info*.
 
-## 6. Stato delle verifiche (ottobre 2026)
+## 6. Stato delle verifiche (audit del 18/10/2026, commit `65b92a7`)
 
 | Verifica | Stato |
 |---|---|
-| `dart format`, `flutter analyze`, `flutter test` (Flutter 3.44.3) | Superati localmente e in CI |
-| Build Android (APK release-mode, firma debug) | In CI, scaricabile come artifact |
-| Build Android release | Non eseguita: richiede la upload key |
-| Build iOS | Workflow TestFlight pronto, non ancora eseguito (richiede i secret Apple) |
-| Audio su dispositivi reali | Non eseguito: vedi checklist manuale |
+| `dart format`, `flutter analyze`, `flutter test` (Flutter 3.44.3) | Superati in locale il 18/10/2026 (201 test) e in CI (run #66 su `main`) |
+| Build Android di test (APK release-mode, firma debug, Pro sviluppatore) | Prodotta dalla CI, scaricabile come artifact; **non pubblicabile** |
+| Build Android release (AAB firmato con upload key) | Mai eseguita: richiede la upload key |
+| Build iOS e upload TestFlight | Workflow riuscito dal run #3; ultimo run #26 su `65b92a7` |
+| App installata da TestFlight | Confermato dal titolare su un iPhone (build non registrata) |
+| App provata su Android | Confermato dal titolare su un Samsung (tipo di build non registrato) |
+| Audio su dispositivi reali | Solo avvio e microfono apparentemente funzionante; checklist manuale non eseguita |
 | Licenza SoundFont | Risolta: FluidR3 (MIT), notice incluso nell'app |
+| Licenze librerie native Android | Da completare (avvisi LGPL/BSD non mostrati) |
+| Privacy policy e metadati store | Assenti |
 
 ## 7. Widget della schermata Home
 

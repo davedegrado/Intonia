@@ -7,18 +7,26 @@ microfono **non sono verificabili senza hardware**: eseguire questa checklist
 su almeno un dispositivo Android e un iPhone (idealmente anche un Android di
 fascia bassa e un iPad) prima di ogni rilascio.
 
-Annotare per ogni prova: dispositivo, versione OS, build, esito, note.
+Annotare per ogni prova: dispositivo, versione OS, build, esito, note, nel
+*Registro delle prove* in fondo. Usare la build candidata senza Pro
+sviluppatore quando possibile. Stato complessivo e priorità:
+[`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) §3.
 
 ## Permessi
 
-1. Installazione pulita → *Riconoscimento in tempo reale → Avvia*: compare la
-   richiesta di permesso; concedendolo il tuner parte senza dover premere di
-   nuovo *Avvia*.
-2. Installazione pulita → negare il permesso: il tuner mostra "Permesso
-   microfono negato"; nel Trainer (modalità Allenamento) *Play* mostra il
-   messaggio di errore e lo stato torna "Pronta"; idem nel Test estensione.
+1. Installazione pulita → Home → pulsante microfono (*Avvia ascolto*): compare
+   la richiesta di permesso; concedendolo il riconoscimento parte senza dover
+   premere di nuovo il pulsante.
+2. Installazione pulita → negare il permesso: il fumetto della Home mostra
+   "Permesso microfono negato"; nell'esercizio (modalità Allenamento) *Play*
+   mostra il messaggio di errore e lo stato torna "Pronta"; idem nel Test
+   estensione.
 3. Revocare il permesso dalle impostazioni di sistema con l'app aperta, poi
    tornare all'app e premere *Play*: nessun crash, messaggio di errore.
+3a. Dopo un rifiuto, riattivare il permesso dalle impostazioni di sistema e
+   tornare all'app: Home, esercizio e Test estensione ascoltano di nuovo
+   senza reinstallare né riavviare l'app (su iOS la richiesta non ricompare:
+   il permesso si riattiva solo da *Impostazioni → Intonia → Microfono*).
 
 ## Riproduzione (SoundFont)
 
@@ -65,6 +73,9 @@ esercizi ±45 cent con stabilità 100 ms, test di estensione ±40, cambio al sem
   a ogni consonante.
 - 12f. Nella Home il nome della nota (DO, RE…) è l'elemento principale;
   l'ottava è leggibile ma secondaria.
+- 12g. Stesso esercizio in modalità Ascendente, Discendente e Completo (con e
+  senza "Ripeti la nota di vertice"): le note attese seguono la modalità e
+  ogni nota cantata viene convalidata nell'ordine giusto, anche in discesa.
 
 ## Allenamento e ciclo di vita
 
@@ -92,3 +103,13 @@ esercizi ±45 cent con stabilità 100 ms, test di estensione ±40, cambio al sem
 20. Dieci minuti di allenamento continuo: nessun rallentamento dell'interfaccia,
     nessun riscaldamento anomalo; annotare la latenza percepita tra voce e
     feedback.
+
+## Registro delle prove
+
+Aggiungere una riga per ogni sessione di prova. Indicare i numeri della
+checklist eseguiti; "—" se non registrato.
+
+| Data | Dispositivo / OS | Build | Prove | Esito | Note |
+|---|---|---|---|---|---|
+| — (prima del 18/10/2026) | iPhone (modello e iOS non registrati) | TestFlight, numero non registrato | Avvio, uso del microfono | App avviata, microfono apparentemente funzionante | Confermato dal titolare; accuratezza non verificata |
+| — (prima del 18/10/2026) | Samsung Android (modello e versione non registrati) | Non registrata | Avvio, uso del microfono | App avviata, microfono apparentemente funzionante | Confermato dal titolare; accuratezza non verificata |
