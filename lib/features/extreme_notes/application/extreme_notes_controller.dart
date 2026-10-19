@@ -50,7 +50,9 @@ class ExtremeNotesController extends Notifier<ExtremeNotesState> {
   late MicrophonePitchService _microphone;
   StreamSubscription<PitchDetectionResult>? _subscription;
   ExtremeNotesTracker _tracker = ExtremeNotesTracker();
-  final _display = PitchStabilizer();
+
+  /// Validazione temporale dei frame (stessa di esercizi e accordatore).
+  final _validator = PitchStabilizer();
   DateTime? _startedAt;
 
   /// Incrementato a ogni avvio, arresto e dispose (avvii superati).
@@ -77,7 +79,7 @@ class ExtremeNotesController extends Notifier<ExtremeNotesState> {
     }
     final generation = ++_generation;
     _tracker = ExtremeNotesTracker();
-    _display.reset();
+    _validator.reset();
     _startedAt = _now;
     state = const ExtremeNotesState(phase: ExtremeNotesPhase.listening);
     try {
@@ -112,8 +114,11 @@ class ExtremeNotesController extends Notifier<ExtremeNotesState> {
       return;
     }
     final now = _now;
-    _tracker.add(detection);
-    final shown = _display.process(detection, now);
+    // Le note estreme si raccolgono dai frame validati (verifica dell'ottava
+    // nel rilevatore e conferma dei salti d'ottava nello stabilizzatore),
+    // non da quelli grezzi.
+    final shown = _validator.process(detection, now);
+    _tracker.add(shown);
     state = ExtremeNotesState(
       phase: ExtremeNotesPhase.listening,
       lowest: _tracker.lowest,

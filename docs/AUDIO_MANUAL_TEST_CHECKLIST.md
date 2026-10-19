@@ -52,6 +52,11 @@ sviluppatore quando possibile. Stato complessivo e priorità:
     non compaiano note fantasma.
 12. Errori d'ottava: cantare la nota giusta un'ottava sopra/sotto → segnata
     come errore (non corretta).
+13. Rilevamento dell'ottava: cantare LA4 su vocali chiare e scure ("i", "a",
+    "u") e con voce soffiata → resta LA4, mai LA5 o LA3 (né nelle note
+    estreme). Un salto reale LA4 → LA5 → LA4 viene seguito entro circa un
+    decimo di secondo. In stanza rumorosa le note incerte non compaiono
+    invece di comparire all'ottava sbagliata.
 
 ### Voce reale: tolleranza e stabilità
 
