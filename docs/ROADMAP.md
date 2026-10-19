@@ -39,8 +39,9 @@ verifica esterna · `[?]` non determinabile.
 
 **Apertura al pubblico**
 - [x] Localizzazione inglese (app e widget, `docs/LOCALIZATION.md`).
-- [ ] Onboarding con obiettivo: esiste la *Guida di Intonia* (tutorial delle
-  funzioni, `lib/features/guide/`), ma nessuna scelta di obiettivo.
+- [ ] Onboarding con obiettivo: esiste la *Guida di Intonia* (tutorial con
+  Intonia che accompagna nelle sezioni ed evidenzia gli elementi,
+  `lib/features/guide/`, `guide_test`), ma nessuna scelta di obiettivo.
 - [ ] Percorsi guidati per principianti: non esistono. Primo passo:
   [x] *Allenamento del giorno* (sessione pronta da 5/10/15 minuti con gli
   esercizi esistenti, selezione locale e deterministica;

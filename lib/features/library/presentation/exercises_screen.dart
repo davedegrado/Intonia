@@ -11,6 +11,7 @@ import '../../../l10n/exercise_l10n.dart';
 import '../../access/application/access_providers.dart';
 import '../../access/domain/entitlement.dart';
 import '../application/exercise_providers.dart';
+import '../../guide/guide.dart';
 
 /// Catalogo degli esercizi strutturati: "Crea la tua sequenza", le sequenze
 /// salvate e le categorie predefinite.
@@ -51,11 +52,22 @@ class ExercisesScreen extends ConsumerWidget {
               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
           for (final (index, category) in categories.indexed)
-            _CategoryAccordion(
-              category: category,
-              exercises: sections[category]!,
-              accent: decor.accent(index),
-            ),
+            if (index == 0)
+              // La guida evidenzia la prima categoria come esempio.
+              GuideAnchor(
+                target: GuideTarget.exerciseCategories,
+                child: _CategoryAccordion(
+                  category: category,
+                  exercises: sections[category]!,
+                  accent: decor.accent(index),
+                ),
+              )
+            else
+              _CategoryAccordion(
+                category: category,
+                exercises: sections[category]!,
+                accent: decor.accent(index),
+              ),
         ],
       ),
     );
@@ -100,9 +112,12 @@ class _CustomSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _CreateSequenceCard(
-          showPro: !canCreate,
-          onTap: () => _chooseStart(context, ref),
+        GuideAnchor(
+          target: GuideTarget.customSequences,
+          child: _CreateSequenceCard(
+            showPro: !canCreate,
+            onTap: () => _chooseStart(context, ref),
+          ),
         ),
         if (exercises.isNotEmpty) ...[
           const SizedBox(height: 16),

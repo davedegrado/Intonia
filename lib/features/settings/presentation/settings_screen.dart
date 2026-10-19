@@ -29,56 +29,69 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             Text(l10n.languageSectionTitle, style: sectionStyle),
             const SizedBox(height: 12),
-            SegmentedButton<String>(
-              key: const ValueKey('settings-language'),
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(value: 'it', label: Text(l10n.languageItalian)),
-                ButtonSegment(value: 'en', label: Text(l10n.languageEnglish)),
-              ],
-              selected: {language},
-              onSelectionChanged: (selection) =>
-                  ref.read(languageProvider.notifier).setLanguage(selection.first),
+            GuideAnchor(
+              target: GuideTarget.settingsLanguage,
+              child: SegmentedButton<String>(
+                key: const ValueKey('settings-language'),
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(value: 'it', label: Text(l10n.languageItalian)),
+                  ButtonSegment(value: 'en', label: Text(l10n.languageEnglish)),
+                ],
+                selected: {language},
+                onSelectionChanged: (selection) =>
+                    ref.read(languageProvider.notifier).setLanguage(selection.first),
+              ),
             ),
             const SizedBox(height: 8),
             Text(l10n.languageHint, style: theme.textTheme.bodySmall),
             const SizedBox(height: 28),
             Text(l10n.settingsAppearance, style: sectionStyle),
             const SizedBox(height: 12),
-            SegmentedButton<AppThemeSetting>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(value: AppThemeSetting.system, label: Text(l10n.themeSystem)),
-                ButtonSegment(value: AppThemeSetting.light, label: Text(l10n.themeLight)),
-                ButtonSegment(value: AppThemeSetting.dark, label: Text(l10n.themeDark)),
-                ButtonSegment(value: AppThemeSetting.neon, label: Text(l10n.themeNeon)),
-              ],
-              selected: {themeSetting},
-              onSelectionChanged: (selection) =>
-                  ref.read(themeSettingProvider.notifier).setThemeSetting(selection.first),
+            GuideAnchor(
+              target: GuideTarget.settingsTheme,
+              child: SegmentedButton<AppThemeSetting>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(value: AppThemeSetting.system, label: Text(l10n.themeSystem)),
+                  ButtonSegment(value: AppThemeSetting.light, label: Text(l10n.themeLight)),
+                  ButtonSegment(value: AppThemeSetting.dark, label: Text(l10n.themeDark)),
+                  ButtonSegment(value: AppThemeSetting.neon, label: Text(l10n.themeNeon)),
+                ],
+                selected: {themeSetting},
+                onSelectionChanged: (selection) =>
+                    ref.read(themeSettingProvider.notifier).setThemeSetting(selection.first),
+              ),
             ),
             const SizedBox(height: 28),
             Text(l10n.settingsNotation, style: sectionStyle),
             const SizedBox(height: 12),
-            SegmentedButton<NoteNotation>(
-              key: const ValueKey('settings-notation'),
-              segments: [
-                ButtonSegment(value: NoteNotation.italian, label: Text(l10n.notationItalian)),
-                ButtonSegment(value: NoteNotation.english, label: Text(l10n.notationInternational)),
-              ],
-              selected: {notation},
-              onSelectionChanged: (selection) =>
-                  ref.read(notationProvider.notifier).setNotation(selection.first),
+            GuideAnchor(
+              target: GuideTarget.settingsNotation,
+              child: SegmentedButton<NoteNotation>(
+                key: const ValueKey('settings-notation'),
+                segments: [
+                  ButtonSegment(value: NoteNotation.italian, label: Text(l10n.notationItalian)),
+                  ButtonSegment(
+                      value: NoteNotation.english, label: Text(l10n.notationInternational)),
+                ],
+                selected: {notation},
+                onSelectionChanged: (selection) =>
+                    ref.read(notationProvider.notifier).setNotation(selection.first),
+              ),
             ),
             const SizedBox(height: 28),
-            ListTile(
-              key: const ValueKey('settings-guide'),
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.school_outlined),
-              title: Text(l10n.guideTitle),
-              subtitle: Text(l10n.guideOpenHint),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => showGuide(context, appGuideSteps(l10n)),
+            GuideAnchor(
+              target: GuideTarget.settingsGuide,
+              child: ListTile(
+                key: const ValueKey('settings-guide'),
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.school_outlined),
+                title: Text(l10n.guideTitle),
+                subtitle: Text(l10n.guideOpenHint),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => showGuide(context, appGuideSteps(l10n)),
+              ),
             ),
             const SizedBox(height: 20),
             Text(l10n.settingsInfo, style: sectionStyle),

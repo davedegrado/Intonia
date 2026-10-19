@@ -1198,36 +1198,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get guideHome =>
-      'Tap the microphone and sing or play a note: I\'ll tell you which note it is and how many cents off you are. At the top you\'ll find your streak and your exercise charges; at the bottom, quick access to note names, theme and settings.';
-
-  @override
-  String get guideExercises =>
-      'Pick a category (triads, arpeggios, scales and more), open an exercise and press Play to train with your voice. Each session uses one charge. With Create your sequence you can write your own (Intonia Pro).';
-
-  @override
-  String get guideExerciseSettingsTitle => 'Exercise settings';
-
-  @override
-  String get guideExerciseSettings =>
-      'In an exercise you choose the key and octave, the mode (Ascending, Descending or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.';
-
-  @override
-  String get guideRange =>
-      'The range test starts from a comfortable note, goes down to your lowest note and then up to your highest. The result shows the two extreme notes and the span in octaves and semitones; past tests are listed here and in your profile.';
-
-  @override
-  String get guideProfile =>
-      'Your streak, sessions, total minutes, average accuracy, vocal range, best and worst notes, range tests and your recent sessions with key and octave.';
-
-  @override
-  String get guideSettingsTitle => 'Settings';
-
-  @override
-  String get guideSettings =>
-      'Choose the language, the theme (System, Light, Dark or Neon) and the note names (C D E or DO RE MI). You can reopen this guide from here at any time.';
-
-  @override
   String get guideKey => 'The note the exercise starts from.';
 
   @override
@@ -1767,4 +1737,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get missionWeeklyWorkouts2 => 'Complete 2 daily workouts';
+
+  @override
+  String get guideMicTitle => 'The microphone';
+
+  @override
+  String get guideMicText =>
+      'Hi, I\'m Intonia! Tap here and sing or play a note: I\'ll tell you which one it is and how many cents off you are.';
+
+  @override
+  String get guideWorkoutText =>
+      'A ready-made session with the exercises you know: open this card, choose 5, 10 or 15 minutes and start.';
+
+  @override
+  String get guideStatusTitle => 'Streak and charges';
+
+  @override
+  String get guideStatusText =>
+      'Here you see how many days in a row you\'ve practised and your exercise charges: each session uses one, and they refill over time.';
+
+  @override
+  String get guideCategoriesText =>
+      'Exercises are grouped by category: open one, pick an exercise and press Play to train with your voice.';
+
+  @override
+  String get guideCustomText =>
+      'Here you compose your own sequences, from scratch or starting from an exercise (Intonia Pro).';
+
+  @override
+  String get guideRangeText =>
+      'Find the lowest and highest notes you can sing. Your results stay here and in your profile.';
+
+  @override
+  String get guideTessituraText =>
+      'The comfort zone test looks for the part of your voice where singing feels easy.';
+
+  @override
+  String get guideStatsTitle => 'Your statistics';
+
+  @override
+  String get guideStatsText =>
+      'Streak, sessions, minutes and average accuracy: everything updates as you practise.';
+
+  @override
+  String get guideAchievementsText =>
+      'Today\'s and this week\'s missions, plus badges to unlock along the way.';
+
+  @override
+  String get guideHistoryTitle => 'History';
+
+  @override
+  String get guideHistoryText => 'Your latest sessions with exercise, key, octave and result.';
+
+  @override
+  String get guideLanguageText => 'Italian or English: by default I use your phone\'s language.';
+
+  @override
+  String get guideThemeText => 'System, Light, Dark or Neon: choose the look you like best.';
+
+  @override
+  String get guideNotationText => 'C D E or DO RE MI: changes the note names throughout the app.';
+
+  @override
+  String get guideReopenText =>
+      'You can reopen this guide from here whenever you like. Enjoy singing!';
+
+  @override
+  String get guideTargetUnavailable =>
+      'You\'ll find it here once you\'ve used this part of the app.';
 }

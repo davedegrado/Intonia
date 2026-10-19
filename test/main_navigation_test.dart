@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/app/app_theme.dart';
+import 'package:vocal_scale_trainer/app/status_chips.dart';
 import 'package:vocal_scale_trainer/app/vocal_scale_trainer_app.dart';
 import 'package:vocal_scale_trainer/core/music/exercise.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
@@ -18,6 +19,7 @@ import 'package:vocal_scale_trainer/features/profile/application/history_provide
 import 'package:vocal_scale_trainer/features/range/application/range_providers.dart';
 import 'package:vocal_scale_trainer/features/range/presentation/range_test_screen.dart';
 import 'package:vocal_scale_trainer/features/settings/application/settings_providers.dart';
+import 'package:vocal_scale_trainer/features/settings/presentation/settings_screen.dart';
 import 'package:vocal_scale_trainer/features/tessitura/application/tessitura_providers.dart';
 import 'package:vocal_scale_trainer/features/tessitura/domain/tessitura.dart';
 import 'package:vocal_scale_trainer/features/tessitura/presentation/tessitura_test_screen.dart';
@@ -538,47 +540,180 @@ void main() {
     expect(find.textContaining('Ottava'), findsOneWidget, reason: 'la sessione vecchia non ne ha');
   });
 
-  testWidgets('first launch: the mascot guide shows once, can be navigated and skipped',
+  /// Rettangolo dell'elemento evidenziato dalla guida.
+  Rect highlight(WidgetTester tester) =>
+      tester.getRect(find.byKey(const ValueKey('guide-highlight')));
+
+  /// L'evidenziazione circonda l'elemento [key] (con un piccolo margine).
+  void expectHighlighted(WidgetTester tester, Finder target) {
+    final rect = tester.getRect(target);
+    final hole = highlight(tester);
+    expect(hole.inflate(1).contains(rect.topLeft), isTrue, reason: '$hole / $rect');
+    expect(hole.inflate(1).contains(rect.bottomRight), isTrue, reason: '$hole / $rect');
+    // Al massimo l'elemento con la sua cornice (es. l'anello del microfono).
+    expect(hole.width, lessThan(rect.width * 1.6 + 16));
+  }
+
+  /// Il riquadro di Intonia è dentro lo schermo e non copre l'elemento.
+  void expectCardBeside(WidgetTester tester) {
+    final card = tester.getRect(find.byKey(const ValueKey('guide-sheet')));
+    final screen = Offset.zero & tester.view.physicalSize / tester.view.devicePixelRatio;
+    expect(screen.contains(card.topLeft) && screen.contains(card.bottomRight - const Offset(1, 1)),
+        isTrue,
+        reason: '$card');
+    if (find.byKey(const ValueKey('guide-highlight')).evaluate().isNotEmpty) {
+      expect(card.overlaps(highlight(tester).deflate(2)), isFalse,
+          reason: 'il riquadro non copre l\'elemento');
+    }
+  }
+
+  Future<void> guideNext(WidgetTester tester) async {
+    await tester.tap(find.byKey(const ValueKey('guide-next')));
+    // Cambio di sezione, transizione, scorrimento e misura dell'elemento.
+    await _frames(tester, 12);
+  }
+
+  testWidgets('first launch: Intonia highlights the microphone, moves step by step, can be skipped',
       (tester) async {
     final app = await _launch(tester, guideSeen: false);
+    await _frames(tester, 10);
     expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
-    expect(find.text('1 di 6'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('guide-next')));
-    await _frames(tester, 3);
-    expect(find.text('2 di 6'), findsOneWidget);
+    expect(find.text('1 di 14'), findsOneWidget);
+    expect(find.text('Il microfono'), findsOneWidget);
+    expectHighlighted(tester, find.byKey(const ValueKey('home-mic')));
+    expectCardBeside(tester);
+
+    await guideNext(tester);
+    expect(find.text('2 di 14'), findsOneWidget);
+    expectHighlighted(tester, find.byKey(const ValueKey('daily-workout-card')));
+    expectCardBeside(tester);
+
     await tester.tap(find.byKey(const ValueKey('guide-back')));
+    await _frames(tester, 5);
+    expect(find.text('1 di 14'), findsOneWidget);
+    expectHighlighted(tester, find.byKey(const ValueKey('home-mic')));
+
+    // Durante la guida l'interfaccia sotto non risponde (niente stati incoerenti).
+    await tester.tap(find.byKey(const ValueKey('home-mic')), warnIfMissed: false);
     await _frames(tester, 3);
-    expect(find.text('1 di 6'), findsOneWidget);
+    expect(app.mic.isRecording, isFalse);
+
     await tester.tap(find.byKey(const ValueKey('guide-skip')));
     await _frames(tester, 5);
     expect(find.byKey(const ValueKey('guide-sheet')), findsNothing);
+    expect(find.byKey(const ValueKey('guide-scrim')), findsNothing, reason: 'nessun overlay resta');
+    expect(find.byKey(const ValueKey('guide-highlight')), findsNothing);
     expect(app.settings.guideSeen, isTrue);
     expect(app.settings.theme, AppThemeSetting.dark, reason: 'altre preferenze intatte');
+
+    // Dopo la guida l'app risponde di nuovo.
+    await _openTab(tester, 'Esercizi');
+    expect(find.byType(ExercisesScreen).hitTestable(), findsOneWidget);
   });
 
-  testWidgets('the guide does not come back once seen and reopens from Settings', (tester) async {
+  testWidgets('the guide visits every section, highlights its elements and closes cleanly',
+      (tester) async {
     await _launch(tester);
-    expect(find.byKey(const ValueKey('guide-sheet')), findsNothing);
+    expect(find.byKey(const ValueKey('guide-sheet')), findsNothing, reason: 'già vista');
     await _openTab(tester, 'Profilo');
     await tester.tap(find.byKey(const ValueKey('profile-settings')));
     await _frames(tester, 5);
     await tester.scrollUntilVisible(find.byKey(const ValueKey('settings-guide')), 150,
         scrollable: find.byType(Scrollable).first);
     await tester.tap(find.byKey(const ValueKey('settings-guide')));
+    await _frames(tester, 8);
+
+    // Si parte dalla Home anche se la guida è aperta dalle Impostazioni.
+    expect(find.text('1 di 14'), findsOneWidget);
+    expect(find.byType(SettingsScreen), findsNothing);
+    expectHighlighted(tester, find.byKey(const ValueKey('home-mic')));
+
+    await guideNext(tester); // allenamento del giorno
+    await guideNext(tester); // serie e cariche
+    // Serie e cariche insieme.
+    expectHighlighted(
+        tester, find.descendant(of: find.byType(HomeScreen), matching: find.byType(StatusChips)));
+
+    await guideNext(tester); // categorie, in Esercizi
+    expect(tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex, 1);
+    expectHighlighted(
+        tester, find.ancestor(of: find.text('Triadi'), matching: find.byType(Card)).first);
+    expectCardBeside(tester);
+    await guideNext(tester); // sequenze personalizzate
+    expect(find.text('5 di 14'), findsOneWidget);
+
+    await guideNext(tester); // test di estensione
+    expectHighlighted(tester, find.byKey(const ValueKey('range-start')));
+    await guideNext(tester); // zona comoda (più in basso: la pagina scorre)
+    expectHighlighted(tester, find.byKey(const ValueKey('tessitura-open')));
+    expectCardBeside(tester);
+
+    await guideNext(tester); // statistiche: profilo vuoto, nessun elemento
+    expect(find.text('8 di 14'), findsOneWidget);
+    expect(find.byKey(const ValueKey('guide-no-target')), findsOneWidget);
+    expect(find.byKey(const ValueKey('guide-highlight')), findsNothing);
+    await guideNext(tester); // obiettivi e badge (c'è anche a profilo vuoto)
+    expectHighlighted(tester, find.byKey(const ValueKey('achievements-card')));
+    await guideNext(tester); // cronologia: non ancora
+    expect(find.byKey(const ValueKey('guide-no-target')), findsOneWidget);
+
+    await guideNext(tester); // lingua, nelle Impostazioni
+    expect(find.byType(SettingsScreen), findsOneWidget);
+    expectHighlighted(tester, find.byKey(const ValueKey('settings-language')));
+    await guideNext(tester); // tema
+    await guideNext(tester); // notazione
+    expectHighlighted(tester, find.byKey(const ValueKey('settings-notation')));
+    expectCardBeside(tester);
+
+    // Indietro dalle Impostazioni torna alla sezione precedente.
+    await tester.tap(find.byKey(const ValueKey('guide-back')));
     await _frames(tester, 5);
-    expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
-    for (var i = 0; i < 5; i++) {
-      await tester.tap(find.byKey(const ValueKey('guide-next')));
-      await _frames(tester, 2);
+    await tester.tap(find.byKey(const ValueKey('guide-back')));
+    await _frames(tester, 5);
+    await tester.tap(find.byKey(const ValueKey('guide-back')));
+    await _frames(tester, 8);
+    expect(find.text('10 di 14'), findsOneWidget);
+    expect(find.byType(SettingsScreen), findsNothing);
+
+    for (var i = 0; i < 4; i++) {
+      await guideNext(tester);
     }
-    expect(find.text('6 di 6'), findsOneWidget);
+    expect(find.text('14 di 14'), findsOneWidget);
     expect(find.byKey(const ValueKey('guide-skip')), findsNothing);
-    await tester.tap(find.byKey(const ValueKey('guide-next')));
-    await _frames(tester, 5);
+    expectHighlighted(tester, find.byKey(const ValueKey('settings-guide')));
+    await guideNext(tester);
     expect(find.byKey(const ValueKey('guide-sheet')), findsNothing);
+    expect(find.byKey(const ValueKey('guide-scrim')), findsNothing);
+    expect(find.byType(SettingsScreen).hitTestable(), findsOneWidget);
   });
 
-  testWidgets('the exercise guide explains only the controls on screen', (tester) async {
+  testWidgets('closing the guide on any step leaves no overlay behind', (tester) async {
+    await _launch(tester, guideSeen: false);
+    await _frames(tester, 5);
+    await guideNext(tester);
+    await guideNext(tester);
+    await guideNext(tester); // in Esercizi
+    await tester.tap(find.byKey(const ValueKey('guide-close')));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('guide-scrim')), findsNothing);
+    expect(find.byKey(const ValueKey('guide-highlight')), findsNothing);
+    await tester.tap(_tab('Home'));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('home-mic')).hitTestable(), findsOneWidget);
+  });
+
+  testWidgets('on a small screen the explanation stays on screen and off the element',
+      (tester) async {
+    await _launch(tester, guideSeen: false, size: const Size(320, 568));
+    await _frames(tester, 10);
+    for (var i = 0; i < 6; i++) {
+      expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
+      expectCardBeside(tester);
+      await guideNext(tester);
+    }
+  });
+
+  testWidgets('the exercise guide highlights only the controls on screen', (tester) async {
     await _launch(tester);
     await _openTab(tester, 'Esercizi');
     await tester.tap(find.text('Triadi'));
@@ -590,8 +725,15 @@ void main() {
     await _frames(tester, 5);
     // Tonalità, ottava, modalità e vertice (la triade in Completo ha un vertice).
     expect(find.text('1 di 4'), findsOneWidget);
+    expect(find.byType(TrainerScreen), findsOneWidget, reason: 'la guida resta sull\'esercizio');
+    await guideNext(tester);
+    await guideNext(tester);
+    expectHighlighted(tester, find.byKey(const ValueKey('trainer-direction')));
+    await guideNext(tester);
+    expectHighlighted(tester, find.byKey(const ValueKey('trainer-repeat-top')));
     await tester.tap(find.byKey(const ValueKey('guide-close')));
     await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('guide-scrim')), findsNothing);
 
     // In modalità Ascendente il vertice non si ripete: niente spiegazione.
     await tester.tap(find.text('Ascendente'));
