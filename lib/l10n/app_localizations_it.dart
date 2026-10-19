@@ -1819,7 +1819,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get guideTapHint => 'Tocca il punto evidenziato per continuare';
+  String get guideTapHint => 'Tocca per continuare';
 
   @override
   String get guideOpenCategoryTitle => 'Apri una categoria';

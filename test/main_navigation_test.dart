@@ -544,9 +544,11 @@ void main() {
   Rect highlight(WidgetTester tester) =>
       tester.getRect(find.byKey(const ValueKey('guide-highlight')));
 
-  /// L'evidenziazione circonda l'elemento [key] (con un piccolo margine).
+  /// L'evidenziazione circonda l'elemento [key] (con un piccolo margine),
+  /// almeno la parte che non tocca i bordi dello schermo.
   void expectHighlighted(WidgetTester tester, Finder target) {
-    final rect = tester.getRect(target);
+    final screen = Offset.zero & tester.view.physicalSize / tester.view.devicePixelRatio;
+    final rect = tester.getRect(target).intersect(screen.deflate(4));
     final hole = highlight(tester);
     expect(hole.inflate(1).contains(rect.topLeft), isTrue, reason: '$hole / $rect');
     expect(hole.inflate(1).contains(rect.bottomRight), isTrue, reason: '$hole / $rect');
@@ -572,6 +574,12 @@ void main() {
       }
     }
     if (find.byKey(const ValueKey('guide-highlight')).evaluate().isNotEmpty) {
+      // L'anello dell'evidenziazione non esce dallo schermo.
+      final hole = highlight(tester);
+      expect(
+          screen.contains(hole.topLeft) && screen.contains(hole.bottomRight - const Offset(1, 1)),
+          isTrue,
+          reason: 'evidenziazione $hole fuori dallo schermo');
       expect(card.overlaps(highlight(tester).deflate(2)), isFalse,
           reason: 'il riquadro non copre l\'elemento');
     }
@@ -629,6 +637,11 @@ void main() {
   Future<void> guideTap(WidgetTester tester, Finder target) async {
     expect(find.byKey(const ValueKey('guide-next')), findsNothing, reason: 'si prosegue toccando');
     expect(find.byKey(const ValueKey('guide-tap-hint')), findsOneWidget);
+    // Il suggerimento sta su una riga.
+    final hint = find.descendant(
+        of: find.byKey(const ValueKey('guide-tap-hint')),
+        matching: find.text('Tocca per continuare'));
+    expect(tester.getSize(hint).height, lessThan(30));
     expectHighlighted(tester, target);
     expectCardBeside(tester);
     await tester.tap(target);
@@ -662,6 +675,7 @@ void main() {
     await guideNext(tester); // serie e cariche
     expectHighlighted(
         tester, find.descendant(of: find.byType(HomeScreen), matching: find.byType(StatusChips)));
+    expectCardBeside(tester); // chip vicino al bordo: l'anello resta nello schermo
 
     await guideNext(tester); // "Vai a Esercizi": tocca l'utente
     expect(find.text('Vai a Esercizi'), findsOneWidget);
@@ -706,6 +720,7 @@ void main() {
     expectCardBeside(tester);
     await guideNext(tester); // impostazioni avanzate
     expect(find.text('14 di 28'), findsOneWidget);
+    expectCardBeside(tester); // icona nell'angolo in alto a destra
     await guideNext(tester); // il ? per rivederle
     expectHighlighted(tester, find.byKey(const ValueKey('trainer-guide')));
     await guideNext(tester); // torna agli esercizi: tocca l'utente

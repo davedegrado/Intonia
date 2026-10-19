@@ -105,6 +105,19 @@ void main() {
     });
   });
 
+  test('the highlight keeps a margin around the element but never leaves the screen', () {
+    const screen = Size(390, 844);
+    // Al centro: 6 punti di margine attorno all'elemento.
+    expect(fitHole(const Rect.fromLTWH(100, 300, 80, 40), screen),
+        const Rect.fromLTWH(94, 294, 92, 52));
+    // Nell'angolo in alto a destra: tagliato a 4 punti dai bordi.
+    final corner = fitHole(const Rect.fromLTRB(340, 50, 388, 98), screen);
+    expect(corner.right, 386);
+    expect(corner.left, 334);
+    expect((Offset.zero & screen).deflate(4).contains(corner.bottomRight - const Offset(1, 1)),
+        isTrue);
+  });
+
   group('GuideTourController', () {
     test('next, back and close; the future completes when the guide ends', () async {
       final container = ProviderContainer();

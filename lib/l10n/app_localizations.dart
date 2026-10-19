@@ -3084,7 +3084,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideTapHint.
   ///
   /// In en, this message translates to:
-  /// **'Tap the highlighted spot to continue'**
+  /// **'Tap to continue'**
   String get guideTapHint;
 
   /// No description provided for @guideOpenCategoryTitle.

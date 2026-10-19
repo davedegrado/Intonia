@@ -1110,7 +1110,7 @@
       }
     }
   },
-  "guideTapHint": "Tap the highlighted spot to continue",
+  "guideTapHint": "Tap to continue",
   "guideOpenCategoryTitle": "Open a category",
   "guideOpenCategoryText": "Tap the category to see its exercises.",
   "guideOpenExerciseTitle": "Open an exercise",

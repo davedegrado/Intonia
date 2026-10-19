@@ -512,7 +512,8 @@ class _TourOverlay extends ConsumerWidget {
     final decor = context.decor;
     final padding = MediaQuery.paddingOf(context);
     final ring = decor.ambient ? decor.heroBorder : colors.primary;
-    final hole = target?.inflate(6);
+    final target = this.target;
+    final hole = target == null ? null : fitHole(target, MediaQuery.sizeOf(context));
     final reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
     return _PassThroughHole(
@@ -570,6 +571,17 @@ class _TourOverlay extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Area evidenziata: l'elemento con un piccolo margine, ma sempre dentro lo
+/// schermo, così l'anello non viene tagliato dai bordi (es. i chip in alto a
+/// destra o un'icona nell'angolo).
+@visibleForTesting
+Rect fitHole(Rect target, Size screen) {
+  const inset = 4.0;
+  final bounds = (Offset.zero & screen).deflate(inset);
+  final hole = target.inflate(6).intersect(bounds);
+  return hole.isEmpty ? target : hole;
 }
 
 /// Lascia passare i tocchi dentro [hole] all'app sotto la guida.
@@ -871,12 +883,19 @@ class _GuideCard extends ConsumerWidget {
                             children: [
                               Icon(Icons.touch_app_rounded, color: colors.primary),
                               const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  l10n.guideTapHint,
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                    color: colors.primary,
-                                    fontWeight: FontWeight.w700,
+                              // Sempre su una riga: se manca spazio si rimpicciolisce.
+                              Flexible(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    l10n.guideTapHint,
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    style: theme.textTheme.labelLarge?.copyWith(
+                                      color: colors.primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
