@@ -18,6 +18,7 @@ import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../tuner/application/tuner_controller.dart';
+import '../../workout/presentation/daily_workout_card.dart';
 
 /// Home: la mascotte e il riconoscimento delle note in tempo reale.
 /// Il microfono parte solo col pulsante e si ferma su stop, cambio di
@@ -128,12 +129,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         bottom: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Tutto sta in una schermata: fumetto, scritta, nota e scorciatoie
-            // hanno altezza fissa, mascotte e microfono si prendono lo spazio
-            // che resta. Solo su schermi minuscoli la pagina scorre.
-            const minHeight = 460.0;
+            // Tutto sta in una schermata: fumetto, scritta, nota, allenamento
+            // e scorciatoie hanno altezza fissa, mascotte e microfono si
+            // prendono lo spazio che resta. Solo se non resta posto per una
+            // mascotte piccola (schermi minuscoli o testo molto grande) la
+            // pagina scorre invece di andare in overflow.
+            final t = MediaQuery.textScalerOf(context).scale(1);
+            const minMascot = 60.0;
+            final fixed = 41.6 * t +
+                38 + // fumetto (due righe) e punta
+                30 * t +
+                12 + // "Avvia ascolto"
+                _NoteCard.height +
+                math.max(38.0, 36 * t) +
+                12 + // allenamento del giorno
+                32 * t +
+                48 + // scorciatoie
+                16 +
+                16 +
+                16; // spaziature e margini
+            double micFor(double h) => (h * 0.13).clamp(60.0, 120.0);
+            final minHeight = fixed + micFor(constraints.maxHeight) * 1.28 + minMascot;
             final height = math.max(constraints.maxHeight, minHeight);
-            final micSize = (height * 0.13).clamp(64.0, 120.0);
+            final micSize = micFor(height);
             final labelStyle = theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800);
             final labelHeight =
                 MediaQuery.textScalerOf(context).scale(labelStyle?.fontSize ?? 22) * 1.3;
@@ -147,7 +165,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     Expanded(
                       child: LayoutBuilder(
                         builder: (context, box) {
-                          final mascotSize = math.min(box.maxHeight - 8, 270.0).clamp(60.0, 270.0);
+                          final mascotSize = math.min(box.maxHeight - 8, 270.0);
+                          if (mascotSize < 32) {
+                            return const SizedBox.shrink();
+                          }
                           return Center(
                             child: MascotStage(
                               size: mascotSize,
@@ -189,6 +210,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     ),
                     const SizedBox(height: 10),
                     _NoteCard(detection: hasPitch ? detection : _lastNote, live: hasPitch),
+                    const SizedBox(height: 8),
+                    const DailyWorkoutCard(),
                     const SizedBox(height: 8),
                     const _QuickActions(),
                   ],
@@ -459,6 +482,8 @@ class _MicButtonState extends State<_MicButton> with SingleTickerProviderStateMi
 class _NoteCard extends ConsumerWidget {
   const _NoteCard({required this.detection, required this.live});
 
+  static const height = 76.0;
+
   final PitchDetectionResult? detection;
   final bool live;
 
@@ -472,7 +497,7 @@ class _NoteCard extends ConsumerWidget {
     final detection = this.detection;
 
     return SizedBox(
-      height: 84,
+      height: height,
       child: Card(
         key: const ValueKey('home-note-card'),
         child: Padding(

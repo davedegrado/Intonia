@@ -19,6 +19,9 @@ import 'package:vocal_scale_trainer/features/settings/application/settings_provi
 import 'package:vocal_scale_trainer/features/tessitura/application/tessitura_providers.dart';
 import 'package:vocal_scale_trainer/features/tessitura/domain/tessitura.dart';
 import 'package:vocal_scale_trainer/features/tessitura/presentation/tessitura_test_screen.dart';
+import 'package:vocal_scale_trainer/features/workout/application/workout_controller.dart';
+import 'package:vocal_scale_trainer/features/workout/domain/daily_workout.dart';
+import 'package:vocal_scale_trainer/features/workout/presentation/workout_screen.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/controllers/trainer_controller.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/screens/trainer_screen.dart';
 import 'package:vocal_scale_trainer/features/tuner/application/tuner_controller.dart';
@@ -92,6 +95,11 @@ class _MemorySettings extends AppSettingsRepository {
   Future<void> saveNoiseThreshold(double threshold) async {}
   // La guida del primo avvio è già stata vista, salvo nei test dedicati.
   bool guideSeen = true;
+  int? workoutMinutes;
+  @override
+  Future<int?> loadWorkoutMinutes() async => workoutMinutes;
+  @override
+  Future<void> saveWorkoutMinutes(int minutes) async => workoutMinutes = minutes;
   @override
   Future<bool?> loadGuideSeen() async => guideSeen;
   @override
@@ -116,6 +124,7 @@ class _App {
   _App(this.mic);
   final FakeMicrophonePitchService mic;
   final settings = _MemorySettings();
+  final workouts = _MemoryList<WorkoutRecord>([]);
 }
 
 /// Avvia l'app completa (splash compreso) con archivi in memoria.
@@ -144,6 +153,7 @@ Future<_App> _launch(
       sessionHistoryRepositoryProvider.overrideWithValue(_MemorySessions([...sessions])),
       rangeHistoryRepositoryProvider.overrideWithValue(_MemoryRanges([...ranges])),
       tessituraRepositoryProvider.overrideWithValue(_MemoryList([...tessitura])),
+      workoutRepositoryProvider.overrideWithValue(app.workouts),
       customExerciseRepositoryProvider.overrideWithValue(_MemoryCustom()),
       appSettingsRepositoryProvider.overrideWithValue(app.settings),
       deviceLocaleProvider.overrideWithValue(device),
@@ -349,6 +359,40 @@ void main() {
     expect(find.byType(TessituraTestScreen), findsOneWidget);
     expect(find.byKey(const ValueKey('tessitura-start')), findsOneWidget);
     expect(find.textContaining('non una classificazione della voce'), findsOneWidget);
+  });
+
+  testWidgets('comfort zone test: phrase, comfort question, provisional result saved',
+      (tester) async {
+    await _launch(tester, ranges: [
+      RangeRecord(timestamp: DateTime(2026, 10, 1, 9), minMidi: 45, maxMidi: 72),
+    ]);
+    await _openTab(tester, 'Estensione');
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('tessitura-open')), 150,
+        scrollable: find.byType(Scrollable).first);
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+    await _frames(tester, 3);
+    await tester.tap(find.byKey(const ValueKey('tessitura-open')));
+    await _frames(tester, 5);
+    await tester.tap(find.byKey(const ValueKey('tessitura-start')));
+    await _frames(tester, 5);
+    expect(find.text('Frammento 1'), findsOneWidget);
+    for (var i = 0; i < 5; i++) {
+      await tester.tap(find.byKey(const ValueKey('tessitura-skip')));
+      await _frames(tester, 2);
+    }
+    expect(find.text('Quanto è stato comodo cantarlo?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('tessitura-rate-effort')));
+    await _frames(tester, 3);
+    expect(find.text('Frammento 2'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('tessitura-finish')));
+    await _frames(tester, 10);
+    expect(find.byKey(const ValueKey('tessitura-result')), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-provisional')), findsOneWidget);
+    final saved = await ProviderScope.containerOf(
+      tester.element(find.byType(TessituraTestScreen)),
+    ).read(tessituraHistoryProvider.future);
+    expect(saved, hasLength(1));
+    expect(saved.single.provisional, isTrue);
   });
 
   testWidgets('range section without a comfort zone test only invites to take it', (tester) async {
@@ -558,14 +602,16 @@ void main() {
   testWidgets('home fits one screen on a short phone, even with larger text', (tester) async {
     tester.platformDispatcher.textScaleFactorTestValue = 1.15;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await _launch(tester, size: const Size(360, 640));
+    // 360×700 utili: un Samsung da 360×780 dp tolte barra di stato e di sistema.
+    await _launch(tester, size: const Size(360, 700));
     final navTop = tester.getTopLeft(find.byType(NavigationBar)).dy;
     for (final key in [
       'home-bubble',
       'home-mascot',
       'home-mic',
       'home-note-card',
-      'quick-settings'
+      'daily-workout-card',
+      'quick-settings',
     ]) {
       expect(tester.getRect(find.byKey(ValueKey(key))).bottom, lessThanOrEqualTo(navTop),
           reason: key);
@@ -596,6 +642,132 @@ void main() {
     expect(repeat, findsNothing);
     expect(tester.getSize(modes).width, width, reason: 'i pulsanti non cambiano larghezza');
     expect(find.text('Discendente'), findsOneWidget);
+  });
+
+  testWidgets('daily workout: from Home to the session, one exercise in the trainer, interrupt',
+      (tester) async {
+    final app = await _launch(tester);
+    expect(find.text('Allenamento del giorno'), findsOneWidget);
+    expect(find.textContaining('Circa 10 min'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('daily-workout-card')));
+    await _frames(tester, 5);
+    expect(find.byType(WorkoutScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('workout-duration')), findsOneWidget);
+    expect(find.text('Riscaldamento'), findsWidgets);
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('workout-charges-note')), 150,
+        scrollable: find
+            .descendant(of: find.byType(WorkoutScreen), matching: find.byType(Scrollable))
+            .first);
+    expect(find.byKey(const ValueKey('workout-charges-note')), findsOneWidget,
+        reason: 'utente Free');
+    await tester.drag(
+        find.descendant(of: find.byType(WorkoutScreen), matching: find.byType(Scrollable)).first,
+        const Offset(0, 1000));
+    await _frames(tester, 3);
+
+    await tester.tap(find.text('5 min'));
+    await _frames(tester, 3);
+    expect(app.settings.workoutMinutes, 5);
+    expect(find.textContaining('Circa 5 min'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('workout-start')));
+    await _frames(tester, 3);
+    expect(find.byKey(const ValueKey('workout-progress')), findsOneWidget);
+    final total = ProviderScope.containerOf(tester.element(find.byType(WorkoutScreen)))
+        .read(workoutControllerProvider)
+        .total;
+    expect(find.text('0 di $total fatti'), findsOneWidget);
+
+    // L'esercizio corrente si apre nel trainer esistente.
+    await tester.tap(find.byKey(const ValueKey('workout-open-step')));
+    await _frames(tester, 5);
+    expect(find.byType(TrainerScreen), findsOneWidget);
+    await tester
+        .tap(find.descendant(of: find.byType(TrainerScreen), matching: find.byType(BackButton)));
+    await _frames(tester, 5);
+    expect(find.byType(WorkoutScreen), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('workout-skip')));
+    await _frames(tester, 3);
+    expect(find.textContaining('1 di'), findsWidgets);
+
+    await tester.tap(find.byKey(const ValueKey('workout-interrupt')));
+    await _frames(tester, 3);
+    await tester.tap(find.byKey(const ValueKey('workout-interrupt-confirm')));
+    await _frames(tester, 8);
+    expect(app.workouts.items.single.outcome, WorkoutOutcome.interrupted);
+    expect(find.byType(WorkoutScreen), findsNothing);
+    expect(find.byKey(const ValueKey('daily-workout-card')), findsOneWidget);
+    expect(find.text('Fatto oggi: 0 di 3'), findsNothing, reason: 'interrotto: non risulta fatto');
+  });
+
+  testWidgets('daily workout: a completed exercise shows its result and moves to the next',
+      (tester) async {
+    await _launch(tester);
+    await tester.tap(find.byKey(const ValueKey('daily-workout-card')));
+    await _frames(tester, 5);
+    await tester.tap(find.byKey(const ValueKey('workout-start')));
+    await _frames(tester, 3);
+    final container = ProviderScope.containerOf(tester.element(find.byType(WorkoutScreen)));
+    final first = container.read(workoutControllerProvider).currentStep!;
+    await tester.tap(find.byKey(const ValueKey('workout-open-step')));
+    await _frames(tester, 5);
+    expect(find.byType(TrainerScreen), findsOneWidget);
+
+    // Il trainer segnala l'esercizio completato (come a fine sequenza).
+    final trainer = container.read(trainerControllerProvider.notifier);
+    // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+    trainer.state = trainer.state.copyWith(
+      completedSession: SessionRecord(
+        timestamp: DateTime.now(),
+        exerciseId: first.exercise.id,
+        exerciseName: first.exercise.name,
+        correct: 9,
+        errors: 1,
+        durationSeconds: 40,
+        perNote: const {},
+      ),
+    );
+    await _frames(tester, 10);
+    expect(find.text('Continua'), findsOneWidget);
+    expect(find.text('Ripeti esercizio'), findsNothing, reason: "l'allenamento prosegue da sé");
+    await tester.tap(find.text('Continua'));
+    await _frames(tester, 10);
+    expect(find.byType(TrainerScreen), findsNothing);
+    expect(find.byType(WorkoutScreen), findsOneWidget);
+    expect(container.read(workoutControllerProvider).completedCount, 1);
+    expect(
+        find.text('1 di ${container.read(workoutControllerProvider).total} fatti'), findsOneWidget);
+  });
+
+  testWidgets('daily workout: skipping everything ends as partial, never as completed',
+      (tester) async {
+    final app = await _launch(tester);
+    await tester.tap(find.byKey(const ValueKey('daily-workout-card')));
+    await _frames(tester, 5);
+    await tester.tap(find.byKey(const ValueKey('workout-start')));
+    await _frames(tester, 3);
+    final total = ProviderScope.containerOf(tester.element(find.byType(WorkoutScreen)))
+        .read(workoutControllerProvider)
+        .total;
+    for (var i = 0; i < total; i++) {
+      await tester.tap(find.byKey(const ValueKey('workout-skip')));
+      await _frames(tester, 3);
+    }
+    expect(find.byKey(const ValueKey('workout-outcome')), findsOneWidget);
+    expect(find.text('Allenamento finito con qualche esercizio saltato'), findsOneWidget);
+    expect(app.workouts.items.single.outcome, WorkoutOutcome.partial);
+    expect(app.workouts.items.single.completedIds, isEmpty);
+
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('workout-close')), 200,
+        scrollable: find
+            .descendant(of: find.byType(WorkoutScreen), matching: find.byType(Scrollable))
+            .first);
+    await tester.tap(find.byKey(const ValueKey('workout-close')));
+    await _frames(tester, 8);
+    expect(find.byType(WorkoutScreen), findsNothing);
+    expect(find.text('Fatto oggi: 0 di $total'), findsOneWidget);
   });
 
   testWidgets('"Not me" removes a range test from the results and the history', (tester) async {

@@ -2396,6 +2396,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness.'**
   String get tessituraLegend;
+
+  /// No description provided for @workoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily workout'**
+  String get workoutTitle;
+
+  /// No description provided for @workoutGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'A ready-made session with the exercises you already know: a warm-up, a few main exercises and a final review. When there is enough data it also brings back the exercises you find hardest.'**
+  String get workoutGoal;
+
+  /// No description provided for @workoutCoachReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for today\'s session?'**
+  String get workoutCoachReady;
+
+  /// No description provided for @workoutCoachDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout done, well done!'**
+  String get workoutCoachDone;
+
+  /// No description provided for @workoutCoachPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Good work: next time try the ones you skipped.'**
+  String get workoutCoachPartial;
+
+  /// No description provided for @workoutDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get workoutDurationLabel;
+
+  /// No description provided for @workoutMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String workoutMinutes(int minutes);
+
+  /// No description provided for @workoutSummaryLine.
+  ///
+  /// In en, this message translates to:
+  /// **'About {minutes} min · {count, plural, =1{1 exercise} other{{count} exercises}}'**
+  String workoutSummaryLine(int minutes, int count);
+
+  /// No description provided for @workoutBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced routine: there isn\'t enough data on your sessions yet.'**
+  String get workoutBalanced;
+
+  /// No description provided for @workoutPersonalized.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your previous sessions.'**
+  String get workoutPersonalized;
+
+  /// No description provided for @workoutPersonalizedHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your previous sessions, with {count, plural, =1{1 exercise} other{{count} exercises}} to review.'**
+  String workoutPersonalizedHard(int count);
+
+  /// No description provided for @workoutDurationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Times are indicative: they come from your previous sessions or, if there are none, from the number of notes.'**
+  String get workoutDurationNote;
+
+  /// No description provided for @workoutChargesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Each exercise uses 1 charge, like the other exercises ({count} exercises, you have {available}).'**
+  String workoutChargesNote(int count, int available);
+
+  /// No description provided for @workoutStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start workout'**
+  String get workoutStart;
+
+  /// No description provided for @workoutRoleWarmUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm-up'**
+  String get workoutRoleWarmUp;
+
+  /// No description provided for @workoutRoleMain.
+  ///
+  /// In en, this message translates to:
+  /// **'Main'**
+  String get workoutRoleMain;
+
+  /// No description provided for @workoutRoleReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get workoutRoleReview;
+
+  /// No description provided for @workoutDifficultTag.
+  ///
+  /// In en, this message translates to:
+  /// **'to practise'**
+  String get workoutDifficultTag;
+
+  /// No description provided for @workoutDifficultReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Chosen because it was harder for you in recent sessions.'**
+  String get workoutDifficultReason;
+
+  /// No description provided for @workoutApproxMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'~{minutes} min'**
+  String workoutApproxMinutes(int minutes);
+
+  /// No description provided for @workoutApproxSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'~{seconds} s'**
+  String workoutApproxSeconds(int seconds);
+
+  /// No description provided for @workoutProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done'**
+  String workoutProgress(int done, int total);
+
+  /// No description provided for @workoutRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Last one done} =1{1 exercise left} other{{count} exercises left}}'**
+  String workoutRemaining(int count);
+
+  /// No description provided for @workoutStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{index} of {total}'**
+  String workoutStepOf(int index, int total);
+
+  /// No description provided for @workoutOpenStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Start this exercise'**
+  String get workoutOpenStep;
+
+  /// No description provided for @workoutSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get workoutSkip;
+
+  /// No description provided for @workoutSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get workoutSkipped;
+
+  /// No description provided for @workoutInterrupt.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop workout'**
+  String get workoutInterrupt;
+
+  /// No description provided for @workoutInterruptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the workout?'**
+  String get workoutInterruptTitle;
+
+  /// No description provided for @workoutInterruptBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It will be saved as interrupted, not completed. The exercises you finished stay in your history.'**
+  String get workoutInterruptBody;
+
+  /// No description provided for @workoutKeepGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going'**
+  String get workoutKeepGoing;
+
+  /// No description provided for @workoutCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout completed'**
+  String get workoutCompleted;
+
+  /// No description provided for @workoutPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout finished with some skips'**
+  String get workoutPartial;
+
+  /// No description provided for @workoutDoneLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} exercises completed'**
+  String workoutDoneLine(int done, int total);
+
+  /// No description provided for @workoutAccuracyLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall accuracy: {percent}%'**
+  String workoutAccuracyLine(int percent);
+
+  /// No description provided for @workoutInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress: {done} of {total}'**
+  String workoutInProgress(int done, int total);
+
+  /// No description provided for @workoutDoneToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed today'**
+  String get workoutDoneToday;
+
+  /// No description provided for @workoutPartialToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Done today: {done} of {total}'**
+  String workoutPartialToday(int done, int total);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

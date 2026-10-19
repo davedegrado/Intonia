@@ -1390,4 +1390,166 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tessituraLegend =>
       'Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness.';
+
+  @override
+  String get workoutTitle => 'Daily workout';
+
+  @override
+  String get workoutGoal =>
+      'A ready-made session with the exercises you already know: a warm-up, a few main exercises and a final review. When there is enough data it also brings back the exercises you find hardest.';
+
+  @override
+  String get workoutCoachReady => 'Ready for today\'s session?';
+
+  @override
+  String get workoutCoachDone => 'Workout done, well done!';
+
+  @override
+  String get workoutCoachPartial => 'Good work: next time try the ones you skipped.';
+
+  @override
+  String get workoutDurationLabel => 'Duration';
+
+  @override
+  String workoutMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String workoutSummaryLine(int minutes, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercises',
+      one: '1 exercise',
+    );
+    return 'About $minutes min · $_temp0';
+  }
+
+  @override
+  String get workoutBalanced => 'Balanced routine: there isn\'t enough data on your sessions yet.';
+
+  @override
+  String get workoutPersonalized => 'Based on your previous sessions.';
+
+  @override
+  String workoutPersonalizedHard(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercises',
+      one: '1 exercise',
+    );
+    return 'Based on your previous sessions, with $_temp0 to review.';
+  }
+
+  @override
+  String get workoutDurationNote =>
+      'Times are indicative: they come from your previous sessions or, if there are none, from the number of notes.';
+
+  @override
+  String workoutChargesNote(int count, int available) {
+    return 'Each exercise uses 1 charge, like the other exercises ($count exercises, you have $available).';
+  }
+
+  @override
+  String get workoutStart => 'Start workout';
+
+  @override
+  String get workoutRoleWarmUp => 'Warm-up';
+
+  @override
+  String get workoutRoleMain => 'Main';
+
+  @override
+  String get workoutRoleReview => 'Review';
+
+  @override
+  String get workoutDifficultTag => 'to practise';
+
+  @override
+  String get workoutDifficultReason => 'Chosen because it was harder for you in recent sessions.';
+
+  @override
+  String workoutApproxMinutes(int minutes) {
+    return '~$minutes min';
+  }
+
+  @override
+  String workoutApproxSeconds(int seconds) {
+    return '~$seconds s';
+  }
+
+  @override
+  String workoutProgress(int done, int total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String workoutRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercises left',
+      one: '1 exercise left',
+      zero: 'Last one done',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String workoutStepOf(int index, int total) {
+    return '$index of $total';
+  }
+
+  @override
+  String get workoutOpenStep => 'Start this exercise';
+
+  @override
+  String get workoutSkip => 'Skip';
+
+  @override
+  String get workoutSkipped => 'Skipped';
+
+  @override
+  String get workoutInterrupt => 'Stop workout';
+
+  @override
+  String get workoutInterruptTitle => 'Stop the workout?';
+
+  @override
+  String get workoutInterruptBody =>
+      'It will be saved as interrupted, not completed. The exercises you finished stay in your history.';
+
+  @override
+  String get workoutKeepGoing => 'Keep going';
+
+  @override
+  String get workoutCompleted => 'Workout completed';
+
+  @override
+  String get workoutPartial => 'Workout finished with some skips';
+
+  @override
+  String workoutDoneLine(int done, int total) {
+    return '$done of $total exercises completed';
+  }
+
+  @override
+  String workoutAccuracyLine(int percent) {
+    return 'Overall accuracy: $percent%';
+  }
+
+  @override
+  String workoutInProgress(int done, int total) {
+    return 'In progress: $done of $total';
+  }
+
+  @override
+  String get workoutDoneToday => 'Completed today';
+
+  @override
+  String workoutPartialToday(int done, int total) {
+    return 'Done today: $done of $total';
+  }
 }

@@ -12,6 +12,8 @@ import '../features/range/presentation/range_test_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/tessitura/presentation/tessitura_test_screen.dart';
 import '../features/trainer/presentation/screens/trainer_screen.dart';
+import '../features/workout/domain/daily_workout.dart';
+import '../features/workout/presentation/workout_screen.dart';
 import 'main_shell.dart';
 
 /// Router dell'app: uno per ProviderScope, così ogni avvio (e ogni test)
@@ -59,6 +61,17 @@ GoRouter createAppRouter() => GoRouter(
         GoRoute(
           path: '/range-test',
           builder: (context, state) => const RangeTestScreen(),
+        ),
+        GoRoute(
+          path: '/workout',
+          builder: (context, state) => const WorkoutScreen(),
+        ),
+        GoRoute(
+          path: '/workout-exercise',
+          builder: (context, state) {
+            final step = state.extra! as WorkoutStep;
+            return TrainerScreen(exercise: step.exercise, workout: true, startMidi: step.startMidi);
+          },
         ),
         GoRoute(
           path: '/tessitura-test',
