@@ -1817,7 +1817,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get guideTapHint => 'Tap the highlighted spot to continue';
+  String get guideTapHint => 'Tap to continue';
 
   @override
   String get guideOpenCategoryTitle => 'Open a category';

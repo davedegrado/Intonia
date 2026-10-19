@@ -498,7 +498,7 @@
   "guideTargetUnavailable": "Lo troverai qui quando avrai usato questa parte dell'app.",
   "guideNavTitle": "Vai a {section}",
   "guideNavText": "Tocca «{section}» nella barra in basso per continuare.",
-  "guideTapHint": "Tocca il punto evidenziato per continuare",
+  "guideTapHint": "Tocca per continuare",
   "guideOpenCategoryTitle": "Apri una categoria",
   "guideOpenCategoryText": "Tocca la categoria per vedere i suoi esercizi.",
   "guideOpenExerciseTitle": "Apri un esercizio",
