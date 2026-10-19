@@ -41,12 +41,21 @@ verifica esterna · `[?]` non determinabile.
 - [x] Localizzazione inglese (app e widget, `docs/LOCALIZATION.md`).
 - [ ] Onboarding con obiettivo: esiste la *Guida di Intonia* (tutorial delle
   funzioni, `lib/features/guide/`), ma nessuna scelta di obiettivo.
-- [ ] Percorsi guidati per principianti: non esistono.
+- [ ] Percorsi guidati per principianti: non esistono. Primo passo:
+  [x] *Allenamento del giorno* (sessione pronta da 5/10/15 minuti con gli
+  esercizi esistenti, selezione locale e deterministica;
+  `daily_workout_test`).
+- [x] Test di tessitura (zona comoda distinta dall'estensione, con comfort
+  dichiarato e misure dell'intonazione; `tessitura_test`).
 - [ ] Spike K0 di fattibilità del Karaoke Mode: non avviato.
 
 **Karaoke Mode (K1–K3)** — [ ] non avviato, vedi `karaoke-architecture.md`.
 
 **Store e monetizzazione**
+- [?] Decisione aperta: nell'allenamento del giorno ogni esercizio usa una
+  carica Free come gli altri esercizi (un allenamento da 10–15 minuti può
+  richiederne più delle 7 disponibili); il test di tessitura, come quello di
+  estensione, non usa cariche.
 - Il modello è cambiato: non più "acquisto unico", ma **Free con cariche +
   abbonamento Pro** (mensile/annuale). Sistema delle cariche ed entitlement
   implementati e testati (`charge_ledger_test`, `free_pro_access_test`,
