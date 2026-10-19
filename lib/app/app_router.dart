@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/music/exercise.dart';
 import '../features/achievements/presentation/achievements_screen.dart';
 import '../features/access/presentation/pro_screen.dart';
+import '../features/extreme_notes/presentation/extreme_notes_screen.dart';
 import '../features/library/presentation/custom_exercise_editor_screen.dart';
 import '../features/library/presentation/exercises_screen.dart';
 import '../features/library/presentation/home_screen.dart';
@@ -77,6 +78,10 @@ GoRouter createAppRouter() => GoRouter(
             final step = state.extra! as WorkoutStep;
             return TrainerScreen(exercise: step.exercise, workout: true, startMidi: step.startMidi);
           },
+        ),
+        GoRoute(
+          path: '/extreme-notes',
+          builder: (context, state) => const ExtremeNotesScreen(),
         ),
         GoRoute(
           path: '/tessitura-test',

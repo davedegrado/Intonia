@@ -314,8 +314,8 @@ void main() {
     expect(find.text('Test precedenti'), findsOneWidget);
     expect(find.text('01/10 09:00'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.byKey(const ValueKey('range-start')), -150,
-        scrollable: find.byType(Scrollable).first);
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 2000));
+    await _frames(tester, 3);
     await tester.tap(find.byKey(const ValueKey('range-start')));
     await _frames(tester, 5);
     expect(find.byType(RangeTestScreen), findsOneWidget);
@@ -351,8 +351,10 @@ void main() {
     await tester.scrollUntilVisible(find.byKey(const ValueKey('tessitura-open')), 150,
         scrollable: find.byType(Scrollable).first);
     expect(find.text('Zona comoda (tessitura)'), findsOneWidget);
-    expect(find.byKey(const ValueKey('tessitura-map')), findsOneWidget);
-    expect(find.text('Affidabilità: media'), findsOneWidget);
+    // Zona comoda ed estensione su fasce separate.
+    expect(find.byKey(const ValueKey('tessitura-band-comfort')), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-band-observed')), findsOneWidget);
+    expect(find.text('Attendibilità: media'), findsOneWidget);
     expect(find.text('+2 semitoni rispetto al 05/10 18:00.'), findsOneWidget);
     expect(find.byKey(const ValueKey('tessitura-provisional')), findsNothing);
 
@@ -366,9 +368,9 @@ void main() {
     expect(find.textContaining('non una classificazione della voce'), findsOneWidget);
   });
 
-  testWidgets('comfort zone test: phrase, comfort question, provisional result saved',
+  testWidgets('comfort zone test: one note at a time, strain stops it, nothing invented',
       (tester) async {
-    await _launch(tester, ranges: [
+    final app = await _launch(tester, ranges: [
       RangeRecord(timestamp: DateTime(2026, 10, 1, 9), minMidi: 45, maxMidi: 72),
     ]);
     await _openTab(tester, 'Estensione');
@@ -380,24 +382,59 @@ void main() {
     await _frames(tester, 5);
     await tester.tap(find.byKey(const ValueKey('tessitura-start')));
     await _frames(tester, 5);
-    expect(find.text('Frammento 1'), findsOneWidget);
-    for (var i = 0; i < 5; i++) {
-      await tester.tap(find.byKey(const ValueKey('tessitura-skip')));
-      await _frames(tester, 2);
-    }
-    expect(find.text('Quanto è stato comodo cantarlo?'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('tessitura-rate-effort')));
+    // Riscaldamento su una nota centrale, con la nota da cantare e i comandi.
+    expect(find.text('Riscaldamento'), findsOneWidget);
+    expect(find.text('Canta questa nota su «a» per circa 3 secondi'), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-target')), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-register')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('tessitura-strain')));
     await _frames(tester, 3);
-    expect(find.text('Frammento 2'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('tessitura-finish')));
+    expect(find.text('Fermiamoci un attimo'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('tessitura-strain-finish')));
     await _frames(tester, 10);
-    expect(find.byKey(const ValueKey('tessitura-result')), findsOneWidget);
-    expect(find.byKey(const ValueKey('tessitura-provisional')), findsOneWidget);
+    // Nessuna prova valida: nessun risultato inventato né salvato.
+    expect(find.byKey(const ValueKey('tessitura-no-data')), findsOneWidget);
+    expect(app.mic.isRecording, isFalse);
     final saved = await ProviderScope.containerOf(
       tester.element(find.byType(TessituraTestScreen)),
     ).read(tessituraHistoryProvider.future);
-    expect(saved, hasLength(1));
-    expect(saved.single.provisional, isTrue);
+    expect(saved, isEmpty);
+  });
+
+  testWidgets('extreme notes: a separate tool in the range section, no reference notes',
+      (tester) async {
+    final app = await _launch(tester);
+    await _openTab(tester, 'Estensione');
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('extreme-open')), 150,
+        scrollable: find.byType(Scrollable).first);
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+    await _frames(tester, 3);
+    await tester.tap(find.byKey(const ValueKey('extreme-open')));
+    await _frames(tester, 5);
+    expect(find.text('Trova le note estreme'), findsWidgets);
+    await tester.tap(find.byKey(const ValueKey('extreme-start')));
+    await _frames(tester, 3);
+    expect(app.mic.isRecording, isTrue);
+    expect(find.byKey(const ValueKey('extreme-stop')).hitTestable(), findsOneWidget);
+    for (final midi in [52, 64]) {
+      final note = MusicalNote.fromMidi(midi);
+      for (var i = 0; i < 25; i++) {
+        app.mic.emit(PitchDetectionResult(
+            frequency: note.frequency, note: note, cents: 0, confidence: 0.95, isStable: true));
+        await tester.pump(const Duration(milliseconds: 23));
+      }
+    }
+    await tester.tap(find.byKey(const ValueKey('extreme-stop')));
+    await _frames(tester, 3);
+    expect(app.mic.isRecording, isFalse);
+    expect(find.byKey(const ValueKey('extreme-low')), findsOneWidget);
+    expect(find.byKey(const ValueKey('extreme-high')), findsOneWidget);
+    expect(find.text('1 ottava (12 semitoni)'), findsOneWidget);
+    expect(find.byKey(const ValueKey('extreme-quality')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('extreme-back')));
+    await _frames(tester, 10);
+    expect(find.byKey(const ValueKey('extreme-open')), findsOneWidget);
   });
 
   testWidgets('range section without a comfort zone test only invites to take it', (tester) async {
