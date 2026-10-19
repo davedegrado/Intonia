@@ -325,7 +325,7 @@ private let violet = rgb(0xA855F7)
 private let magenta = rgb(0xE879F9)
 private let muted = rgb(0xC7C9F2)
 private let onDot = rgb(0x1B1846)
-private let border = rgb(0x3B3592)
+private let cardBorder = rgb(0x3B3592)
 private let numberGradient = LinearGradient(
   colors: [cyan, sky, rgb(0x8B9CFA)], startPoint: .top, endPoint: .bottom)
 
@@ -470,7 +470,7 @@ struct PrecisionWidgetView: View {
     .background(
       RoundedRectangle(cornerRadius: 16)
         .fill(Color.white.opacity(0.07))
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(border, lineWidth: 1)))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(cardBorder, lineWidth: 1)))
   }
 
   private func active(_ index: Int) -> Bool {
