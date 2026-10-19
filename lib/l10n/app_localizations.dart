@@ -2061,54 +2061,6 @@ abstract class AppLocalizations {
   /// **'{current} of {total}'**
   String guideProgress(int current, int total);
 
-  /// No description provided for @guideHome.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap the microphone and sing or play a note: I\'ll tell you which note it is and how many cents off you are. At the top you\'ll find your streak and your exercise charges; at the bottom, quick access to note names, theme and settings.'**
-  String get guideHome;
-
-  /// No description provided for @guideExercises.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick a category (triads, arpeggios, scales and more), open an exercise and press Play to train with your voice. Each session uses one charge. With Create your sequence you can write your own (Intonia Pro).'**
-  String get guideExercises;
-
-  /// No description provided for @guideExerciseSettingsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Exercise settings'**
-  String get guideExerciseSettingsTitle;
-
-  /// No description provided for @guideExerciseSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'In an exercise you choose the key and octave, the mode (Ascending, Descending or Full) and, in Full mode, whether to repeat the top note. The ? button in the exercise explains these options.'**
-  String get guideExerciseSettings;
-
-  /// No description provided for @guideRange.
-  ///
-  /// In en, this message translates to:
-  /// **'The range test starts from a comfortable note, goes down to your lowest note and then up to your highest. The result shows the two extreme notes and the span in octaves and semitones; past tests are listed here and in your profile.'**
-  String get guideRange;
-
-  /// No description provided for @guideProfile.
-  ///
-  /// In en, this message translates to:
-  /// **'Your streak, sessions, total minutes, average accuracy, vocal range, best and worst notes, range tests and your recent sessions with key and octave.'**
-  String get guideProfile;
-
-  /// No description provided for @guideSettingsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Settings'**
-  String get guideSettingsTitle;
-
-  /// No description provided for @guideSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose the language, the theme (System, Light, Dark or Neon) and the note names (C D E or DO RE MI). You can reopen this guide from here at any time.'**
-  String get guideSettings;
-
   /// No description provided for @guideKey.
   ///
   /// In en, this message translates to:
@@ -3002,6 +2954,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Complete 2 daily workouts'**
   String get missionWeeklyWorkouts2;
+
+  /// No description provided for @guideMicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The microphone'**
+  String get guideMicTitle;
+
+  /// No description provided for @guideMicText.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, I\'m Intonia! Tap here and sing or play a note: I\'ll tell you which one it is and how many cents off you are.'**
+  String get guideMicText;
+
+  /// No description provided for @guideWorkoutText.
+  ///
+  /// In en, this message translates to:
+  /// **'A ready-made session with the exercises you know: open this card, choose 5, 10 or 15 minutes and start.'**
+  String get guideWorkoutText;
+
+  /// No description provided for @guideStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak and charges'**
+  String get guideStatusTitle;
+
+  /// No description provided for @guideStatusText.
+  ///
+  /// In en, this message translates to:
+  /// **'Here you see how many days in a row you\'ve practised and your exercise charges: each session uses one, and they refill over time.'**
+  String get guideStatusText;
+
+  /// No description provided for @guideCategoriesText.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercises are grouped by category: open one, pick an exercise and press Play to train with your voice.'**
+  String get guideCategoriesText;
+
+  /// No description provided for @guideCustomText.
+  ///
+  /// In en, this message translates to:
+  /// **'Here you compose your own sequences, from scratch or starting from an exercise (Intonia Pro).'**
+  String get guideCustomText;
+
+  /// No description provided for @guideRangeText.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the lowest and highest notes you can sing. Your results stay here and in your profile.'**
+  String get guideRangeText;
+
+  /// No description provided for @guideTessituraText.
+  ///
+  /// In en, this message translates to:
+  /// **'The comfort zone test looks for the part of your voice where singing feels easy.'**
+  String get guideTessituraText;
+
+  /// No description provided for @guideStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your statistics'**
+  String get guideStatsTitle;
+
+  /// No description provided for @guideStatsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak, sessions, minutes and average accuracy: everything updates as you practise.'**
+  String get guideStatsText;
+
+  /// No description provided for @guideAchievementsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s and this week\'s missions, plus badges to unlock along the way.'**
+  String get guideAchievementsText;
+
+  /// No description provided for @guideHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get guideHistoryTitle;
+
+  /// No description provided for @guideHistoryText.
+  ///
+  /// In en, this message translates to:
+  /// **'Your latest sessions with exercise, key, octave and result.'**
+  String get guideHistoryText;
+
+  /// No description provided for @guideLanguageText.
+  ///
+  /// In en, this message translates to:
+  /// **'Italian or English: by default I use your phone\'s language.'**
+  String get guideLanguageText;
+
+  /// No description provided for @guideThemeText.
+  ///
+  /// In en, this message translates to:
+  /// **'System, Light, Dark or Neon: choose the look you like best.'**
+  String get guideThemeText;
+
+  /// No description provided for @guideNotationText.
+  ///
+  /// In en, this message translates to:
+  /// **'C D E or DO RE MI: changes the note names throughout the app.'**
+  String get guideNotationText;
+
+  /// No description provided for @guideReopenText.
+  ///
+  /// In en, this message translates to:
+  /// **'You can reopen this guide from here whenever you like. Enjoy singing!'**
+  String get guideReopenText;
+
+  /// No description provided for @guideTargetUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll find it here once you\'ve used this part of the app.'**
+  String get guideTargetUnavailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

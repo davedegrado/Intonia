@@ -18,6 +18,7 @@ import '../../settings/application/settings_providers.dart';
 import '../../tessitura/application/tessitura_providers.dart';
 import '../../tessitura/presentation/tessitura_map.dart';
 import '../application/range_providers.dart';
+import '../../guide/guide.dart';
 
 /// Sezione Estensione vocale: invito al test, ultimo risultato e test
 /// precedenti. Il test vero e proprio è a schermo intero (/range-test).
@@ -75,11 +76,14 @@ class RangeScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 18),
-          HeroButton(
-            key: const ValueKey('range-start'),
-            icon: Icons.graphic_eq_rounded,
-            label: latest == null ? l10n.rangeStartTest : l10n.rangeRetakeTest,
-            onPressed: () => pushFullScreen(context, ref, '/range-test'),
+          GuideAnchor(
+            target: GuideTarget.rangeTest,
+            child: HeroButton(
+              key: const ValueKey('range-start'),
+              icon: Icons.graphic_eq_rounded,
+              label: latest == null ? l10n.rangeStartTest : l10n.rangeRetakeTest,
+              onPressed: () => pushFullScreen(context, ref, '/range-test'),
+            ),
           ),
           const SizedBox(height: 22),
           if (latest == null)
@@ -91,7 +95,7 @@ class RangeScreen extends ConsumerWidget {
           else
             _LatestResult(record: latest, notation: notation),
           const SizedBox(height: 22),
-          const _TessituraSection(),
+          const GuideAnchor(target: GuideTarget.tessitura, child: _TessituraSection()),
           if (previous.isNotEmpty) ...[
             const SizedBox(height: 22),
             Text(l10n.rangePreviousTests,

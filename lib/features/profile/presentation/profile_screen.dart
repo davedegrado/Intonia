@@ -20,6 +20,7 @@ import '../../../l10n/exercise_l10n.dart';
 import '../../range/application/range_providers.dart';
 import '../../settings/application/settings_providers.dart';
 import '../application/history_providers.dart';
+import '../../guide/guide.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -52,7 +53,8 @@ class ProfileScreen extends ConsumerWidget {
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 24),
-                const AchievementsCard(),
+                const GuideAnchor(
+                    target: GuideTarget.profileAchievements, child: AchievementsCard()),
               ],
             ),
           ),
@@ -116,42 +118,48 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             _StreakCard(streak: streak),
             const SizedBox(height: 12),
-            const AchievementsCard(),
+            const GuideAnchor(target: GuideTarget.profileAchievements, child: AchievementsCard()),
             const SizedBox(height: 12),
-            _StatRow(children: [
-              _StatCard(
-                  icon: Icons.event_repeat_rounded,
-                  accent: decor.accent(0),
-                  label: l10n.profileStatSessions,
-                  value: '${records.length}'),
-              _StatCard(
-                  icon: Icons.timer_outlined,
-                  accent: decor.accent(1),
-                  label: l10n.profileStatMinutes,
-                  value: '$totalMinutes'),
-            ]),
-            const SizedBox(height: 10),
-            _StatRow(children: [
-              _StatCard(
-                  icon: Icons.track_changes_rounded,
-                  accent: decor.accent(3),
-                  label: l10n.profileStatAccuracy,
-                  value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
-              _StatCard(
-                icon: Icons.height_rounded,
-                accent: decor.accent(2),
-                label: l10n.profileStatRange,
-                value: '—',
-                valueWidget: lowMidi != null && highMidi != null
-                    ? NoteRangeText(
-                        low: spelledMidi(lowMidi),
-                        high: spelledMidi(highMidi),
-                        notation: notation,
-                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-                      )
-                    : null,
-              ),
-            ]),
+            GuideAnchor(
+              target: GuideTarget.profileStats,
+              child: Column(children: [
+                _StatRow(children: [
+                  _StatCard(
+                      icon: Icons.event_repeat_rounded,
+                      accent: decor.accent(0),
+                      label: l10n.profileStatSessions,
+                      value: '${records.length}'),
+                  _StatCard(
+                      icon: Icons.timer_outlined,
+                      accent: decor.accent(1),
+                      label: l10n.profileStatMinutes,
+                      value: '$totalMinutes'),
+                ]),
+                const SizedBox(height: 10),
+                _StatRow(children: [
+                  _StatCard(
+                      icon: Icons.track_changes_rounded,
+                      accent: decor.accent(3),
+                      label: l10n.profileStatAccuracy,
+                      value: '${(avgAccuracy * 100).toStringAsFixed(0)}%'),
+                  _StatCard(
+                    icon: Icons.height_rounded,
+                    accent: decor.accent(2),
+                    label: l10n.profileStatRange,
+                    value: '—',
+                    valueWidget: lowMidi != null && highMidi != null
+                        ? NoteRangeText(
+                            low: spelledMidi(lowMidi),
+                            high: spelledMidi(highMidi),
+                            notation: notation,
+                            style:
+                                theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                          )
+                        : null,
+                  ),
+                ]),
+              ]),
+            ),
             if (rated.isNotEmpty) ...[
               const SizedBox(height: 20),
               _SectionTitle(l10n.profileBestWorstNotes),
@@ -223,7 +231,11 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 20),
-            _SectionTitle(fullHistory ? l10n.profileAllSessions : l10n.profileRecentSessions),
+            GuideAnchor(
+              target: GuideTarget.profileHistory,
+              child:
+                  _SectionTitle(fullHistory ? l10n.profileAllSessions : l10n.profileRecentSessions),
+            ),
             if (recent.isNotEmpty)
               Card(
                 child: Column(children: [

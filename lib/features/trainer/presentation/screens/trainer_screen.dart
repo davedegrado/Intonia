@@ -316,51 +316,57 @@ class _BottomControlBar extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<PitchClass>(
-                      initialValue: state.settings.key,
-                      decoration: InputDecoration(
-                        labelText: l10n.trainerKey,
-                        isDense: true,
-                        border: OutlineInputBorder(),
+                    child: GuideAnchor(
+                      target: GuideTarget.trainerKey,
+                      child: DropdownButtonFormField<PitchClass>(
+                        initialValue: state.settings.key,
+                        decoration: InputDecoration(
+                          labelText: l10n.trainerKey,
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                        items: [
+                          for (final pitch in PitchClass.values)
+                            DropdownMenuItem(
+                              value: pitch,
+                              child: Text(NoteSpeller.keyLabel(pitch, notation)),
+                            ),
+                        ],
+                        onChanged: state.isPlaying
+                            ? null
+                            : (value) => value == null ? null : controller.updateKey(value),
                       ),
-                      items: [
-                        for (final pitch in PitchClass.values)
-                          DropdownMenuItem(
-                            value: pitch,
-                            child: Text(NoteSpeller.keyLabel(pitch, notation)),
-                          ),
-                      ],
-                      onChanged: state.isPlaying
-                          ? null
-                          : (value) => value == null ? null : controller.updateKey(value),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: DropdownButtonFormField<int>(
-                      initialValue: state.settings.octave,
-                      decoration: InputDecoration(
-                        labelText: l10n.trainerOctave,
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                      ),
-                      // Ogni ottava mostra la tonica in quell'ottava (es. DO4 o
-                      // C4), con la notazione scelta dall'utente.
-                      items: [
-                        for (final octave in _octaves)
-                          DropdownMenuItem(
-                            value: octave,
-                            child: NoteText(
-                              NoteSpeller.spellRoot(
-                                MusicalNote(pitchClass: state.settings.key, octave: octave),
+                    child: GuideAnchor(
+                      target: GuideTarget.trainerOctave,
+                      child: DropdownButtonFormField<int>(
+                        initialValue: state.settings.octave,
+                        decoration: InputDecoration(
+                          labelText: l10n.trainerOctave,
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                        // Ogni ottava mostra la tonica in quell'ottava (es. DO4 o
+                        // C4), con la notazione scelta dall'utente.
+                        items: [
+                          for (final octave in _octaves)
+                            DropdownMenuItem(
+                              value: octave,
+                              child: NoteText(
+                                NoteSpeller.spellRoot(
+                                  MusicalNote(pitchClass: state.settings.key, octave: octave),
+                                ),
+                                notation: notation,
                               ),
-                              notation: notation,
                             ),
-                          ),
-                      ],
-                      onChanged: state.isPlaying
-                          ? null
-                          : (value) => value == null ? null : controller.updateOctave(value),
+                        ],
+                        onChanged: state.isPlaying
+                            ? null
+                            : (value) => value == null ? null : controller.updateOctave(value),
+                      ),
                     ),
                   ),
                 ],
@@ -653,71 +659,78 @@ class _DirectionRow extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Icone solo se c'è posto anche per le parole intere.
-            final icons = constraints.maxWidth >= 400;
-            return SizedBox(
-              width: double.infinity,
-              child: SegmentedButton<PlaybackDirection>(
-                key: const ValueKey('trainer-direction'),
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment(
-                    value: PlaybackDirection.forward,
-                    icon: icons ? const Icon(Icons.trending_up) : null,
-                    label: label(l10n.trainerDirectionForward),
-                  ),
-                  ButtonSegment(
-                    value: PlaybackDirection.reverse,
-                    icon: icons ? const Icon(Icons.trending_down) : null,
-                    label: label(l10n.trainerDirectionReverse),
-                  ),
-                  ButtonSegment(
-                    value: PlaybackDirection.complete,
-                    icon: icons ? const Icon(Icons.swap_vert) : null,
-                    label: label(l10n.trainerDirectionComplete),
-                  ),
-                ],
-                style: const ButtonStyle(
-                  visualDensity: VisualDensity.compact,
-                  padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
-                ),
-                selected: {direction},
-                onSelectionChanged:
-                    disabled ? null : (selection) => controller.updateDirection(selection.first),
-              ),
-            );
-          },
-        ),
-        if (showRepeatTop)
-          Tooltip(
-            message: l10n.trainerRepeatTopHint,
-            child: InkWell(
-              key: const ValueKey('trainer-repeat-top'),
-              borderRadius: BorderRadius.circular(8),
-              onTap: disabled ? null : () => controller.updateRepeatTop(!state.settings.repeatTop),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Row(
-                  children: [
-                    Icon(Icons.repeat_one,
-                        size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l10n.trainerRepeatTop,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+        GuideAnchor(
+          target: GuideTarget.trainerDirection,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Icone solo se c'è posto anche per le parole intere.
+              final icons = constraints.maxWidth >= 400;
+              return SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<PlaybackDirection>(
+                  key: const ValueKey('trainer-direction'),
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment(
+                      value: PlaybackDirection.forward,
+                      icon: icons ? const Icon(Icons.trending_up) : null,
+                      label: label(l10n.trainerDirectionForward),
                     ),
-                    Switch(
-                      value: state.settings.repeatTop,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      onChanged: disabled ? null : controller.updateRepeatTop,
+                    ButtonSegment(
+                      value: PlaybackDirection.reverse,
+                      icon: icons ? const Icon(Icons.trending_down) : null,
+                      label: label(l10n.trainerDirectionReverse),
+                    ),
+                    ButtonSegment(
+                      value: PlaybackDirection.complete,
+                      icon: icons ? const Icon(Icons.swap_vert) : null,
+                      label: label(l10n.trainerDirectionComplete),
                     ),
                   ],
+                  style: const ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                    padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+                  ),
+                  selected: {direction},
+                  onSelectionChanged:
+                      disabled ? null : (selection) => controller.updateDirection(selection.first),
+                ),
+              );
+            },
+          ),
+        ),
+        if (showRepeatTop)
+          GuideAnchor(
+            target: GuideTarget.trainerRepeatTop,
+            child: Tooltip(
+              message: l10n.trainerRepeatTopHint,
+              child: InkWell(
+                key: const ValueKey('trainer-repeat-top'),
+                borderRadius: BorderRadius.circular(8),
+                onTap:
+                    disabled ? null : () => controller.updateRepeatTop(!state.settings.repeatTop),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Row(
+                    children: [
+                      Icon(Icons.repeat_one,
+                          size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.trainerRepeatTop,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      Switch(
+                        value: state.settings.repeatTop,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        onChanged: disabled ? null : controller.updateRepeatTop,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

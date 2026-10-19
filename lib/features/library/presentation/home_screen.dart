@@ -123,7 +123,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
     return SectionScaffold(
       title: l10n.appTitle,
-      actions: const [StatusChips()],
+      actions: const [GuideAnchor(target: GuideTarget.homeStatus, child: StatusChips())],
       variant: SceneVariant.home,
       body: SafeArea(
         bottom: false,
@@ -186,13 +186,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         },
                       ),
                     ),
-                    _MicButton(
-                      size: micSize,
-                      active: tuner.active,
-                      onPressed: () {
-                        final controller = ref.read(tunerControllerProvider.notifier);
-                        tuner.active ? controller.stop() : controller.start();
-                      },
+                    GuideAnchor(
+                      target: GuideTarget.homeMic,
+                      child: _MicButton(
+                        size: micSize,
+                        active: tuner.active,
+                        onPressed: () {
+                          final controller = ref.read(tunerControllerProvider.notifier);
+                          tuner.active ? controller.stop() : controller.start();
+                        },
+                      ),
                     ),
                     const SizedBox(height: 2),
                     // Una riga di altezza fissa: se la scritta è lunga si
@@ -211,7 +214,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     const SizedBox(height: 10),
                     _NoteCard(detection: hasPitch ? detection : _lastNote, live: hasPitch),
                     const SizedBox(height: 8),
-                    const DailyWorkoutCard(),
+                    const GuideAnchor(target: GuideTarget.dailyWorkout, child: DailyWorkoutCard()),
                     const SizedBox(height: 8),
                     const _QuickActions(),
                   ],

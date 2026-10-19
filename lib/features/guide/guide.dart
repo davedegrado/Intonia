@@ -1,31 +1,209 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/l10n.dart';
-import '../mascot/domain/mascot_mood.dart';
-import '../mascot/presentation/intonia_mascot.dart';
+import 'guide_tour.dart';
 
-/// Un passaggio della guida: icona della sezione, titolo e spiegazione.
+/// Elementi dell'interfaccia che la guida può evidenziare.
+enum GuideTarget {
+  homeMic,
+  homeStatus,
+  dailyWorkout,
+  exerciseCategories,
+  customSequences,
+  rangeTest,
+  tessitura,
+  profileStats,
+  profileAchievements,
+  profileHistory,
+  settingsLanguage,
+  settingsTheme,
+  settingsNotation,
+  settingsGuide,
+  trainerKey,
+  trainerOctave,
+  trainerDirection,
+  trainerRepeatTop,
+}
+
+/// Segna un elemento come bersaglio della guida. Non cambia aspetto né
+/// comportamento del figlio: registra solo dove si trova. Se lo stesso
+/// bersaglio è montato due volte (es. durante una transizione) vale
+/// l'ultimo, senza errori.
+class GuideAnchor extends StatefulWidget {
+  const GuideAnchor({required this.target, required this.child, super.key});
+
+  final GuideTarget target;
+  final Widget child;
+
+  static final _registry = <GuideTarget, _GuideAnchorState>{};
+
+  /// Contesto dell'elemento [target] se è montato, altrimenti null.
+  static BuildContext? contextOf(GuideTarget target) {
+    final anchor = _registry[target];
+    return anchor != null && anchor.mounted ? anchor.context : null;
+  }
+
+  @override
+  State<GuideAnchor> createState() => _GuideAnchorState();
+}
+
+class _GuideAnchorState extends State<GuideAnchor> {
+  @override
+  void initState() {
+    super.initState();
+    GuideAnchor._registry[widget.target] = this;
+  }
+
+  @override
+  void didUpdateWidget(GuideAnchor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.target != widget.target) {
+      _unregister(oldWidget.target);
+      GuideAnchor._registry[widget.target] = this;
+    }
+  }
+
+  @override
+  void dispose() {
+    _unregister(widget.target);
+    super.dispose();
+  }
+
+  void _unregister(GuideTarget target) {
+    if (GuideAnchor._registry[target] == this) {
+      GuideAnchor._registry.remove(target);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
+/// Un passaggio della guida: cosa spiega Intonia, quale elemento evidenzia
+/// e in quale sezione si trova.
 class GuideStep {
-  const GuideStep({required this.icon, required this.title, required this.text});
+  const GuideStep({
+    required this.icon,
+    required this.title,
+    required this.text,
+    this.target,
+    this.section,
+  });
 
   final IconData icon;
   final String title;
   final String text;
+
+  /// Elemento da evidenziare; null = spiegazione senza evidenziazione.
+  final GuideTarget? target;
+
+  /// Percorso della sezione in cui si trova (es. '/range'); null = la
+  /// schermata attuale.
+  final String? section;
 }
 
-/// Guida completa di Intonia, una sezione per passaggio.
+/// Guida completa: Intonia accompagna nelle sezioni dell'app ed evidenzia
+/// gli elementi di cui parla.
 List<GuideStep> appGuideSteps(AppLocalizations l10n) => [
-      GuideStep(icon: Icons.home_outlined, title: l10n.navHome, text: l10n.guideHome),
       GuideStep(
-          icon: Icons.music_note_outlined, title: l10n.navExercises, text: l10n.guideExercises),
+        icon: Icons.mic_rounded,
+        title: l10n.guideMicTitle,
+        text: l10n.guideMicText,
+        target: GuideTarget.homeMic,
+        section: '/',
+      ),
       GuideStep(
-          icon: Icons.tune,
-          title: l10n.guideExerciseSettingsTitle,
-          text: l10n.guideExerciseSettings),
-      GuideStep(icon: Icons.bar_chart_outlined, title: l10n.navRange, text: l10n.guideRange),
-      GuideStep(icon: Icons.person_outline, title: l10n.navProfile, text: l10n.guideProfile),
+        icon: Icons.fitness_center_rounded,
+        title: l10n.workoutTitle,
+        text: l10n.guideWorkoutText,
+        target: GuideTarget.dailyWorkout,
+        section: '/',
+      ),
       GuideStep(
-          icon: Icons.settings_outlined, title: l10n.guideSettingsTitle, text: l10n.guideSettings),
+        icon: Icons.local_fire_department_rounded,
+        title: l10n.guideStatusTitle,
+        text: l10n.guideStatusText,
+        target: GuideTarget.homeStatus,
+        section: '/',
+      ),
+      GuideStep(
+        icon: Icons.music_note_outlined,
+        title: l10n.exercisesCategories,
+        text: l10n.guideCategoriesText,
+        target: GuideTarget.exerciseCategories,
+        section: '/exercises',
+      ),
+      GuideStep(
+        icon: Icons.edit_note,
+        title: l10n.exercisesCreateTitle,
+        text: l10n.guideCustomText,
+        target: GuideTarget.customSequences,
+        section: '/exercises',
+      ),
+      GuideStep(
+        icon: Icons.bar_chart_outlined,
+        title: l10n.rangeTestTitle,
+        text: l10n.guideRangeText,
+        target: GuideTarget.rangeTest,
+        section: '/range',
+      ),
+      GuideStep(
+        icon: Icons.tune_rounded,
+        title: l10n.tessituraSectionTitle,
+        text: l10n.guideTessituraText,
+        target: GuideTarget.tessitura,
+        section: '/range',
+      ),
+      GuideStep(
+        icon: Icons.insights,
+        title: l10n.guideStatsTitle,
+        text: l10n.guideStatsText,
+        target: GuideTarget.profileStats,
+        section: '/profile',
+      ),
+      GuideStep(
+        icon: Icons.military_tech_rounded,
+        title: l10n.achievementsTitle,
+        text: l10n.guideAchievementsText,
+        target: GuideTarget.profileAchievements,
+        section: '/profile',
+      ),
+      GuideStep(
+        icon: Icons.history,
+        title: l10n.guideHistoryTitle,
+        text: l10n.guideHistoryText,
+        target: GuideTarget.profileHistory,
+        section: '/profile',
+      ),
+      GuideStep(
+        icon: Icons.language,
+        title: l10n.languageSectionTitle,
+        text: l10n.guideLanguageText,
+        target: GuideTarget.settingsLanguage,
+        section: '/settings',
+      ),
+      GuideStep(
+        icon: Icons.palette_outlined,
+        title: l10n.settingsAppearance,
+        text: l10n.guideThemeText,
+        target: GuideTarget.settingsTheme,
+        section: '/settings',
+      ),
+      GuideStep(
+        icon: Icons.music_note_outlined,
+        title: l10n.settingsNotation,
+        text: l10n.guideNotationText,
+        target: GuideTarget.settingsNotation,
+        section: '/settings',
+      ),
+      GuideStep(
+        icon: Icons.school_outlined,
+        title: l10n.guideTitle,
+        text: l10n.guideReopenText,
+        target: GuideTarget.settingsGuide,
+        section: '/settings',
+      ),
     ];
 
 /// Guida della schermata dell'esercizio: solo i controlli presenti.
@@ -36,129 +214,38 @@ List<GuideStep> exerciseGuideSteps(
 }) =>
     [
       if (hasKeyAndOctave) ...[
-        GuideStep(icon: Icons.piano, title: l10n.trainerKey, text: l10n.guideKey),
-        GuideStep(icon: Icons.height, title: l10n.trainerOctave, text: l10n.guideOctave),
+        GuideStep(
+          icon: Icons.piano,
+          title: l10n.trainerKey,
+          text: l10n.guideKey,
+          target: GuideTarget.trainerKey,
+        ),
+        GuideStep(
+          icon: Icons.height,
+          title: l10n.trainerOctave,
+          text: l10n.guideOctave,
+          target: GuideTarget.trainerOctave,
+        ),
       ],
-      GuideStep(icon: Icons.swap_horiz, title: l10n.guideDirectionTitle, text: l10n.guideDirection),
+      GuideStep(
+        icon: Icons.swap_horiz,
+        title: l10n.guideDirectionTitle,
+        text: l10n.guideDirection,
+        target: GuideTarget.trainerDirection,
+      ),
       if (hasRepeatTop)
-        GuideStep(icon: Icons.repeat_one, title: l10n.trainerRepeatTop, text: l10n.guideRepeatTop),
+        GuideStep(
+          icon: Icons.repeat_one,
+          title: l10n.trainerRepeatTop,
+          text: l10n.guideRepeatTop,
+          target: GuideTarget.trainerRepeatTop,
+        ),
     ];
 
-/// Mostra la guida in un pannello con la mascotte. Torna quando l'utente la
-/// chiude, la salta o arriva in fondo.
+/// Avvia la guida con Intonia sopra l'app. Torna quando l'utente la chiude,
+/// la salta o arriva in fondo.
 Future<void> showGuide(BuildContext context, List<GuideStep> steps) {
-  return showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    isScrollControlled: true,
-    builder: (context) => GuideSheet(steps: steps),
-  );
-}
-
-class GuideSheet extends StatefulWidget {
-  const GuideSheet({required this.steps, super.key});
-
-  final List<GuideStep> steps;
-
-  @override
-  State<GuideSheet> createState() => _GuideSheetState();
-}
-
-class _GuideSheetState extends State<GuideSheet> {
-  int _index = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = context.l10n;
-    final step = widget.steps[_index];
-    final last = _index == widget.steps.length - 1;
-    void close() => Navigator.of(context).pop();
-
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-        child: Column(
-          key: const ValueKey('guide-sheet'),
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Text(
-                  l10n.guideProgress(_index + 1, widget.steps.length),
-                  style: theme.textTheme.labelMedium,
-                ),
-                const Spacer(),
-                if (!last)
-                  TextButton(
-                    key: const ValueKey('guide-skip'),
-                    onPressed: close,
-                    child: Text(l10n.guideSkip),
-                  ),
-                IconButton(
-                  key: const ValueKey('guide-close'),
-                  tooltip: l10n.commonClose,
-                  icon: const Icon(Icons.close),
-                  onPressed: close,
-                ),
-              ],
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IntoniaMascot(
-                  mood: _index == 0 ? MascotMood.greeting : MascotMood.idle,
-                  size: 72,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(step.icon, size: 20, color: theme.colorScheme.primary),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(step.title,
-                                style: theme.textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w800)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(step.text, style: theme.textTheme.bodyMedium?.copyWith(height: 1.35)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                if (_index > 0) ...[
-                  Expanded(
-                    child: OutlinedButton(
-                      key: const ValueKey('guide-back'),
-                      onPressed: () => setState(() => _index--),
-                      child: Text(l10n.commonBack),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                ],
-                Expanded(
-                  child: FilledButton(
-                    key: const ValueKey('guide-next'),
-                    onPressed: last ? close : () => setState(() => _index++),
-                    child: Text(last ? l10n.guideDone : l10n.guideNext),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  return ProviderScope.containerOf(context, listen: false)
+      .read(guideTourProvider.notifier)
+      .start(steps);
 }
