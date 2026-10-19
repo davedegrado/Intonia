@@ -110,6 +110,15 @@ class AppSettingsRepository {
 
   Future<void> saveGuideSeen() => _write('guideSeen', true);
 
+  /// Durata preferita dell'allenamento del giorno in minuti (null = mai scelta).
+  Future<int?> loadWorkoutMinutes() async {
+    final json = await _read();
+    final value = json['workoutMinutes'];
+    return value is int ? value : null;
+  }
+
+  Future<void> saveWorkoutMinutes(int minutes) => _write('workoutMinutes', minutes);
+
   /// Soglia RMS di silenzio calibrata sul rumore ambientale (null = default).
   Future<double?> loadNoiseThreshold() async {
     final json = await _read();

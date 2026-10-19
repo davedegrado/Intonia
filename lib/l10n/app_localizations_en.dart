@@ -1261,4 +1261,295 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rangeNotMineConfirm => 'Remove';
+
+  @override
+  String get tessituraTitle => 'Comfort zone test';
+
+  @override
+  String get tessituraSectionTitle => 'Comfort zone (tessitura)';
+
+  @override
+  String get tessituraSectionIntro =>
+      'Not your highest or lowest note: the part of your voice where singing feels easy.';
+
+  @override
+  String get tessituraStart => 'Find your comfort zone';
+
+  @override
+  String get tessituraRetake => 'Retake the comfort zone test';
+
+  @override
+  String get tessituraHowItWorks =>
+      'You sing short phrases that go up and come back down (about 3–5 minutes). After each one, tell me how comfortable it felt. I also listen to how steady and centred each note is and whether you can hold it, but your answer counts the most.';
+
+  @override
+  String get tessituraUsesRange =>
+      'I start from your latest range test and move up and down from there.';
+
+  @override
+  String get tessituraNoRange =>
+      'No range test yet: you\'ll start by holding a comfortable note. A range test first gives a more reliable map.';
+
+  @override
+  String get tessituraNotAClassification =>
+      'This is an estimate for practice, not a voice type (soprano, alto, tenor, bass) and not a medical assessment.';
+
+  @override
+  String get tessituraCoachIntro => 'Let\'s find where your voice feels at home!';
+
+  @override
+  String get tessituraCoachFindStart => 'Hold a note that feels easy.';
+
+  @override
+  String get tessituraCoachSing => 'Sing along, no need to push.';
+
+  @override
+  String get tessituraCoachSustain => 'Now hold it steady…';
+
+  @override
+  String get tessituraCoachRate => 'How did that one feel?';
+
+  @override
+  String get tessituraCoachDone => 'Here\'s your comfort zone!';
+
+  @override
+  String get tessituraCoachProvisional =>
+      'A first estimate: repeat the test to make it more precise.';
+
+  @override
+  String tessituraTrial(int number) {
+    return 'Phrase $number';
+  }
+
+  @override
+  String get tessituraHoldNote => 'Hold this note';
+
+  @override
+  String get tessituraFinishNow => 'Finish now';
+
+  @override
+  String get tessituraCancel => 'Cancel';
+
+  @override
+  String get tessituraRateQuestion => 'How comfortable was it to sing?';
+
+  @override
+  String get tessituraRateEasy => 'Comfortable';
+
+  @override
+  String get tessituraRateEffort => 'A bit of effort';
+
+  @override
+  String get tessituraRateHard => 'Hard or strained';
+
+  @override
+  String get tessituraRateFailed => 'I couldn\'t sing it';
+
+  @override
+  String get tessituraComfortZone => 'Comfort zone';
+
+  @override
+  String get tessituraNoZone => 'Not enough data yet';
+
+  @override
+  String get tessituraMaxRange => 'Maximum range';
+
+  @override
+  String get tessituraToVerify => 'To verify';
+
+  @override
+  String tessituraReliability(String level) {
+    return 'Reliability: $level';
+  }
+
+  @override
+  String get tessituraReliabilityLow => 'low';
+
+  @override
+  String get tessituraReliabilityMedium => 'medium';
+
+  @override
+  String get tessituraReliabilityHigh => 'good';
+
+  @override
+  String get tessituraProvisional => 'Provisional estimate';
+
+  @override
+  String get tessituraLastResult => 'Last result';
+
+  @override
+  String tessituraCompareSame(String date) {
+    return 'Same width as on $date.';
+  }
+
+  @override
+  String tessituraCompareDelta(String date, String delta) {
+    return '$delta semitones compared with $date.';
+  }
+
+  @override
+  String get tessituraLegend =>
+      'Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness.';
+
+  @override
+  String get workoutTitle => 'Daily workout';
+
+  @override
+  String get workoutGoal =>
+      'A ready-made session with the exercises you already know: a warm-up, a few main exercises and a final review. When there is enough data it also brings back the exercises you find hardest.';
+
+  @override
+  String get workoutCoachReady => 'Ready for today\'s session?';
+
+  @override
+  String get workoutCoachDone => 'Workout done, well done!';
+
+  @override
+  String get workoutCoachPartial => 'Good work: next time try the ones you skipped.';
+
+  @override
+  String get workoutDurationLabel => 'Duration';
+
+  @override
+  String workoutMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String workoutSummaryLine(int minutes, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercises',
+      one: '1 exercise',
+    );
+    return 'About $minutes min · $_temp0';
+  }
+
+  @override
+  String get workoutBalanced => 'Balanced routine: there isn\'t enough data on your sessions yet.';
+
+  @override
+  String get workoutPersonalized => 'Based on your previous sessions.';
+
+  @override
+  String workoutPersonalizedHard(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercises',
+      one: '1 exercise',
+    );
+    return 'Based on your previous sessions, with $_temp0 to review.';
+  }
+
+  @override
+  String get workoutDurationNote =>
+      'Times are indicative: they come from your previous sessions or, if there are none, from the number of notes.';
+
+  @override
+  String workoutChargesNote(int count, int available) {
+    return 'Each exercise uses 1 charge, like the other exercises ($count exercises, you have $available).';
+  }
+
+  @override
+  String get workoutStart => 'Start workout';
+
+  @override
+  String get workoutRoleWarmUp => 'Warm-up';
+
+  @override
+  String get workoutRoleMain => 'Main';
+
+  @override
+  String get workoutRoleReview => 'Review';
+
+  @override
+  String get workoutDifficultTag => 'to practise';
+
+  @override
+  String get workoutDifficultReason => 'Chosen because it was harder for you in recent sessions.';
+
+  @override
+  String workoutApproxMinutes(int minutes) {
+    return '~$minutes min';
+  }
+
+  @override
+  String workoutApproxSeconds(int seconds) {
+    return '~$seconds s';
+  }
+
+  @override
+  String workoutProgress(int done, int total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String workoutRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercises left',
+      one: '1 exercise left',
+      zero: 'Last one done',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String workoutStepOf(int index, int total) {
+    return '$index of $total';
+  }
+
+  @override
+  String get workoutOpenStep => 'Start this exercise';
+
+  @override
+  String get workoutSkip => 'Skip';
+
+  @override
+  String get workoutSkipped => 'Skipped';
+
+  @override
+  String get workoutInterrupt => 'Stop workout';
+
+  @override
+  String get workoutInterruptTitle => 'Stop the workout?';
+
+  @override
+  String get workoutInterruptBody =>
+      'It will be saved as interrupted, not completed. The exercises you finished stay in your history.';
+
+  @override
+  String get workoutKeepGoing => 'Keep going';
+
+  @override
+  String get workoutCompleted => 'Workout completed';
+
+  @override
+  String get workoutPartial => 'Workout finished with some skips';
+
+  @override
+  String workoutDoneLine(int done, int total) {
+    return '$done of $total exercises completed';
+  }
+
+  @override
+  String workoutAccuracyLine(int percent) {
+    return 'Overall accuracy: $percent%';
+  }
+
+  @override
+  String workoutInProgress(int done, int total) {
+    return 'In progress: $done of $total';
+  }
+
+  @override
+  String get workoutDoneToday => 'Completed today';
+
+  @override
+  String workoutPartialToday(int done, int total) {
+    return 'Done today: $done of $total';
+  }
 }

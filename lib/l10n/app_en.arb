@@ -741,5 +741,224 @@
       }
     }
   },
-  "rangeNotMineConfirm": "Remove"
+  "rangeNotMineConfirm": "Remove",
+  "tessituraTitle": "Comfort zone test",
+  "tessituraSectionTitle": "Comfort zone (tessitura)",
+  "tessituraSectionIntro": "Not your highest or lowest note: the part of your voice where singing feels easy.",
+  "tessituraStart": "Find your comfort zone",
+  "tessituraRetake": "Retake the comfort zone test",
+  "tessituraHowItWorks": "You sing short phrases that go up and come back down (about 3–5 minutes). After each one, tell me how comfortable it felt. I also listen to how steady and centred each note is and whether you can hold it, but your answer counts the most.",
+  "tessituraUsesRange": "I start from your latest range test and move up and down from there.",
+  "tessituraNoRange": "No range test yet: you'll start by holding a comfortable note. A range test first gives a more reliable map.",
+  "tessituraNotAClassification": "This is an estimate for practice, not a voice type (soprano, alto, tenor, bass) and not a medical assessment.",
+  "tessituraCoachIntro": "Let's find where your voice feels at home!",
+  "tessituraCoachFindStart": "Hold a note that feels easy.",
+  "tessituraCoachSing": "Sing along, no need to push.",
+  "tessituraCoachSustain": "Now hold it steady…",
+  "tessituraCoachRate": "How did that one feel?",
+  "tessituraCoachDone": "Here's your comfort zone!",
+  "tessituraCoachProvisional": "A first estimate: repeat the test to make it more precise.",
+  "tessituraTrial": "Phrase {number}",
+  "@tessituraTrial": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "tessituraHoldNote": "Hold this note",
+  "tessituraFinishNow": "Finish now",
+  "tessituraCancel": "Cancel",
+  "tessituraRateQuestion": "How comfortable was it to sing?",
+  "tessituraRateEasy": "Comfortable",
+  "tessituraRateEffort": "A bit of effort",
+  "tessituraRateHard": "Hard or strained",
+  "tessituraRateFailed": "I couldn't sing it",
+  "tessituraComfortZone": "Comfort zone",
+  "tessituraNoZone": "Not enough data yet",
+  "tessituraMaxRange": "Maximum range",
+  "tessituraToVerify": "To verify",
+  "tessituraReliability": "Reliability: {level}",
+  "@tessituraReliability": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "tessituraReliabilityLow": "low",
+  "tessituraReliabilityMedium": "medium",
+  "tessituraReliabilityHigh": "good",
+  "tessituraProvisional": "Provisional estimate",
+  "tessituraLastResult": "Last result",
+  "tessituraCompareSame": "Same width as on {date}.",
+  "@tessituraCompareSame": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tessituraCompareDelta": "{delta} semitones compared with {date}.",
+  "@tessituraCompareDelta": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "tessituraLegend": "Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness.",
+  "workoutTitle": "Daily workout",
+  "workoutGoal": "A ready-made session with the exercises you already know: a warm-up, a few main exercises and a final review. When there is enough data it also brings back the exercises you find hardest.",
+  "workoutCoachReady": "Ready for today's session?",
+  "workoutCoachDone": "Workout done, well done!",
+  "workoutCoachPartial": "Good work: next time try the ones you skipped.",
+  "workoutDurationLabel": "Duration",
+  "workoutMinutes": "{minutes} min",
+  "@workoutMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutSummaryLine": "About {minutes} min · {count, plural, =1{1 exercise} other{{count} exercises}}",
+  "@workoutSummaryLine": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutBalanced": "Balanced routine: there isn't enough data on your sessions yet.",
+  "workoutPersonalized": "Based on your previous sessions.",
+  "workoutPersonalizedHard": "Based on your previous sessions, with {count, plural, =1{1 exercise} other{{count} exercises}} to review.",
+  "@workoutPersonalizedHard": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutDurationNote": "Times are indicative: they come from your previous sessions or, if there are none, from the number of notes.",
+  "workoutChargesNote": "Each exercise uses 1 charge, like the other exercises ({count} exercises, you have {available}).",
+  "@workoutChargesNote": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "available": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutStart": "Start workout",
+  "workoutRoleWarmUp": "Warm-up",
+  "workoutRoleMain": "Main",
+  "workoutRoleReview": "Review",
+  "workoutDifficultTag": "to practise",
+  "workoutDifficultReason": "Chosen because it was harder for you in recent sessions.",
+  "workoutApproxMinutes": "~{minutes} min",
+  "@workoutApproxMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutApproxSeconds": "~{seconds} s",
+  "@workoutApproxSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutProgress": "{done} of {total} done",
+  "@workoutProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutRemaining": "{count, plural, =0{Last one done} =1{1 exercise left} other{{count} exercises left}}",
+  "@workoutRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutStepOf": "{index} of {total}",
+  "@workoutStepOf": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutOpenStep": "Start this exercise",
+  "workoutSkip": "Skip",
+  "workoutSkipped": "Skipped",
+  "workoutInterrupt": "Stop workout",
+  "workoutInterruptTitle": "Stop the workout?",
+  "workoutInterruptBody": "It will be saved as interrupted, not completed. The exercises you finished stay in your history.",
+  "workoutKeepGoing": "Keep going",
+  "workoutCompleted": "Workout completed",
+  "workoutPartial": "Workout finished with some skips",
+  "workoutDoneLine": "{done} of {total} exercises completed",
+  "@workoutDoneLine": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutAccuracyLine": "Overall accuracy: {percent}%",
+  "@workoutAccuracyLine": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutInProgress": "In progress: {done} of {total}",
+  "@workoutInProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutDoneToday": "Completed today",
+  "workoutPartialToday": "Done today: {done} of {total}",
+  "@workoutPartialToday": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

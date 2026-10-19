@@ -2168,6 +2168,462 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove'**
   String get rangeNotMineConfirm;
+
+  /// No description provided for @tessituraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfort zone test'**
+  String get tessituraTitle;
+
+  /// No description provided for @tessituraSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfort zone (tessitura)'**
+  String get tessituraSectionTitle;
+
+  /// No description provided for @tessituraSectionIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Not your highest or lowest note: the part of your voice where singing feels easy.'**
+  String get tessituraSectionIntro;
+
+  /// No description provided for @tessituraStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Find your comfort zone'**
+  String get tessituraStart;
+
+  /// No description provided for @tessituraRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake the comfort zone test'**
+  String get tessituraRetake;
+
+  /// No description provided for @tessituraHowItWorks.
+  ///
+  /// In en, this message translates to:
+  /// **'You sing short phrases that go up and come back down (about 3–5 minutes). After each one, tell me how comfortable it felt. I also listen to how steady and centred each note is and whether you can hold it, but your answer counts the most.'**
+  String get tessituraHowItWorks;
+
+  /// No description provided for @tessituraUsesRange.
+  ///
+  /// In en, this message translates to:
+  /// **'I start from your latest range test and move up and down from there.'**
+  String get tessituraUsesRange;
+
+  /// No description provided for @tessituraNoRange.
+  ///
+  /// In en, this message translates to:
+  /// **'No range test yet: you\'ll start by holding a comfortable note. A range test first gives a more reliable map.'**
+  String get tessituraNoRange;
+
+  /// No description provided for @tessituraNotAClassification.
+  ///
+  /// In en, this message translates to:
+  /// **'This is an estimate for practice, not a voice type (soprano, alto, tenor, bass) and not a medical assessment.'**
+  String get tessituraNotAClassification;
+
+  /// No description provided for @tessituraCoachIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s find where your voice feels at home!'**
+  String get tessituraCoachIntro;
+
+  /// No description provided for @tessituraCoachFindStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold a note that feels easy.'**
+  String get tessituraCoachFindStart;
+
+  /// No description provided for @tessituraCoachSing.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing along, no need to push.'**
+  String get tessituraCoachSing;
+
+  /// No description provided for @tessituraCoachSustain.
+  ///
+  /// In en, this message translates to:
+  /// **'Now hold it steady…'**
+  String get tessituraCoachSustain;
+
+  /// No description provided for @tessituraCoachRate.
+  ///
+  /// In en, this message translates to:
+  /// **'How did that one feel?'**
+  String get tessituraCoachRate;
+
+  /// No description provided for @tessituraCoachDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Here\'s your comfort zone!'**
+  String get tessituraCoachDone;
+
+  /// No description provided for @tessituraCoachProvisional.
+  ///
+  /// In en, this message translates to:
+  /// **'A first estimate: repeat the test to make it more precise.'**
+  String get tessituraCoachProvisional;
+
+  /// No description provided for @tessituraTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Phrase {number}'**
+  String tessituraTrial(int number);
+
+  /// No description provided for @tessituraHoldNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold this note'**
+  String get tessituraHoldNote;
+
+  /// No description provided for @tessituraFinishNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish now'**
+  String get tessituraFinishNow;
+
+  /// No description provided for @tessituraCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get tessituraCancel;
+
+  /// No description provided for @tessituraRateQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How comfortable was it to sing?'**
+  String get tessituraRateQuestion;
+
+  /// No description provided for @tessituraRateEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfortable'**
+  String get tessituraRateEasy;
+
+  /// No description provided for @tessituraRateEffort.
+  ///
+  /// In en, this message translates to:
+  /// **'A bit of effort'**
+  String get tessituraRateEffort;
+
+  /// No description provided for @tessituraRateHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard or strained'**
+  String get tessituraRateHard;
+
+  /// No description provided for @tessituraRateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'I couldn\'t sing it'**
+  String get tessituraRateFailed;
+
+  /// No description provided for @tessituraComfortZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfort zone'**
+  String get tessituraComfortZone;
+
+  /// No description provided for @tessituraNoZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data yet'**
+  String get tessituraNoZone;
+
+  /// No description provided for @tessituraMaxRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum range'**
+  String get tessituraMaxRange;
+
+  /// No description provided for @tessituraToVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'To verify'**
+  String get tessituraToVerify;
+
+  /// No description provided for @tessituraReliability.
+  ///
+  /// In en, this message translates to:
+  /// **'Reliability: {level}'**
+  String tessituraReliability(String level);
+
+  /// No description provided for @tessituraReliabilityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'low'**
+  String get tessituraReliabilityLow;
+
+  /// No description provided for @tessituraReliabilityMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'medium'**
+  String get tessituraReliabilityMedium;
+
+  /// No description provided for @tessituraReliabilityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'good'**
+  String get tessituraReliabilityHigh;
+
+  /// No description provided for @tessituraProvisional.
+  ///
+  /// In en, this message translates to:
+  /// **'Provisional estimate'**
+  String get tessituraProvisional;
+
+  /// No description provided for @tessituraLastResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Last result'**
+  String get tessituraLastResult;
+
+  /// No description provided for @tessituraCompareSame.
+  ///
+  /// In en, this message translates to:
+  /// **'Same width as on {date}.'**
+  String tessituraCompareSame(String date);
+
+  /// No description provided for @tessituraCompareDelta.
+  ///
+  /// In en, this message translates to:
+  /// **'{delta} semitones compared with {date}.'**
+  String tessituraCompareDelta(String date, String delta);
+
+  /// No description provided for @tessituraLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness.'**
+  String get tessituraLegend;
+
+  /// No description provided for @workoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily workout'**
+  String get workoutTitle;
+
+  /// No description provided for @workoutGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'A ready-made session with the exercises you already know: a warm-up, a few main exercises and a final review. When there is enough data it also brings back the exercises you find hardest.'**
+  String get workoutGoal;
+
+  /// No description provided for @workoutCoachReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for today\'s session?'**
+  String get workoutCoachReady;
+
+  /// No description provided for @workoutCoachDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout done, well done!'**
+  String get workoutCoachDone;
+
+  /// No description provided for @workoutCoachPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Good work: next time try the ones you skipped.'**
+  String get workoutCoachPartial;
+
+  /// No description provided for @workoutDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get workoutDurationLabel;
+
+  /// No description provided for @workoutMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String workoutMinutes(int minutes);
+
+  /// No description provided for @workoutSummaryLine.
+  ///
+  /// In en, this message translates to:
+  /// **'About {minutes} min · {count, plural, =1{1 exercise} other{{count} exercises}}'**
+  String workoutSummaryLine(int minutes, int count);
+
+  /// No description provided for @workoutBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced routine: there isn\'t enough data on your sessions yet.'**
+  String get workoutBalanced;
+
+  /// No description provided for @workoutPersonalized.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your previous sessions.'**
+  String get workoutPersonalized;
+
+  /// No description provided for @workoutPersonalizedHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your previous sessions, with {count, plural, =1{1 exercise} other{{count} exercises}} to review.'**
+  String workoutPersonalizedHard(int count);
+
+  /// No description provided for @workoutDurationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Times are indicative: they come from your previous sessions or, if there are none, from the number of notes.'**
+  String get workoutDurationNote;
+
+  /// No description provided for @workoutChargesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Each exercise uses 1 charge, like the other exercises ({count} exercises, you have {available}).'**
+  String workoutChargesNote(int count, int available);
+
+  /// No description provided for @workoutStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start workout'**
+  String get workoutStart;
+
+  /// No description provided for @workoutRoleWarmUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm-up'**
+  String get workoutRoleWarmUp;
+
+  /// No description provided for @workoutRoleMain.
+  ///
+  /// In en, this message translates to:
+  /// **'Main'**
+  String get workoutRoleMain;
+
+  /// No description provided for @workoutRoleReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get workoutRoleReview;
+
+  /// No description provided for @workoutDifficultTag.
+  ///
+  /// In en, this message translates to:
+  /// **'to practise'**
+  String get workoutDifficultTag;
+
+  /// No description provided for @workoutDifficultReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Chosen because it was harder for you in recent sessions.'**
+  String get workoutDifficultReason;
+
+  /// No description provided for @workoutApproxMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'~{minutes} min'**
+  String workoutApproxMinutes(int minutes);
+
+  /// No description provided for @workoutApproxSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'~{seconds} s'**
+  String workoutApproxSeconds(int seconds);
+
+  /// No description provided for @workoutProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done'**
+  String workoutProgress(int done, int total);
+
+  /// No description provided for @workoutRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Last one done} =1{1 exercise left} other{{count} exercises left}}'**
+  String workoutRemaining(int count);
+
+  /// No description provided for @workoutStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{index} of {total}'**
+  String workoutStepOf(int index, int total);
+
+  /// No description provided for @workoutOpenStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Start this exercise'**
+  String get workoutOpenStep;
+
+  /// No description provided for @workoutSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get workoutSkip;
+
+  /// No description provided for @workoutSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get workoutSkipped;
+
+  /// No description provided for @workoutInterrupt.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop workout'**
+  String get workoutInterrupt;
+
+  /// No description provided for @workoutInterruptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the workout?'**
+  String get workoutInterruptTitle;
+
+  /// No description provided for @workoutInterruptBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It will be saved as interrupted, not completed. The exercises you finished stay in your history.'**
+  String get workoutInterruptBody;
+
+  /// No description provided for @workoutKeepGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going'**
+  String get workoutKeepGoing;
+
+  /// No description provided for @workoutCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout completed'**
+  String get workoutCompleted;
+
+  /// No description provided for @workoutPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout finished with some skips'**
+  String get workoutPartial;
+
+  /// No description provided for @workoutDoneLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} exercises completed'**
+  String workoutDoneLine(int done, int total);
+
+  /// No description provided for @workoutAccuracyLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall accuracy: {percent}%'**
+  String workoutAccuracyLine(int percent);
+
+  /// No description provided for @workoutInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress: {done} of {total}'**
+  String workoutInProgress(int done, int total);
+
+  /// No description provided for @workoutDoneToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed today'**
+  String get workoutDoneToday;
+
+  /// No description provided for @workoutPartialToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Done today: {done} of {total}'**
+  String workoutPartialToday(int done, int total);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

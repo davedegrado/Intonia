@@ -14,16 +14,20 @@ enum SessionResultAction { done, repeat }
 /// Fine esercizio a schermo intero: la mascotte commenta com'è andata e
 /// mostra la precisione (la stessa percentuale del profilo).
 class SessionResultScreen extends StatefulWidget {
-  const SessionResultScreen({required this.record, super.key});
+  const SessionResultScreen({required this.record, this.showRepeat = true, super.key});
 
   final SessionRecord record;
 
+  /// "Ripeti" (non nell'allenamento del giorno, che prosegue da sé).
+  final bool showRepeat;
+
   /// Transizione a dissolvenza, a schermo intero sopra il trainer.
-  static Route<SessionResultAction> route(SessionRecord record) {
+  static Route<SessionResultAction> route(SessionRecord record, {bool showRepeat = true}) {
     return PageRouteBuilder<SessionResultAction>(
       fullscreenDialog: true,
       transitionDuration: const Duration(milliseconds: 350),
-      pageBuilder: (context, animation, secondaryAnimation) => SessionResultScreen(record: record),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          SessionResultScreen(record: record, showRepeat: showRepeat),
       transitionsBuilder: (context, animation, secondaryAnimation, child) =>
           FadeTransition(opacity: animation, child: child),
     );
@@ -192,13 +196,15 @@ class _SessionResultScreenState extends State<SessionResultScreen>
                         child: Text(l10n.sessionContinue),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    TextButton.icon(
-                      style: TextButton.styleFrom(foregroundColor: const Color(0xFFC7D2FE)),
-                      onPressed: () => Navigator.of(context).pop(SessionResultAction.repeat),
-                      icon: const Icon(Icons.replay),
-                      label: Text(l10n.sessionRepeat),
-                    ),
+                    if (widget.showRepeat) ...[
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        style: TextButton.styleFrom(foregroundColor: const Color(0xFFC7D2FE)),
+                        onPressed: () => Navigator.of(context).pop(SessionResultAction.repeat),
+                        icon: const Icon(Icons.replay),
+                        label: Text(l10n.sessionRepeat),
+                      ),
+                    ],
                   ],
                 ),
               ),

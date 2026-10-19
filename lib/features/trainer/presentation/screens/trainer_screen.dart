@@ -12,6 +12,7 @@ import '../../../../core/session/session_record.dart';
 import '../../../../l10n/exercise_l10n.dart';
 import '../../../guide/guide.dart';
 import '../../../settings/application/settings_providers.dart';
+import '../../../workout/application/workout_controller.dart';
 import '../../../mascot/presentation/mascot_coach.dart';
 import '../../domain/trainer_mascot_mood.dart';
 import '../../domain/trainer_state.dart';
@@ -25,9 +26,16 @@ import '../widgets/session_stats_panel.dart';
 /// Trainer mobile-first: note sempre visibili in alto, controlli essenziali
 /// fissi in basso, impostazioni avanzate in un bottom sheet.
 class TrainerScreen extends ConsumerStatefulWidget {
-  const TrainerScreen({required this.exercise, super.key});
+  const TrainerScreen({required this.exercise, this.workout = false, this.startMidi, super.key});
 
   final ExerciseDefinition exercise;
+
+  /// Esercizio dell'allenamento del giorno: a fine esercizio si torna alla
+  /// sessione invece di ripeterlo.
+  final bool workout;
+
+  /// Prima nota consigliata (tonalità e ottava), se diversa da quella attuale.
+  final int? startMidi;
 
   @override
   ConsumerState<TrainerScreen> createState() => _TrainerScreenState();
@@ -38,8 +46,16 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(trainerControllerProvider.notifier).selectExercise(widget.exercise);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final controller = ref.read(trainerControllerProvider.notifier);
+      await controller.selectExercise(widget.exercise);
+      final start = widget.startMidi;
+      if (start != null && widget.exercise.rootMidi == null && mounted) {
+        final note = MusicalNote.fromMidi(start);
+        controller
+          ..updateKey(note.pitchClass)
+          ..updateOctave(note.octave);
+      }
     });
   }
 
@@ -75,8 +91,19 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
 
   /// A esercizio completato mostra il risultato a schermo intero.
   Future<void> _showResult(SessionRecord record) async {
-    final action = await Navigator.of(context).push(SessionResultScreen.route(record));
-    if (action == SessionResultAction.repeat && mounted) {
+    if (widget.workout) {
+      ref.read(workoutControllerProvider.notifier).recordCompletion(record);
+    }
+    final action = await Navigator.of(context).push(
+      SessionResultScreen.route(record, showRepeat: !widget.workout),
+    );
+    if (!mounted) {
+      return;
+    }
+    if (widget.workout) {
+      // Si torna all'allenamento, che propone l'esercizio successivo.
+      Navigator.of(context).maybePop();
+    } else if (action == SessionResultAction.repeat) {
       await startTrainerSession(context, ref);
     }
   }

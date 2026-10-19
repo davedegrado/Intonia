@@ -1263,4 +1263,297 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get rangeNotMineConfirm => 'Togli';
+
+  @override
+  String get tessituraTitle => 'Test di tessitura';
+
+  @override
+  String get tessituraSectionTitle => 'Zona comoda (tessitura)';
+
+  @override
+  String get tessituraSectionIntro =>
+      'Non la nota più alta o più bassa: la parte della voce in cui cantare ti viene facile.';
+
+  @override
+  String get tessituraStart => 'Trova la tua zona comoda';
+
+  @override
+  String get tessituraRetake => 'Rifai il test di tessitura';
+
+  @override
+  String get tessituraHowItWorks =>
+      'Canti brevi frammenti che salgono e tornano giù (circa 3–5 minuti). Dopo ognuno mi dici quanto è stato comodo. Ascolto anche quanto ogni nota è ferma e centrata e se riesci a tenerla, ma la tua risposta conta più di tutto.';
+
+  @override
+  String get tessituraUsesRange =>
+      'Parto dal tuo ultimo test di estensione e mi muovo su e giù da lì.';
+
+  @override
+  String get tessituraNoRange =>
+      'Non hai ancora un test di estensione: si parte tenendo una nota comoda. Con un test di estensione la mappa è più affidabile.';
+
+  @override
+  String get tessituraNotAClassification =>
+      'È una stima per allenarti, non una classificazione della voce (soprano, contralto, tenore, basso) né una valutazione medica.';
+
+  @override
+  String get tessituraCoachIntro => 'Cerchiamo dove la tua voce si sente a casa!';
+
+  @override
+  String get tessituraCoachFindStart => 'Tieni una nota che ti viene facile.';
+
+  @override
+  String get tessituraCoachSing => 'Canta con calma, senza forzare.';
+
+  @override
+  String get tessituraCoachSustain => 'Ora tienila ferma…';
+
+  @override
+  String get tessituraCoachRate => 'Com\'è andata questa?';
+
+  @override
+  String get tessituraCoachDone => 'Ecco la tua zona comoda!';
+
+  @override
+  String get tessituraCoachProvisional =>
+      'Una prima stima: ripeti il test per renderla più precisa.';
+
+  @override
+  String tessituraTrial(int number) {
+    return 'Frammento $number';
+  }
+
+  @override
+  String get tessituraHoldNote => 'Tieni questa nota';
+
+  @override
+  String get tessituraFinishNow => 'Termina ora';
+
+  @override
+  String get tessituraCancel => 'Annulla';
+
+  @override
+  String get tessituraRateQuestion => 'Quanto è stato comodo cantarlo?';
+
+  @override
+  String get tessituraRateEasy => 'Comodo';
+
+  @override
+  String get tessituraRateEffort => 'Un po\' faticoso';
+
+  @override
+  String get tessituraRateHard => 'Difficile o forzato';
+
+  @override
+  String get tessituraRateFailed => 'Non ci sono riuscito';
+
+  @override
+  String get tessituraComfortZone => 'Zona comoda';
+
+  @override
+  String get tessituraNoZone => 'Dati ancora insufficienti';
+
+  @override
+  String get tessituraMaxRange => 'Estensione massima';
+
+  @override
+  String get tessituraToVerify => 'Da verificare';
+
+  @override
+  String tessituraReliability(String level) {
+    return 'Affidabilità: $level';
+  }
+
+  @override
+  String get tessituraReliabilityLow => 'bassa';
+
+  @override
+  String get tessituraReliabilityMedium => 'media';
+
+  @override
+  String get tessituraReliabilityHigh => 'buona';
+
+  @override
+  String get tessituraProvisional => 'Stima provvisoria';
+
+  @override
+  String get tessituraLastResult => 'Ultimo risultato';
+
+  @override
+  String tessituraCompareSame(String date) {
+    return 'Stessa ampiezza del $date.';
+  }
+
+  @override
+  String tessituraCompareDelta(String date, String delta) {
+    return '$delta semitoni rispetto al $date.';
+  }
+
+  @override
+  String get tessituraLegend =>
+      'Fascia colorata: zona comoda. Fascia chiara: estensione massima. Punti: note da ricontrollare (risultati incerti o non coerenti). La stima è indicativa e può cambiare con la giornata, il riscaldamento e la stanchezza.';
+
+  @override
+  String get workoutTitle => 'Allenamento del giorno';
+
+  @override
+  String get workoutGoal =>
+      'Una sessione pronta con gli esercizi che già conosci: riscaldamento, alcuni esercizi principali e un ripasso finale. Quando ci sono abbastanza dati riprende anche gli esercizi che trovi più difficili.';
+
+  @override
+  String get workoutCoachReady => 'Pronto per la sessione di oggi?';
+
+  @override
+  String get workoutCoachDone => 'Allenamento finito, bravo!';
+
+  @override
+  String get workoutCoachPartial => 'Buon lavoro: la prossima volta prova anche quelli saltati.';
+
+  @override
+  String get workoutDurationLabel => 'Durata';
+
+  @override
+  String workoutMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String workoutSummaryLine(int minutes, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count esercizi',
+      one: '1 esercizio',
+    );
+    return 'Circa $minutes min · $_temp0';
+  }
+
+  @override
+  String get workoutBalanced =>
+      'Routine bilanciata: non ci sono ancora abbastanza dati sulle tue sessioni.';
+
+  @override
+  String get workoutPersonalized => 'In base alle tue sessioni precedenti.';
+
+  @override
+  String workoutPersonalizedHard(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count esercizi',
+      one: '1 esercizio',
+    );
+    return 'In base alle tue sessioni precedenti, con $_temp0 da ripassare.';
+  }
+
+  @override
+  String get workoutDurationNote =>
+      'I tempi sono indicativi: vengono dalle tue sessioni precedenti o, se non ce ne sono, dal numero di note.';
+
+  @override
+  String workoutChargesNote(int count, int available) {
+    return 'Ogni esercizio usa 1 carica, come gli altri esercizi ($count esercizi, ne hai $available).';
+  }
+
+  @override
+  String get workoutStart => 'Inizia l\'allenamento';
+
+  @override
+  String get workoutRoleWarmUp => 'Riscaldamento';
+
+  @override
+  String get workoutRoleMain => 'Principale';
+
+  @override
+  String get workoutRoleReview => 'Ripasso';
+
+  @override
+  String get workoutDifficultTag => 'da ripassare';
+
+  @override
+  String get workoutDifficultReason =>
+      'Scelto perché nelle ultime sessioni ti è risultato più difficile.';
+
+  @override
+  String workoutApproxMinutes(int minutes) {
+    return '~$minutes min';
+  }
+
+  @override
+  String workoutApproxSeconds(int seconds) {
+    return '~$seconds s';
+  }
+
+  @override
+  String workoutProgress(int done, int total) {
+    return '$done di $total fatti';
+  }
+
+  @override
+  String workoutRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mancano $count esercizi',
+      one: 'Manca 1 esercizio',
+      zero: 'Finito l\'ultimo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String workoutStepOf(int index, int total) {
+    return '$index di $total';
+  }
+
+  @override
+  String get workoutOpenStep => 'Inizia l\'esercizio';
+
+  @override
+  String get workoutSkip => 'Salta';
+
+  @override
+  String get workoutSkipped => 'Saltato';
+
+  @override
+  String get workoutInterrupt => 'Interrompi l\'allenamento';
+
+  @override
+  String get workoutInterruptTitle => 'Interrompere l\'allenamento?';
+
+  @override
+  String get workoutInterruptBody =>
+      'Verrà salvato come interrotto, non come completato. Gli esercizi finiti restano nella cronologia.';
+
+  @override
+  String get workoutKeepGoing => 'Continua';
+
+  @override
+  String get workoutCompleted => 'Allenamento completato';
+
+  @override
+  String get workoutPartial => 'Allenamento finito con qualche esercizio saltato';
+
+  @override
+  String workoutDoneLine(int done, int total) {
+    return '$done esercizi completati su $total';
+  }
+
+  @override
+  String workoutAccuracyLine(int percent) {
+    return 'Precisione complessiva: $percent%';
+  }
+
+  @override
+  String workoutInProgress(int done, int total) {
+    return 'In corso: $done di $total';
+  }
+
+  @override
+  String get workoutDoneToday => 'Completato oggi';
+
+  @override
+  String workoutPartialToday(int done, int total) {
+    return 'Fatto oggi: $done di $total';
+  }
 }
