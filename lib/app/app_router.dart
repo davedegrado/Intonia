@@ -10,6 +10,7 @@ import '../features/profile/presentation/profile_screen.dart';
 import '../features/range/presentation/range_screen.dart';
 import '../features/range/presentation/range_test_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
+import '../features/tessitura/presentation/tessitura_test_screen.dart';
 import '../features/trainer/presentation/screens/trainer_screen.dart';
 import 'main_shell.dart';
 
@@ -58,6 +59,10 @@ GoRouter createAppRouter() => GoRouter(
         GoRoute(
           path: '/range-test',
           builder: (context, state) => const RangeTestScreen(),
+        ),
+        GoRoute(
+          path: '/tessitura-test',
+          builder: (context, state) => const TessituraTestScreen(),
         ),
         GoRoute(
           path: '/pro',

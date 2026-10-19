@@ -15,6 +15,8 @@ import '../../../core/session/range_record.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
 import '../../settings/application/settings_providers.dart';
+import '../../tessitura/application/tessitura_providers.dart';
+import '../../tessitura/presentation/tessitura_map.dart';
 import '../application/range_providers.dart';
 
 /// Sezione Estensione vocale: invito al test, ultimo risultato e test
@@ -88,6 +90,8 @@ class RangeScreen extends ConsumerWidget {
             )
           else
             _LatestResult(record: latest, notation: notation),
+          const SizedBox(height: 22),
+          const _TessituraSection(),
           if (previous.isNotEmpty) ...[
             const SizedBox(height: 22),
             Text(l10n.rangePreviousTests,
@@ -364,6 +368,52 @@ class _NotMineMenu extends ConsumerWidget {
               Text(context.l10n.rangeNotMine),
             ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Test di tessitura: invito o ultimo risultato (con confronto col precedente).
+class _TessituraSection extends ConsumerWidget {
+  const _TessituraSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final notation = ref.watch(notationProvider);
+    final history = ref.watch(tessituraHistoryProvider).value ?? const [];
+    final latest = history.isNotEmpty ? history.last : null;
+    final previous = history.length > 1 ? history[history.length - 2] : null;
+    void open() => pushFullScreen(context, ref, '/tessitura-test');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.tessituraSectionTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text(l10n.tessituraSectionIntro,
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+        const SizedBox(height: 10),
+        if (latest != null)
+          TessituraResultCard(record: latest, previous: previous, notation: notation),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: latest == null
+              ? FilledButton.tonalIcon(
+                  key: const ValueKey('tessitura-open'),
+                  onPressed: open,
+                  icon: const Icon(Icons.tune_rounded),
+                  label: Text(l10n.tessituraStart),
+                )
+              : TextButton.icon(
+                  key: const ValueKey('tessitura-open'),
+                  onPressed: open,
+                  icon: const Icon(Icons.replay, size: 18),
+                  label: Text(l10n.tessituraRetake),
+                ),
         ),
       ],
     );

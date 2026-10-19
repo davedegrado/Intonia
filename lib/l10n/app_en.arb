@@ -741,5 +741,74 @@
       }
     }
   },
-  "rangeNotMineConfirm": "Remove"
+  "rangeNotMineConfirm": "Remove",
+  "tessituraTitle": "Comfort zone test",
+  "tessituraSectionTitle": "Comfort zone (tessitura)",
+  "tessituraSectionIntro": "Not your highest or lowest note: the part of your voice where singing feels easy.",
+  "tessituraStart": "Find your comfort zone",
+  "tessituraRetake": "Retake the comfort zone test",
+  "tessituraHowItWorks": "You sing short phrases that go up and come back down (about 3–5 minutes). After each one, tell me how comfortable it felt. I also listen to how steady and centred each note is and whether you can hold it, but your answer counts the most.",
+  "tessituraUsesRange": "I start from your latest range test and move up and down from there.",
+  "tessituraNoRange": "No range test yet: you'll start by holding a comfortable note. A range test first gives a more reliable map.",
+  "tessituraNotAClassification": "This is an estimate for practice, not a voice type (soprano, alto, tenor, bass) and not a medical assessment.",
+  "tessituraCoachIntro": "Let's find where your voice feels at home!",
+  "tessituraCoachFindStart": "Hold a note that feels easy.",
+  "tessituraCoachSing": "Sing along, no need to push.",
+  "tessituraCoachSustain": "Now hold it steady…",
+  "tessituraCoachRate": "How did that one feel?",
+  "tessituraCoachDone": "Here's your comfort zone!",
+  "tessituraCoachProvisional": "A first estimate: repeat the test to make it more precise.",
+  "tessituraTrial": "Phrase {number}",
+  "@tessituraTrial": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "tessituraHoldNote": "Hold this note",
+  "tessituraFinishNow": "Finish now",
+  "tessituraCancel": "Cancel",
+  "tessituraRateQuestion": "How comfortable was it to sing?",
+  "tessituraRateEasy": "Comfortable",
+  "tessituraRateEffort": "A bit of effort",
+  "tessituraRateHard": "Hard or strained",
+  "tessituraRateFailed": "I couldn't sing it",
+  "tessituraComfortZone": "Comfort zone",
+  "tessituraNoZone": "Not enough data yet",
+  "tessituraMaxRange": "Maximum range",
+  "tessituraToVerify": "To verify",
+  "tessituraReliability": "Reliability: {level}",
+  "@tessituraReliability": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "tessituraReliabilityLow": "low",
+  "tessituraReliabilityMedium": "medium",
+  "tessituraReliabilityHigh": "good",
+  "tessituraProvisional": "Provisional estimate",
+  "tessituraLastResult": "Last result",
+  "tessituraCompareSame": "Same width as on {date}.",
+  "@tessituraCompareSame": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tessituraCompareDelta": "{delta} semitones compared with {date}.",
+  "@tessituraCompareDelta": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "tessituraLegend": "Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness."
 }

@@ -16,12 +16,16 @@ import 'package:vocal_scale_trainer/features/profile/application/history_provide
 import 'package:vocal_scale_trainer/features/range/application/range_providers.dart';
 import 'package:vocal_scale_trainer/features/range/presentation/range_test_screen.dart';
 import 'package:vocal_scale_trainer/features/settings/application/settings_providers.dart';
+import 'package:vocal_scale_trainer/features/tessitura/application/tessitura_providers.dart';
+import 'package:vocal_scale_trainer/features/tessitura/domain/tessitura.dart';
+import 'package:vocal_scale_trainer/features/tessitura/presentation/tessitura_test_screen.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/controllers/trainer_controller.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/screens/trainer_screen.dart';
 import 'package:vocal_scale_trainer/features/tuner/application/tuner_controller.dart';
 import 'package:vocal_scale_trainer/services/audio/piano_audio_service.dart';
 import 'package:vocal_scale_trainer/services/storage/app_settings_repository.dart';
 import 'package:vocal_scale_trainer/services/storage/custom_exercise_repository.dart';
+import 'package:vocal_scale_trainer/services/storage/json_list_repository.dart';
 import 'package:vocal_scale_trainer/services/storage/range_history_repository.dart';
 import 'package:vocal_scale_trainer/services/storage/session_history_repository.dart';
 
@@ -44,6 +48,19 @@ class _MemoryRanges extends RangeHistoryRepository {
   Future<List<RangeRecord>> load() async => items;
   @override
   Future<void> save(List<RangeRecord> records) async => items = records;
+}
+
+class _MemoryList<T> extends JsonListRepository<T> {
+  _MemoryList(this.items)
+      : super(
+            fileName: 'unused.json',
+            fromJson: (_) => throw UnimplementedError(),
+            toJson: (_) => {});
+  List<T> items;
+  @override
+  Future<List<T>> load() async => items;
+  @override
+  Future<void> save(List<T> records) async => items = records;
 }
 
 class _MemoryCustom extends CustomExerciseRepository {
@@ -106,6 +123,7 @@ Future<_App> _launch(
   WidgetTester tester, {
   List<SessionRecord> sessions = const [],
   List<RangeRecord> ranges = const [],
+  List<TessituraRecord> tessitura = const [],
   Size size = const Size(390, 844),
   AppThemeSetting theme = AppThemeSetting.dark,
   Locale device = const Locale('it'),
@@ -125,6 +143,7 @@ Future<_App> _launch(
       chargesRepositoryProvider.overrideWithValue(InMemoryChargesRepository()),
       sessionHistoryRepositoryProvider.overrideWithValue(_MemorySessions([...sessions])),
       rangeHistoryRepositoryProvider.overrideWithValue(_MemoryRanges([...ranges])),
+      tessituraRepositoryProvider.overrideWithValue(_MemoryList([...tessitura])),
       customExerciseRepositoryProvider.overrideWithValue(_MemoryCustom()),
       appSettingsRepositoryProvider.overrideWithValue(app.settings),
       deviceLocaleProvider.overrideWithValue(device),
@@ -292,6 +311,53 @@ void main() {
     await _frames(tester, 10);
     expect(find.byKey(const ValueKey('range-start')), findsOneWidget);
     expect(find.byType(NavigationBar).hitTestable(), findsOneWidget);
+  });
+
+  testWidgets('range section offers the comfort zone test and shows the latest result',
+      (tester) async {
+    TessituraRecord record(DateTime when, int low, int high) => TessituraRecord(
+          timestamp: when,
+          comfortLow: low,
+          comfortHigh: high,
+          rangeLow: 45,
+          rangeHigh: 72,
+          toVerify: const [64],
+          reliability: TessituraReliability.medium,
+          provisional: false,
+          trials: 8,
+        );
+    await _launch(tester, ranges: [
+      RangeRecord(timestamp: DateTime(2026, 10, 1, 9), minMidi: 45, maxMidi: 72),
+    ], tessitura: [
+      record(DateTime(2026, 10, 5, 18), 55, 61),
+      record(DateTime(2026, 10, 12, 18), 55, 63),
+    ]);
+    await _openTab(tester, 'Estensione');
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('tessitura-open')), 150,
+        scrollable: find.byType(Scrollable).first);
+    expect(find.text('Zona comoda (tessitura)'), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-map')), findsOneWidget);
+    expect(find.text('Affidabilità: media'), findsOneWidget);
+    expect(find.text('+2 semitoni rispetto al 05/10 18:00.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-provisional')), findsNothing);
+
+    // Il pulsante non deve restare sotto la barra di navigazione.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+    await _frames(tester, 3);
+    await tester.tap(find.byKey(const ValueKey('tessitura-open')));
+    await _frames(tester, 5);
+    expect(find.byType(TessituraTestScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-start')), findsOneWidget);
+    expect(find.textContaining('non una classificazione della voce'), findsOneWidget);
+  });
+
+  testWidgets('range section without a comfort zone test only invites to take it', (tester) async {
+    await _launch(tester);
+    await _openTab(tester, 'Estensione');
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('tessitura-open')), 150,
+        scrollable: find.byType(Scrollable).first);
+    expect(find.text('Trova la tua zona comoda'), findsOneWidget);
+    expect(find.byKey(const ValueKey('tessitura-result')), findsNothing);
   });
 
   testWidgets('range section without tests invents no result', (tester) async {

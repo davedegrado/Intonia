@@ -1261,4 +1261,133 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rangeNotMineConfirm => 'Remove';
+
+  @override
+  String get tessituraTitle => 'Comfort zone test';
+
+  @override
+  String get tessituraSectionTitle => 'Comfort zone (tessitura)';
+
+  @override
+  String get tessituraSectionIntro =>
+      'Not your highest or lowest note: the part of your voice where singing feels easy.';
+
+  @override
+  String get tessituraStart => 'Find your comfort zone';
+
+  @override
+  String get tessituraRetake => 'Retake the comfort zone test';
+
+  @override
+  String get tessituraHowItWorks =>
+      'You sing short phrases that go up and come back down (about 3–5 minutes). After each one, tell me how comfortable it felt. I also listen to how steady and centred each note is and whether you can hold it, but your answer counts the most.';
+
+  @override
+  String get tessituraUsesRange =>
+      'I start from your latest range test and move up and down from there.';
+
+  @override
+  String get tessituraNoRange =>
+      'No range test yet: you\'ll start by holding a comfortable note. A range test first gives a more reliable map.';
+
+  @override
+  String get tessituraNotAClassification =>
+      'This is an estimate for practice, not a voice type (soprano, alto, tenor, bass) and not a medical assessment.';
+
+  @override
+  String get tessituraCoachIntro => 'Let\'s find where your voice feels at home!';
+
+  @override
+  String get tessituraCoachFindStart => 'Hold a note that feels easy.';
+
+  @override
+  String get tessituraCoachSing => 'Sing along, no need to push.';
+
+  @override
+  String get tessituraCoachSustain => 'Now hold it steady…';
+
+  @override
+  String get tessituraCoachRate => 'How did that one feel?';
+
+  @override
+  String get tessituraCoachDone => 'Here\'s your comfort zone!';
+
+  @override
+  String get tessituraCoachProvisional =>
+      'A first estimate: repeat the test to make it more precise.';
+
+  @override
+  String tessituraTrial(int number) {
+    return 'Phrase $number';
+  }
+
+  @override
+  String get tessituraHoldNote => 'Hold this note';
+
+  @override
+  String get tessituraFinishNow => 'Finish now';
+
+  @override
+  String get tessituraCancel => 'Cancel';
+
+  @override
+  String get tessituraRateQuestion => 'How comfortable was it to sing?';
+
+  @override
+  String get tessituraRateEasy => 'Comfortable';
+
+  @override
+  String get tessituraRateEffort => 'A bit of effort';
+
+  @override
+  String get tessituraRateHard => 'Hard or strained';
+
+  @override
+  String get tessituraRateFailed => 'I couldn\'t sing it';
+
+  @override
+  String get tessituraComfortZone => 'Comfort zone';
+
+  @override
+  String get tessituraNoZone => 'Not enough data yet';
+
+  @override
+  String get tessituraMaxRange => 'Maximum range';
+
+  @override
+  String get tessituraToVerify => 'To verify';
+
+  @override
+  String tessituraReliability(String level) {
+    return 'Reliability: $level';
+  }
+
+  @override
+  String get tessituraReliabilityLow => 'low';
+
+  @override
+  String get tessituraReliabilityMedium => 'medium';
+
+  @override
+  String get tessituraReliabilityHigh => 'good';
+
+  @override
+  String get tessituraProvisional => 'Provisional estimate';
+
+  @override
+  String get tessituraLastResult => 'Last result';
+
+  @override
+  String tessituraCompareSame(String date) {
+    return 'Same width as on $date.';
+  }
+
+  @override
+  String tessituraCompareDelta(String date, String delta) {
+    return '$delta semitones compared with $date.';
+  }
+
+  @override
+  String get tessituraLegend =>
+      'Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness.';
 }

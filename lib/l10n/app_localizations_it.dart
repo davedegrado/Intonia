@@ -1263,4 +1263,133 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get rangeNotMineConfirm => 'Togli';
+
+  @override
+  String get tessituraTitle => 'Test di tessitura';
+
+  @override
+  String get tessituraSectionTitle => 'Zona comoda (tessitura)';
+
+  @override
+  String get tessituraSectionIntro =>
+      'Non la nota più alta o più bassa: la parte della voce in cui cantare ti viene facile.';
+
+  @override
+  String get tessituraStart => 'Trova la tua zona comoda';
+
+  @override
+  String get tessituraRetake => 'Rifai il test di tessitura';
+
+  @override
+  String get tessituraHowItWorks =>
+      'Canti brevi frammenti che salgono e tornano giù (circa 3–5 minuti). Dopo ognuno mi dici quanto è stato comodo. Ascolto anche quanto ogni nota è ferma e centrata e se riesci a tenerla, ma la tua risposta conta più di tutto.';
+
+  @override
+  String get tessituraUsesRange =>
+      'Parto dal tuo ultimo test di estensione e mi muovo su e giù da lì.';
+
+  @override
+  String get tessituraNoRange =>
+      'Non hai ancora un test di estensione: si parte tenendo una nota comoda. Con un test di estensione la mappa è più affidabile.';
+
+  @override
+  String get tessituraNotAClassification =>
+      'È una stima per allenarti, non una classificazione della voce (soprano, contralto, tenore, basso) né una valutazione medica.';
+
+  @override
+  String get tessituraCoachIntro => 'Cerchiamo dove la tua voce si sente a casa!';
+
+  @override
+  String get tessituraCoachFindStart => 'Tieni una nota che ti viene facile.';
+
+  @override
+  String get tessituraCoachSing => 'Canta con calma, senza forzare.';
+
+  @override
+  String get tessituraCoachSustain => 'Ora tienila ferma…';
+
+  @override
+  String get tessituraCoachRate => 'Com\'è andata questa?';
+
+  @override
+  String get tessituraCoachDone => 'Ecco la tua zona comoda!';
+
+  @override
+  String get tessituraCoachProvisional =>
+      'Una prima stima: ripeti il test per renderla più precisa.';
+
+  @override
+  String tessituraTrial(int number) {
+    return 'Frammento $number';
+  }
+
+  @override
+  String get tessituraHoldNote => 'Tieni questa nota';
+
+  @override
+  String get tessituraFinishNow => 'Termina ora';
+
+  @override
+  String get tessituraCancel => 'Annulla';
+
+  @override
+  String get tessituraRateQuestion => 'Quanto è stato comodo cantarlo?';
+
+  @override
+  String get tessituraRateEasy => 'Comodo';
+
+  @override
+  String get tessituraRateEffort => 'Un po\' faticoso';
+
+  @override
+  String get tessituraRateHard => 'Difficile o forzato';
+
+  @override
+  String get tessituraRateFailed => 'Non ci sono riuscito';
+
+  @override
+  String get tessituraComfortZone => 'Zona comoda';
+
+  @override
+  String get tessituraNoZone => 'Dati ancora insufficienti';
+
+  @override
+  String get tessituraMaxRange => 'Estensione massima';
+
+  @override
+  String get tessituraToVerify => 'Da verificare';
+
+  @override
+  String tessituraReliability(String level) {
+    return 'Affidabilità: $level';
+  }
+
+  @override
+  String get tessituraReliabilityLow => 'bassa';
+
+  @override
+  String get tessituraReliabilityMedium => 'media';
+
+  @override
+  String get tessituraReliabilityHigh => 'buona';
+
+  @override
+  String get tessituraProvisional => 'Stima provvisoria';
+
+  @override
+  String get tessituraLastResult => 'Ultimo risultato';
+
+  @override
+  String tessituraCompareSame(String date) {
+    return 'Stessa ampiezza del $date.';
+  }
+
+  @override
+  String tessituraCompareDelta(String date, String delta) {
+    return '$delta semitoni rispetto al $date.';
+  }
+
+  @override
+  String get tessituraLegend =>
+      'Fascia colorata: zona comoda. Fascia chiara: estensione massima. Punti: note da ricontrollare (risultati incerti o non coerenti). La stima è indicativa e può cambiare con la giornata, il riscaldamento e la stanchezza.';
 }
