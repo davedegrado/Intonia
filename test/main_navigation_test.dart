@@ -481,10 +481,6 @@ void main() {
     final home = find.byType(HomeScreen);
     expect(Theme.of(tester.element(home)).brightness, Brightness.dark);
 
-    await tester.ensureVisible(find.byKey(const ValueKey('quick-theme')));
-
-    await tester.pump();
-
     await tester.tap(find.byKey(const ValueKey('quick-theme')));
     await _frames(tester, 5);
     await tester.tap(find.widgetWithText(ListTile, 'Chiaro'));
@@ -492,19 +488,11 @@ void main() {
     expect(app.settings.theme, AppThemeSetting.light);
     expect(Theme.of(tester.element(home)).brightness, Brightness.light);
 
-    await tester.ensureVisible(find.byKey(const ValueKey('quick-theme')));
-
-    await tester.pump();
-
     await tester.tap(find.byKey(const ValueKey('quick-theme')));
     await _frames(tester, 5);
     await tester.tap(find.widgetWithText(ListTile, 'Neon'));
     await _frames(tester, 5);
     expect(Theme.of(tester.element(home)).scaffoldBackgroundColor, const Color(0xFF0B0B1C));
-
-    await tester.ensureVisible(find.byKey(const ValueKey('quick-notation')));
-
-    await tester.pump();
 
     await tester.tap(find.byKey(const ValueKey('quick-notation')));
     await _frames(tester, 2);
@@ -656,7 +644,7 @@ void main() {
     expectCardBeside(tester);
 
     await tester.tap(find.byKey(const ValueKey('guide-back')));
-    await _frames(tester, 12);
+    await _frames(tester, 5);
     expect(find.text('1 di 28'), findsOneWidget);
     expectHighlighted(tester, find.byKey(const ValueKey('home-mic')));
 
@@ -713,7 +701,7 @@ void main() {
     await tester.scrollUntilVisible(find.byKey(const ValueKey('settings-guide')), 150,
         scrollable: find.byType(Scrollable).first);
     await tester.tap(find.byKey(const ValueKey('settings-guide')));
-    await _frames(tester, 12);
+    await _frames(tester, 8);
 
     // Si parte dalla Home anche se la guida è aperta dalle Impostazioni.
     expect(find.text('1 di 28'), findsOneWidget);
@@ -929,35 +917,27 @@ void main() {
     expect(find.text('1 di 5'), findsOneWidget);
   });
 
-  testWidgets('home: the microphone fills the first screen, the cards follow in order',
-      (tester) async {
+  testWidgets('home fits one screen on a short phone, even with larger text', (tester) async {
     tester.platformDispatcher.textScaleFactorTestValue = 1.15;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     // 360×700 utili: un Samsung da 360×780 dp tolte barra di stato e di sistema.
     await _launch(tester, size: const Size(360, 700));
     final navTop = tester.getTopLeft(find.byType(NavigationBar)).dy;
-    for (final key in ['home-bubble', 'home-mascot', 'home-mic', 'home-note-card']) {
+    for (final key in [
+      'home-bubble',
+      'home-mascot',
+      'home-mic',
+      'home-note-card',
+      'daily-workout-card',
+      'quick-settings',
+    ]) {
       expect(tester.getRect(find.byKey(ValueKey(key))).bottom, lessThanOrEqualTo(navTop),
           reason: key);
     }
-    // La card della serie si intravede: si capisce che la pagina continua.
-    expect(tester.getRect(find.byKey(const ValueKey('home-streak'))).top, lessThan(navTop));
-    double top(String key) => tester.getRect(find.byKey(ValueKey(key))).top;
-    final order = [
-      'home-note-card',
-      'home-streak',
-      'precision-card',
-      'daily-workout-card',
-      'quick-settings',
-    ].map(top).toList();
-    for (var i = 1; i < order.length; i++) {
-      expect(order[i], greaterThan(order[i - 1]), reason: 'ordine $i');
-    }
-    await tester.ensureVisible(find.byKey(const ValueKey('quick-settings')));
-    await _frames(tester, 2);
-    expect(tester.getRect(find.byKey(const ValueKey('quick-settings'))).bottom,
-        lessThanOrEqualTo(navTop));
-    expect(tester.takeException(), isNull);
+    expect(
+        find.descendant(of: find.byType(HomeScreen), matching: find.byType(SingleChildScrollView)),
+        findsNothing,
+        reason: 'niente scorrimento');
   });
 
   testWidgets('"repeat the top note" has its own row and leaves the modes full width',
@@ -987,10 +967,6 @@ void main() {
     final app = await _launch(tester);
     expect(find.text('Allenamento del giorno'), findsOneWidget);
     expect(find.textContaining('Circa 10 min'), findsOneWidget);
-
-    await tester.ensureVisible(find.byKey(const ValueKey('daily-workout-card')));
-
-    await tester.pump();
 
     await tester.tap(find.byKey(const ValueKey('daily-workout-card')));
     await _frames(tester, 5);
@@ -1047,8 +1023,6 @@ void main() {
   testWidgets('daily workout: a completed exercise shows its result and moves to the next',
       (tester) async {
     await _launch(tester);
-    await tester.ensureVisible(find.byKey(const ValueKey('daily-workout-card')));
-    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('daily-workout-card')));
     await _frames(tester, 5);
     await tester.tap(find.byKey(const ValueKey('workout-start')));
@@ -1088,8 +1062,6 @@ void main() {
   testWidgets('daily workout: skipping everything ends as partial, never as completed',
       (tester) async {
     final app = await _launch(tester);
-    await tester.ensureVisible(find.byKey(const ValueKey('daily-workout-card')));
-    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('daily-workout-card')));
     await _frames(tester, 5);
     await tester.tap(find.byKey(const ValueKey('workout-start')));

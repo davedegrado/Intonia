@@ -253,17 +253,27 @@ conservare la licenza originale in `assets/soundfonts/licenses/`, registrarla in
 
 ## 7. Widget della schermata Home
 
-Mostra la mascotte, i giorni consecutivi di allenamento (numero grande e
-pallini degli ultimi 7 giorni) e un invito ad
-allenarsi; toccandolo si apre l'app.
+Due widget distinti, toccandoli si apre l'app:
 
-- **Dati**: l'app pubblica giorno dell'ultimo allenamento e serie a quella
-  data (`lib/features/home_widget/`, `lib/services/widget/home_widget_service.dart`)
-  all'avvio e a ogni sessione salvata; il widget ricalcola lo stato del giorno
-  da solo (anche ad app chiusa), con la stessa logica in Dart, Kotlin e Swift.
-- **Android**: `IntoniaWidgetProvider.kt`, `res/layout/widget_intonia.xml`,
-  `res/xml/intonia_widget_info.xml` (3×2 celle, ridimensionabile).
-- **iOS**: `ios/IntoniaWidget/` (SwiftUI/WidgetKit, formati piccolo e medio),
-  aggiornato anche a mezzanotte.
-- **Immagini della mascotte** nei widget: generate dal disegno dell'app con
+- **Serie**: la mascotte tra luci e nuvole, i giorni di fila in grande e un
+  messaggio (serie da iniziare, primo giorno, attiva, da salvare oggi).
+- **Precisione settimanale**: precisione media della settimana in corso (note
+  corrette / note valutate, da lunedì a domenica) e i sette giorni: misurato
+  (pieno con spunta), allenamento senza note valutate (trattino), nessun
+  allenamento (vuoto), futuro (contorno tenue). Senza dati mostra "—".
+
+- **Dati**: l'app pubblica giorno dell'ultimo allenamento, serie a quella data
+  e i totali per giorno dal lunedì della settimana scorsa
+  (`lib/features/home_widget/`, `lib/services/widget/home_widget_service.dart`)
+  all'avvio e a ogni sessione salvata; i widget ricalcolano giorno e
+  settimana da soli (anche ad app chiusa), con la stessa logica in Dart,
+  Kotlin e Swift.
+- **Android**: `IntoniaWidgetProvider.kt` e `IntoniaPrecisionWidgetProvider.kt`,
+  `res/layout/widget_intonia.xml` e `widget_precision.xml`,
+  `res/xml/intonia_widget_info.xml` e `intonia_precision_widget_info.xml`
+  (4×2 celle, ridimensionabili).
+- **iOS**: `ios/IntoniaWidget/` (SwiftUI/WidgetKit; serie piccolo e medio,
+  precisione medio), aggiornati anche a mezzanotte.
+- **Scene con la mascotte** del widget della serie: generate dal disegno
+  dell'app con
   `flutter test tool/render_widget_mascot_test.dart`.

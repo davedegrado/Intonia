@@ -16,7 +16,6 @@ import '../../../core/pitch/pitch_recognition_config.dart';
 import '../../guide/guide.dart';
 import '../../mascot/domain/mascot_mood.dart';
 import '../../mascot/presentation/intonia_mascot.dart';
-import '../../progress/presentation/progress_cards.dart';
 import '../../settings/application/settings_providers.dart';
 import '../../tuner/application/tuner_controller.dart';
 import '../../workout/presentation/daily_workout_card.dart';
@@ -38,10 +37,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   /// Festa della mascotte quando la nota diventa intonata (al massimo una
   /// ogni [_celebrationGap], così non "saltella" di continuo).
   static const _celebrationGap = Duration(seconds: 3);
-
-  /// Quanto della card della serie si vede sotto la parte alta, così si
-  /// capisce che la pagina continua.
-  static const _peek = 44.0;
   bool _wasInTune = false;
   DateTime? _lastCelebration;
   int _reactionId = 0;
@@ -134,11 +129,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         bottom: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // La parte alta (fumetto, mascotte, microfono, nota) riempie la
-            // prima schermata lasciando intravedere la card della serie;
-            // sotto, scorrendo, serie, precisione, allenamento e scorciatoie.
-            // Fumetto, scritta e nota hanno altezza fissa, mascotte e
-            // microfono si prendono lo spazio che resta.
+            // Tutto sta in una schermata: fumetto, scritta, nota, allenamento
+            // e scorciatoie hanno altezza fissa, mascotte e microfono si
+            // prendono lo spazio che resta. Solo se non resta posto per una
+            // mascotte piccola (schermi minuscoli o testo molto grande) la
+            // pagina scorre invece di andare in overflow.
             final t = MediaQuery.textScalerOf(context).scale(1);
             const minMascot = 60.0;
             final fixed = 41.6 * t +
@@ -146,15 +141,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                 30 * t +
                 12 + // "Avvia ascolto"
                 _NoteCard.height +
-                28; // spaziature e margini
+                math.max(38.0, 36 * t) +
+                12 + // allenamento del giorno
+                32 * t +
+                48 + // scorciatoie
+                16 +
+                16 +
+                16; // spaziature e margini
             double micFor(double h) => (h * 0.13).clamp(60.0, 120.0);
             final minHeight = fixed + micFor(constraints.maxHeight) * 1.28 + minMascot;
-            final height = math.max(constraints.maxHeight - _peek, minHeight);
+            final height = math.max(constraints.maxHeight, minHeight);
             final micSize = micFor(height);
             final labelStyle = theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800);
             final labelHeight =
                 MediaQuery.textScalerOf(context).scale(labelStyle?.fontSize ?? 22) * 1.3;
-            final hero = SizedBox(
+            final page = SizedBox(
               height: height,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
@@ -212,40 +213,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                     ),
                     const SizedBox(height: 10),
                     _NoteCard(detection: hasPitch ? detection : _lastNote, live: hasPitch),
+                    const SizedBox(height: 8),
+                    const GuideAnchor(target: GuideTarget.dailyWorkout, child: DailyWorkoutCard()),
+                    const SizedBox(height: 8),
+                    const _QuickActions(),
                   ],
                 ),
               ),
             );
-            return SingleChildScrollView(
-              key: const ValueKey('home-scroll'),
-              child: Column(
-                children: [
-                  hero,
-                  Center(
-                    child: ConstrainedBox(
-                      // Su schermi larghi le card non si allungano a dismisura.
-                      constraints: const BoxConstraints(maxWidth: 640),
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 0, 16, 24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            StreakCard(),
-                            SizedBox(height: 12),
-                            WeeklyPrecisionCard(),
-                            SizedBox(height: 12),
-                            GuideAnchor(
-                                target: GuideTarget.dailyWorkout, child: DailyWorkoutCard()),
-                            SizedBox(height: 8),
-                            _QuickActions(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return constraints.maxHeight >= minHeight ? page : SingleChildScrollView(child: page);
           },
         ),
       ),

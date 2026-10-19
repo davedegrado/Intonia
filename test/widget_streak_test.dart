@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vocal_scale_trainer/core/session/session_record.dart';
 import 'package:vocal_scale_trainer/features/home_widget/domain/widget_streak.dart';
 
 void main() {
@@ -34,46 +35,56 @@ void main() {
     test('trained today', () {
       final view = WidgetView.of(data, DateTime(2026, 10, 13, 22));
       expect(view.status, WidgetStatus.trainedToday);
-      expect(view.title, '3 giorni di fila');
-      expect(view.message, 'Fatto! Sei inarrestabile ✨');
-      expect(view.week, [false, false, false, false, true, true, true]);
+      expect(view.streak, 3);
+      expect(view.label, 'giorni\ndi fila');
+      expect(view.message, 'Continua così, sei sulla strada giusta!');
+    });
+
+    test('first day of a streak, done today', () {
+      const one = WidgetStreakData(lastTrainingDay: '2026-10-13', streakAtLastTraining: 1);
+      final view = WidgetView.of(one, DateTime(2026, 10, 13, 8));
+      expect(view.status, WidgetStatus.firstDay);
+      expect(view.label, 'giorno\ndi fila');
+      expect(view.message, 'Primo giorno: ottimo inizio!');
     });
 
     test('trained yesterday: keep the streak alive', () {
       final view = WidgetView.of(data, DateTime(2026, 10, 14, 7));
       expect(view.status, WidgetStatus.keepStreak);
       expect(view.streak, 3);
-      expect(view.message, 'Allenati oggi: salva la serie! 🔥');
-      expect(view.week, [false, false, false, true, true, true, false]);
+      expect(view.message, 'Allenati oggi per non perdere la serie!');
     });
 
     test('streak lost after a missed day', () {
       final view = WidgetView.of(data, DateTime(2026, 10, 15));
       expect(view.status, WidgetStatus.start);
       expect(view.streak, 0);
-      expect(view.title, 'Allena l\'orecchio');
-      // I giorni allenati restano visibili anche a serie interrotta.
-      expect(view.week, [false, false, true, true, true, false, false]);
+      expect(view.message, 'Inizia oggi la tua serie!');
     });
 
     test('no history', () {
-      expect(
-          WidgetView.of(WidgetStreakData.empty, DateTime(2026, 10, 13)).status, WidgetStatus.start);
+      final view = WidgetView.of(WidgetStreakData.empty, DateTime(2026, 10, 13));
+      expect(view.status, WidgetStatus.start);
+      expect(view.streak, 0);
     });
 
-    test('singular title and month boundary', () {
+    test('month boundary', () {
       const one = WidgetStreakData(lastTrainingDay: '2026-09-30', streakAtLastTraining: 1);
       final view = WidgetView.of(one, DateTime(2026, 10, 1, 8));
       expect(view.status, WidgetStatus.keepStreak);
-      expect(view.title, '1 giorno di fila');
-      expect(view.week, [false, false, false, false, false, true, false]);
+      expect(view.streak, 1);
+      expect(view.label, 'giorno\ndi fila');
     });
 
-    test('a long streak fills the whole week', () {
-      const long = WidgetStreakData(lastTrainingDay: '2026-10-13', streakAtLastTraining: 40);
-      expect(WidgetView.of(long, DateTime(2026, 10, 13, 9)).week, List.filled(7, true));
-      expect(WidgetView.of(WidgetStreakData.empty, DateTime(2026, 10, 13)).week,
-          List.filled(7, false));
+    test('same count as the app (computeStreak)', () {
+      final sessions = [
+        DateTime(2026, 10, 11, 9),
+        DateTime(2026, 10, 12, 9),
+        DateTime(2026, 10, 13)
+      ];
+      final now = DateTime(2026, 10, 13, 20);
+      expect(WidgetView.of(WidgetStreakData.fromSessions(sessions), now).streak,
+          computeStreak(sessions, now));
     });
   });
 }

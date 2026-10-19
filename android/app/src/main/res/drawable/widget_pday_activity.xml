@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Allenamento senza note valutate: anello colorato dal codice, interno tenue. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#40FFFFFF" />
+    <stroke
+        android:width="2dp"
+        android:color="#FFFFFF" />
+</shape>

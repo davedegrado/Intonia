@@ -25,7 +25,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!-- Widget della schermata Home: serie di giorni e invito ad allenarsi. -->
+        <!-- Widget della schermata Home: serie di giorni con la mascotte. -->
         <receiver
             android:name=".IntoniaWidgetProvider"
             android:exported="true"
@@ -36,6 +36,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/intonia_widget_info" />
+        </receiver>
+        <!-- Widget della schermata Home: precisione media della settimana. -->
+        <receiver
+            android:name=".IntoniaPrecisionWidgetProvider"
+            android:exported="true"
+            android:label="@string/precision_widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/intonia_precision_widget_info" />
         </receiver>
     </application>
 </manifest>

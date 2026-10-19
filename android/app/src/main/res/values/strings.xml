@@ -1,19 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Testi del widget: inglese di base (anche per le lingue non supportate),
+<!-- Testi dei widget: inglese di base (anche per le lingue non supportate),
      italiano in values-it. -->
 <resources>
     <string name="widget_description">Your Intonia training streak with the mascot</string>
     <string name="widget_mascot_description">Intonia mascot</string>
-    <string name="widget_default_title">Train your ear</string>
-    <string name="widget_default_message">Ready to practice? 🎵</string>
-    <string name="widget_message_trained">Done! You\'re unstoppable ✨</string>
-    <string name="widget_message_keep_streak">Practice today: keep your streak! 🔥</string>
+    <string name="widget_message_start">Start your streak today!</string>
+    <string name="widget_message_keep_streak">Practise today to keep your streak!</string>
+    <string name="widget_message_first_day">Day one: great start!</string>
+    <string name="widget_message_trained">Keep it up, you\'re on track!</string>
     <plurals name="widget_streak_title">
-        <item quantity="one">%d-day streak</item>
-        <item quantity="other">%d-day streak</item>
+        <item quantity="one">%d day in a row</item>
+        <item quantity="other">%d days in a row</item>
     </plurals>
     <plurals name="widget_streak_label">
-        <item quantity="one">day\nstreak</item>
-        <item quantity="other">day\nstreak</item>
+        <item quantity="one">day\nin a row</item>
+        <item quantity="other">days\nin a row</item>
     </plurals>
+
+    <string name="precision_widget_label">Intonia accuracy</string>
+    <string name="precision_widget_description">Your average pitch accuracy this week, day by day</string>
+    <string name="precision_widget_title">Average accuracy</string>
+    <string name="precision_widget_period">This week</string>
+    <string name="precision_widget_none">No accuracy measured this week yet</string>
+    <string name="precision_widget_percent">Average accuracy this week: %d percent</string>
+    <string name="precision_message_empty">Do an exercise to measure it</string>
+    <string name="precision_message_improved">Your voice is more and more in tune!</string>
+    <string name="precision_message_high">Excellent pitch!</string>
+    <string name="precision_message_mid">Good pitch, keep going!</string>
+    <string name="precision_message_low">Every exercise sharpens your voice</string>
+    <string-array name="precision_weekdays">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+    <string name="precision_day_measured">%1$s: accuracy %2$d percent</string>
+    <string name="precision_day_activity">%1$s: practice without scored notes</string>
+    <string name="precision_day_empty">%1$s: no practice</string>
+    <string name="precision_day_future">%1$s: not yet</string>
 </resources>
