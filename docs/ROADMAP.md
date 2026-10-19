@@ -47,6 +47,9 @@ verifica esterna · `[?]` non determinabile.
   `daily_workout_test`).
 - [x] Test di tessitura (zona comoda distinta dall'estensione, con comfort
   dichiarato e misure dell'intonazione; `tessitura_test`).
+- [x] Obiettivi, missioni e badge locali (16 obiettivi in 4 categorie,
+  missioni giornaliere e settimanali, ricavati dalla cronologia;
+  `achievements_test`).
 - [ ] Spike K0 di fattibilità del Karaoke Mode: non avviato.
 
 **Karaoke Mode (K1–K3)** — [ ] non avviato, vedi `karaoke-architecture.md`.

@@ -1552,4 +1552,219 @@ class AppLocalizationsEn extends AppLocalizations {
   String workoutPartialToday(int done, int total) {
     return 'Done today: $done of $total';
   }
+
+  @override
+  String get achievementsTitle => 'Goals and badges';
+
+  @override
+  String get achievementsCoach => 'Every small step counts!';
+
+  @override
+  String get achievementsStreakCurrent => 'Current streak';
+
+  @override
+  String get achievementsStreakBest => 'Best streak';
+
+  @override
+  String get achievementsBadges => 'Badges';
+
+  @override
+  String achievementsDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String achievementsBadgeCount(int unlocked, int total) {
+    return '$unlocked of $total';
+  }
+
+  @override
+  String get achievementsDaily => 'Today\'s missions';
+
+  @override
+  String get achievementsDailyHint => 'New missions every day at midnight.';
+
+  @override
+  String get achievementsWeekly => 'This week\'s missions';
+
+  @override
+  String achievementsWeeklyHint(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Until Sunday $dateString.';
+  }
+
+  @override
+  String get achievementsMissionDone => 'Done';
+
+  @override
+  String achievementsProgress(int value, int target) {
+    return '$value of $target';
+  }
+
+  @override
+  String achievementsUnlockedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Unlocked on $dateString';
+  }
+
+  @override
+  String get achievementsLocked => 'Locked';
+
+  @override
+  String get achievementsUnlocked => 'Unlocked';
+
+  @override
+  String get achievementsToastTitle => 'Badge unlocked!';
+
+  @override
+  String achievementsProfileSummary(int unlocked, int total, int done, int missions) {
+    return '$unlocked/$total badges · today\'s missions $done/$missions';
+  }
+
+  @override
+  String get achievementsCategoryConsistency => 'Consistency';
+
+  @override
+  String get achievementsCategoryTraining => 'Practice';
+
+  @override
+  String get achievementsCategoryAccuracy => 'Accuracy';
+
+  @override
+  String get achievementsCategoryExploration => 'Exploration';
+
+  @override
+  String get achievementsCountingRules =>
+      'Only completed exercises count (not interrupted ones), and each one counts once. Accuracy goals need at least 5 sung notes. The streak counts days with at least one session: opening the app is not enough.';
+
+  @override
+  String get achievementNoteRunHint =>
+      'Counted from sessions recorded by this version of Intonia onwards.';
+
+  @override
+  String get achievementFirstExerciseName => 'First step';
+
+  @override
+  String get achievementFirstExerciseDesc => 'Complete your first exercise.';
+
+  @override
+  String get achievementDays3Name => 'Three days';
+
+  @override
+  String get achievementDays3Desc => 'Complete exercises on 3 different days.';
+
+  @override
+  String get achievementDays7Name => 'Seven days';
+
+  @override
+  String get achievementDays7Desc => 'Complete exercises on 7 different days.';
+
+  @override
+  String get achievementStreak7Name => '7-day streak';
+
+  @override
+  String get achievementStreak7Desc => 'Practise 7 days in a row.';
+
+  @override
+  String get achievementStreak30Name => '30-day streak';
+
+  @override
+  String get achievementStreak30Desc => 'Practise 30 days in a row.';
+
+  @override
+  String get achievementExercises5Name => 'Warming up';
+
+  @override
+  String get achievementExercises5Desc => 'Complete 5 exercises.';
+
+  @override
+  String get achievementExercises25Name => 'In good shape';
+
+  @override
+  String get achievementExercises25Desc => 'Complete 25 exercises.';
+
+  @override
+  String get achievementFirstWorkoutName => 'First workout';
+
+  @override
+  String get achievementFirstWorkoutDesc => 'Complete a daily workout.';
+
+  @override
+  String get achievementWorkouts5Name => 'Five workouts';
+
+  @override
+  String get achievementWorkouts5Desc => 'Complete 5 daily workouts.';
+
+  @override
+  String get achievementWorkouts10Name => 'Ten workouts';
+
+  @override
+  String get achievementWorkouts10Desc => 'Complete 10 daily workouts.';
+
+  @override
+  String get achievementPerfectName => 'Spot on!';
+
+  @override
+  String get achievementPerfectDesc => 'Complete an exercise with 100% accuracy.';
+
+  @override
+  String get achievementAccurate5Name => 'Sharp ear';
+
+  @override
+  String get achievementAccurate5Desc => 'Complete 5 exercises with at least 90% accuracy.';
+
+  @override
+  String get achievementNoteRun10Name => 'Ten in a row';
+
+  @override
+  String get achievementNoteRun10Desc => 'Sing 10 correct notes in a row in one exercise.';
+
+  @override
+  String get achievementCategories3Name => 'Explorer';
+
+  @override
+  String get achievementCategories3Desc => 'Complete exercises in 3 different categories.';
+
+  @override
+  String get achievementFirstTessituraName => 'Comfort zone';
+
+  @override
+  String get achievementFirstTessituraDesc => 'Complete the comfort zone test.';
+
+  @override
+  String get achievementSecondTessituraName => 'Back in the zone';
+
+  @override
+  String get achievementSecondTessituraDesc => 'Take the comfort zone test again on another day.';
+
+  @override
+  String get missionDailyExercises2 => 'Complete 2 exercises today';
+
+  @override
+  String get missionDailyExercises3 => 'Complete 3 exercises today';
+
+  @override
+  String get missionDailyWorkout => 'Complete the daily workout';
+
+  @override
+  String get missionDailyAccuracy90 => 'Get at least 90% in an exercise';
+
+  @override
+  String get missionWeeklyCategories2 => 'Complete exercises in 2 categories';
+
+  @override
+  String get missionWeeklyDays3 => 'Complete exercises on 3 different days';
+
+  @override
+  String get missionWeeklyWorkouts2 => 'Complete 2 daily workouts';
 }

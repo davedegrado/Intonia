@@ -194,7 +194,7 @@ class TrainerController extends Notifier<TrainerState> {
     }
     if (state.isPlaying || state.isListening) {
       final finished = state.sessionStats.finish();
-      _recordSession(finished);
+      _recordSession(finished, completed: false);
       state = state.copyWith(
         isPlaying: false,
         isListening: false,
@@ -205,7 +205,7 @@ class TrainerController extends Notifier<TrainerState> {
 
   /// Salva nello storico le sessioni di allenamento con almeno un tentativo
   /// e ritorna il riepilogo salvato.
-  SessionRecord? _recordSession(SessionStats stats) {
+  SessionRecord? _recordSession(SessionStats stats, {required bool completed}) {
     if (state.settings.mode != TrainerMode.train || stats.attempts.isEmpty) {
       return null;
     }
@@ -217,6 +217,7 @@ class TrainerController extends Notifier<TrainerState> {
       octave: state.settings.octave,
       direction: (state.settings.direction ?? _exercise.defaultDirection).name,
       repeatTop: state.settings.repeatTop,
+      completed: completed,
     );
     unawaited(ref.read(sessionHistoryProvider.notifier).add(record));
     return record;
@@ -441,7 +442,7 @@ class TrainerController extends Notifier<TrainerState> {
     final finished = currentIndex == state.sequence.length - 1 &&
         progress.every((status) => status == NoteProgressStatus.correct);
 
-    final completed = finished ? _recordSession(stats.finish()) : null;
+    final completed = finished ? _recordSession(stats.finish(), completed: true) : null;
 
     state = state.copyWith(
       progress: progress,

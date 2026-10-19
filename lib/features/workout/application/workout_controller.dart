@@ -23,6 +23,26 @@ final workoutRepositoryProvider = Provider<JsonListRepository<WorkoutRecord>>(
   ),
 );
 
+/// Allenamenti del giorno salvati, dal più vecchio al più recente.
+final workoutHistoryProvider = AsyncNotifierProvider<WorkoutHistoryNotifier, List<WorkoutRecord>>(
+  WorkoutHistoryNotifier.new,
+);
+
+class WorkoutHistoryNotifier extends AsyncNotifier<List<WorkoutRecord>> {
+  @override
+  Future<List<WorkoutRecord>> build() => ref.read(workoutRepositoryProvider).load();
+
+  Future<void> add(WorkoutRecord record) async {
+    // Attende il caricamento: aggiungere a uno stato vuoto sovrascriverebbe lo storico.
+    final current = [...await future, record];
+    if (!ref.mounted) {
+      return;
+    }
+    state = AsyncData(current);
+    await ref.read(workoutRepositoryProvider).save(current);
+  }
+}
+
 enum WorkoutStatus { ready, running, finished }
 
 enum WorkoutStepStatus { pending, current, completed, skipped }
@@ -117,7 +137,7 @@ class WorkoutController extends Notifier<WorkoutState> {
   Future<void> _load() async {
     // Proposta subito con la durata predefinita; poi preferenza e stato di oggi.
     final savedFuture = ref.read(appSettingsRepositoryProvider).loadWorkoutMinutes();
-    final historyFuture = ref.read(workoutRepositoryProvider).load();
+    final historyFuture = ref.read(workoutHistoryProvider.future);
     // Dopo build: lo stato iniziale deve esistere prima di leggerlo.
     await Future<void>.microtask(() {});
     await refresh();
@@ -287,9 +307,7 @@ class WorkoutController extends Notifier<WorkoutState> {
       lastRecord: record,
       today: record,
     );
-    final repository = ref.read(workoutRepositoryProvider);
-    final history = [...await repository.load(), record];
-    await repository.save(history);
+    await ref.read(workoutHistoryProvider.notifier).add(record);
     if (!ref.mounted) {
       return;
     }

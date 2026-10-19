@@ -1556,4 +1556,219 @@ class AppLocalizationsIt extends AppLocalizations {
   String workoutPartialToday(int done, int total) {
     return 'Fatto oggi: $done di $total';
   }
+
+  @override
+  String get achievementsTitle => 'Obiettivi e badge';
+
+  @override
+  String get achievementsCoach => 'Ogni piccolo passo conta!';
+
+  @override
+  String get achievementsStreakCurrent => 'Serie attuale';
+
+  @override
+  String get achievementsStreakBest => 'Serie migliore';
+
+  @override
+  String get achievementsBadges => 'Badge';
+
+  @override
+  String achievementsDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giorni',
+      one: '1 giorno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String achievementsBadgeCount(int unlocked, int total) {
+    return '$unlocked di $total';
+  }
+
+  @override
+  String get achievementsDaily => 'Missioni di oggi';
+
+  @override
+  String get achievementsDailyHint => 'Nuove missioni ogni giorno a mezzanotte.';
+
+  @override
+  String get achievementsWeekly => 'Missioni della settimana';
+
+  @override
+  String achievementsWeeklyHint(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Fino a domenica $dateString.';
+  }
+
+  @override
+  String get achievementsMissionDone => 'Fatto';
+
+  @override
+  String achievementsProgress(int value, int target) {
+    return '$value di $target';
+  }
+
+  @override
+  String achievementsUnlockedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Sbloccato il $dateString';
+  }
+
+  @override
+  String get achievementsLocked => 'Da sbloccare';
+
+  @override
+  String get achievementsUnlocked => 'Sbloccato';
+
+  @override
+  String get achievementsToastTitle => 'Badge sbloccato!';
+
+  @override
+  String achievementsProfileSummary(int unlocked, int total, int done, int missions) {
+    return '$unlocked/$total badge · missioni di oggi $done/$missions';
+  }
+
+  @override
+  String get achievementsCategoryConsistency => 'Costanza';
+
+  @override
+  String get achievementsCategoryTraining => 'Allenamento';
+
+  @override
+  String get achievementsCategoryAccuracy => 'Precisione';
+
+  @override
+  String get achievementsCategoryExploration => 'Esplorazione';
+
+  @override
+  String get achievementsCountingRules =>
+      'Contano solo gli esercizi completati (non quelli interrotti), ognuno una volta sola. Gli obiettivi di precisione richiedono almeno 5 note cantate. La serie conta i giorni con almeno una sessione: aprire l\'app non basta.';
+
+  @override
+  String get achievementNoteRunHint =>
+      'Contato dalle sessioni registrate da questa versione di Intonia in poi.';
+
+  @override
+  String get achievementFirstExerciseName => 'Primo passo';
+
+  @override
+  String get achievementFirstExerciseDesc => 'Completa il tuo primo esercizio.';
+
+  @override
+  String get achievementDays3Name => 'Tre giorni';
+
+  @override
+  String get achievementDays3Desc => 'Completa esercizi in 3 giorni diversi.';
+
+  @override
+  String get achievementDays7Name => 'Sette giorni';
+
+  @override
+  String get achievementDays7Desc => 'Completa esercizi in 7 giorni diversi.';
+
+  @override
+  String get achievementStreak7Name => 'Serie di 7';
+
+  @override
+  String get achievementStreak7Desc => 'Allenati 7 giorni di fila.';
+
+  @override
+  String get achievementStreak30Name => 'Serie di 30';
+
+  @override
+  String get achievementStreak30Desc => 'Allenati 30 giorni di fila.';
+
+  @override
+  String get achievementExercises5Name => 'Si comincia';
+
+  @override
+  String get achievementExercises5Desc => 'Completa 5 esercizi.';
+
+  @override
+  String get achievementExercises25Name => 'In forma';
+
+  @override
+  String get achievementExercises25Desc => 'Completa 25 esercizi.';
+
+  @override
+  String get achievementFirstWorkoutName => 'Primo allenamento';
+
+  @override
+  String get achievementFirstWorkoutDesc => 'Completa un Allenamento del giorno.';
+
+  @override
+  String get achievementWorkouts5Name => 'Cinque allenamenti';
+
+  @override
+  String get achievementWorkouts5Desc => 'Completa 5 Allenamenti del giorno.';
+
+  @override
+  String get achievementWorkouts10Name => 'Dieci allenamenti';
+
+  @override
+  String get achievementWorkouts10Desc => 'Completa 10 Allenamenti del giorno.';
+
+  @override
+  String get achievementPerfectName => 'Perfetto!';
+
+  @override
+  String get achievementPerfectDesc => 'Completa un esercizio con il 100% di precisione.';
+
+  @override
+  String get achievementAccurate5Name => 'Orecchio fino';
+
+  @override
+  String get achievementAccurate5Desc => 'Completa 5 esercizi con almeno il 90% di precisione.';
+
+  @override
+  String get achievementNoteRun10Name => 'Dieci di fila';
+
+  @override
+  String get achievementNoteRun10Desc => 'Canta 10 note corrette di fila in un esercizio.';
+
+  @override
+  String get achievementCategories3Name => 'Esploratore';
+
+  @override
+  String get achievementCategories3Desc => 'Completa esercizi in 3 categorie diverse.';
+
+  @override
+  String get achievementFirstTessituraName => 'Zona comoda';
+
+  @override
+  String get achievementFirstTessituraDesc => 'Completa il test di tessitura.';
+
+  @override
+  String get achievementSecondTessituraName => 'Di nuovo in zona';
+
+  @override
+  String get achievementSecondTessituraDesc => 'Rifai il test di tessitura in un altro giorno.';
+
+  @override
+  String get missionDailyExercises2 => 'Completa 2 esercizi oggi';
+
+  @override
+  String get missionDailyExercises3 => 'Completa 3 esercizi oggi';
+
+  @override
+  String get missionDailyWorkout => 'Completa l\'Allenamento del giorno';
+
+  @override
+  String get missionDailyAccuracy90 => 'Ottieni almeno il 90% in un esercizio';
+
+  @override
+  String get missionWeeklyCategories2 => 'Completa esercizi in 2 categorie';
+
+  @override
+  String get missionWeeklyDays3 => 'Completa esercizi in 3 giorni diversi';
+
+  @override
+  String get missionWeeklyWorkouts2 => 'Completa 2 Allenamenti del giorno';
 }

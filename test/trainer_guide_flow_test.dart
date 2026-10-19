@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
 import 'package:vocal_scale_trainer/features/access/application/access_providers.dart';
 import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
+import 'package:vocal_scale_trainer/features/profile/application/history_providers.dart';
 import 'package:vocal_scale_trainer/features/trainer/domain/note_progress.dart';
 import 'package:vocal_scale_trainer/features/trainer/presentation/controllers/trainer_controller.dart';
 import 'package:vocal_scale_trainer/services/audio/piano_audio_service.dart';
@@ -155,11 +156,28 @@ void main() {
     expect(record, isNotNull);
     expect(record!.correct, sequence.length);
     expect(record.accuracyPercent, 100);
+    expect(record.completed, isTrue, reason: 'registrato come completato dal trainer');
+    expect(record.longestCorrectRun, sequence.length);
     expect(state.isPlaying, isFalse);
 
     // Un nuovo giro azzera il risultato.
     await controller.play();
     expect(container.read(trainerControllerProvider).completedSession, isNull);
     await controller.stop();
+  });
+
+  test('stopping an exercise halfway saves it as not completed', () async {
+    final controller = container.read(trainerControllerProvider.notifier)
+      ..updateGuideEveryNote(false);
+    final sequence = container.read(trainerControllerProvider).sequence;
+    await controller.play();
+    await _waitGuideMute();
+    await _hold(mic, sequence.first);
+    await controller.stop();
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    final saved = container.read(sessionHistoryProvider).value!;
+    expect(saved, hasLength(1));
+    expect(saved.single.completed, isFalse);
+    expect(container.read(trainerControllerProvider).completedSession, isNull);
   });
 }

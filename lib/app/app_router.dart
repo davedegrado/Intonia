@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/music/exercise.dart';
+import '../features/achievements/presentation/achievements_screen.dart';
 import '../features/access/presentation/pro_screen.dart';
 import '../features/library/presentation/custom_exercise_editor_screen.dart';
 import '../features/library/presentation/exercises_screen.dart';
@@ -61,6 +62,10 @@ GoRouter createAppRouter() => GoRouter(
         GoRoute(
           path: '/range-test',
           builder: (context, state) => const RangeTestScreen(),
+        ),
+        GoRoute(
+          path: '/achievements',
+          builder: (context, state) => const AchievementsScreen(),
         ),
         GoRoute(
           path: '/workout',

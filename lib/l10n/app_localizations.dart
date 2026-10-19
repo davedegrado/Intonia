@@ -2624,6 +2624,384 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done today: {done} of {total}'**
   String workoutPartialToday(int done, int total);
+
+  /// No description provided for @achievementsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Goals and badges'**
+  String get achievementsTitle;
+
+  /// No description provided for @achievementsCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Every small step counts!'**
+  String get achievementsCoach;
+
+  /// No description provided for @achievementsStreakCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current streak'**
+  String get achievementsStreakCurrent;
+
+  /// No description provided for @achievementsStreakBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best streak'**
+  String get achievementsStreakBest;
+
+  /// No description provided for @achievementsBadges.
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get achievementsBadges;
+
+  /// No description provided for @achievementsDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String achievementsDays(int count);
+
+  /// No description provided for @achievementsBadgeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{unlocked} of {total}'**
+  String achievementsBadgeCount(int unlocked, int total);
+
+  /// No description provided for @achievementsDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s missions'**
+  String get achievementsDaily;
+
+  /// No description provided for @achievementsDailyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'New missions every day at midnight.'**
+  String get achievementsDailyHint;
+
+  /// No description provided for @achievementsWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'This week\'s missions'**
+  String get achievementsWeekly;
+
+  /// No description provided for @achievementsWeeklyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Until Sunday {date}.'**
+  String achievementsWeeklyHint(DateTime date);
+
+  /// No description provided for @achievementsMissionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get achievementsMissionDone;
+
+  /// No description provided for @achievementsProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} of {target}'**
+  String achievementsProgress(int value, int target);
+
+  /// No description provided for @achievementsUnlockedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked on {date}'**
+  String achievementsUnlockedOn(DateTime date);
+
+  /// No description provided for @achievementsLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get achievementsLocked;
+
+  /// No description provided for @achievementsUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get achievementsUnlocked;
+
+  /// No description provided for @achievementsToastTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Badge unlocked!'**
+  String get achievementsToastTitle;
+
+  /// No description provided for @achievementsProfileSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{unlocked}/{total} badges · today\'s missions {done}/{missions}'**
+  String achievementsProfileSummary(int unlocked, int total, int done, int missions);
+
+  /// No description provided for @achievementsCategoryConsistency.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistency'**
+  String get achievementsCategoryConsistency;
+
+  /// No description provided for @achievementsCategoryTraining.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get achievementsCategoryTraining;
+
+  /// No description provided for @achievementsCategoryAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy'**
+  String get achievementsCategoryAccuracy;
+
+  /// No description provided for @achievementsCategoryExploration.
+  ///
+  /// In en, this message translates to:
+  /// **'Exploration'**
+  String get achievementsCategoryExploration;
+
+  /// No description provided for @achievementsCountingRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Only completed exercises count (not interrupted ones), and each one counts once. Accuracy goals need at least 5 sung notes. The streak counts days with at least one session: opening the app is not enough.'**
+  String get achievementsCountingRules;
+
+  /// No description provided for @achievementNoteRunHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted from sessions recorded by this version of Intonia onwards.'**
+  String get achievementNoteRunHint;
+
+  /// No description provided for @achievementFirstExerciseName.
+  ///
+  /// In en, this message translates to:
+  /// **'First step'**
+  String get achievementFirstExerciseName;
+
+  /// No description provided for @achievementFirstExerciseDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your first exercise.'**
+  String get achievementFirstExerciseDesc;
+
+  /// No description provided for @achievementDays3Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Three days'**
+  String get achievementDays3Name;
+
+  /// No description provided for @achievementDays3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete exercises on 3 different days.'**
+  String get achievementDays3Desc;
+
+  /// No description provided for @achievementDays7Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Seven days'**
+  String get achievementDays7Name;
+
+  /// No description provided for @achievementDays7Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete exercises on 7 different days.'**
+  String get achievementDays7Desc;
+
+  /// No description provided for @achievementStreak7Name.
+  ///
+  /// In en, this message translates to:
+  /// **'7-day streak'**
+  String get achievementStreak7Name;
+
+  /// No description provided for @achievementStreak7Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise 7 days in a row.'**
+  String get achievementStreak7Desc;
+
+  /// No description provided for @achievementStreak30Name.
+  ///
+  /// In en, this message translates to:
+  /// **'30-day streak'**
+  String get achievementStreak30Name;
+
+  /// No description provided for @achievementStreak30Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise 30 days in a row.'**
+  String get achievementStreak30Desc;
+
+  /// No description provided for @achievementExercises5Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Warming up'**
+  String get achievementExercises5Name;
+
+  /// No description provided for @achievementExercises5Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 5 exercises.'**
+  String get achievementExercises5Desc;
+
+  /// No description provided for @achievementExercises25Name.
+  ///
+  /// In en, this message translates to:
+  /// **'In good shape'**
+  String get achievementExercises25Name;
+
+  /// No description provided for @achievementExercises25Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 25 exercises.'**
+  String get achievementExercises25Desc;
+
+  /// No description provided for @achievementFirstWorkoutName.
+  ///
+  /// In en, this message translates to:
+  /// **'First workout'**
+  String get achievementFirstWorkoutName;
+
+  /// No description provided for @achievementFirstWorkoutDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a daily workout.'**
+  String get achievementFirstWorkoutDesc;
+
+  /// No description provided for @achievementWorkouts5Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Five workouts'**
+  String get achievementWorkouts5Name;
+
+  /// No description provided for @achievementWorkouts5Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 5 daily workouts.'**
+  String get achievementWorkouts5Desc;
+
+  /// No description provided for @achievementWorkouts10Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ten workouts'**
+  String get achievementWorkouts10Name;
+
+  /// No description provided for @achievementWorkouts10Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 10 daily workouts.'**
+  String get achievementWorkouts10Desc;
+
+  /// No description provided for @achievementPerfectName.
+  ///
+  /// In en, this message translates to:
+  /// **'Spot on!'**
+  String get achievementPerfectName;
+
+  /// No description provided for @achievementPerfectDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete an exercise with 100% accuracy.'**
+  String get achievementPerfectDesc;
+
+  /// No description provided for @achievementAccurate5Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharp ear'**
+  String get achievementAccurate5Name;
+
+  /// No description provided for @achievementAccurate5Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 5 exercises with at least 90% accuracy.'**
+  String get achievementAccurate5Desc;
+
+  /// No description provided for @achievementNoteRun10Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ten in a row'**
+  String get achievementNoteRun10Name;
+
+  /// No description provided for @achievementNoteRun10Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing 10 correct notes in a row in one exercise.'**
+  String get achievementNoteRun10Desc;
+
+  /// No description provided for @achievementCategories3Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Explorer'**
+  String get achievementCategories3Name;
+
+  /// No description provided for @achievementCategories3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete exercises in 3 different categories.'**
+  String get achievementCategories3Desc;
+
+  /// No description provided for @achievementFirstTessituraName.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfort zone'**
+  String get achievementFirstTessituraName;
+
+  /// No description provided for @achievementFirstTessituraDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the comfort zone test.'**
+  String get achievementFirstTessituraDesc;
+
+  /// No description provided for @achievementSecondTessituraName.
+  ///
+  /// In en, this message translates to:
+  /// **'Back in the zone'**
+  String get achievementSecondTessituraName;
+
+  /// No description provided for @achievementSecondTessituraDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the comfort zone test again on another day.'**
+  String get achievementSecondTessituraDesc;
+
+  /// No description provided for @missionDailyExercises2.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 2 exercises today'**
+  String get missionDailyExercises2;
+
+  /// No description provided for @missionDailyExercises3.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 3 exercises today'**
+  String get missionDailyExercises3;
+
+  /// No description provided for @missionDailyWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the daily workout'**
+  String get missionDailyWorkout;
+
+  /// No description provided for @missionDailyAccuracy90.
+  ///
+  /// In en, this message translates to:
+  /// **'Get at least 90% in an exercise'**
+  String get missionDailyAccuracy90;
+
+  /// No description provided for @missionWeeklyCategories2.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete exercises in 2 categories'**
+  String get missionWeeklyCategories2;
+
+  /// No description provided for @missionWeeklyDays3.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete exercises on 3 different days'**
+  String get missionWeeklyDays3;
+
+  /// No description provided for @missionWeeklyWorkouts2.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 2 daily workouts'**
+  String get missionWeeklyWorkouts2;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
