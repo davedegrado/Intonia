@@ -78,6 +78,12 @@ class FakeMicrophonePitchService implements MicrophonePitchService {
 
   void emit(PitchDetectionResult result) => _controller.add(result);
 
+  /// Simula un errore del flusso audio (microfono perso, interruzione).
+  void emitError(Object error) => _controller.addError(error);
+
+  /// Se impostato, [start] fallisce con questa eccezione (audio non disponibile).
+  Object? startError;
+
   @override
   Stream<PitchDetectionResult> get pitchStream => _controller.stream;
 
@@ -104,6 +110,9 @@ class FakeMicrophonePitchService implements MicrophonePitchService {
     final gate = index < perCallGates.length ? perCallGates[index] : startGate;
     if (gate != null) {
       await gate.future;
+    }
+    if (startError != null) {
+      throw startError!;
     }
     if (!permissionGranted) {
       return false;

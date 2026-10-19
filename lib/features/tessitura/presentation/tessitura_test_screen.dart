@@ -13,8 +13,8 @@ import '../application/tessitura_test_controller.dart';
 import '../domain/tessitura.dart';
 import 'tessitura_map.dart';
 
-/// Test di tessitura a schermo intero: introduzione, prove guidate con la
-/// domanda sul comfort dopo ognuna, risultato.
+/// Test di tessitura a schermo intero: introduzione, prove guidate una nota
+/// alla volta, sforzo percepito, risultato.
 class TessituraTestScreen extends ConsumerStatefulWidget {
   const TessituraTestScreen({super.key});
 
@@ -63,10 +63,11 @@ class _TessituraTestScreenState extends ConsumerState<TessituraTestScreen>
             _IntroView(state: state, controller: controller, notation: notation),
           TessituraPhase.findingStart =>
             _FindingStartView(state: state, controller: controller, notation: notation),
-          TessituraPhase.singing ||
-          TessituraPhase.sustaining =>
-            _SingingView(state: state, controller: controller, notation: notation),
+          TessituraPhase.attempt =>
+            _AttemptView(state: state, controller: controller, notation: notation),
           TessituraPhase.rating => _RatingView(state: state, controller: controller),
+          TessituraPhase.strainChoice => _StrainView(controller: controller),
+          TessituraPhase.melodicOffer => _MelodicOfferView(controller: controller),
           TessituraPhase.done =>
             _DoneView(state: state, controller: controller, notation: notation),
         },
@@ -89,6 +90,8 @@ class _IntroView extends StatelessWidget {
     final message = switch (state.message) {
       TessituraMessage.microphoneDenied => l10n.rangeMicDenied,
       TessituraMessage.audioUnavailable => l10n.rangeAudioInitFailed,
+      TessituraMessage.cannotCalibrate => l10n.tessituraCannotCalibrate,
+      TessituraMessage.interrupted => l10n.tessituraInterrupted,
       null => null,
     };
     return ListView(
@@ -112,7 +115,9 @@ class _IntroView extends StatelessWidget {
         ),
         if (message != null) ...[
           const SizedBox(height: 12),
-          Text(message, style: TextStyle(color: theme.colorScheme.error)),
+          Text(message,
+              key: const ValueKey('tessitura-message'),
+              style: TextStyle(color: theme.colorScheme.error)),
         ],
         const SizedBox(height: 24),
         FilledButton.icon(
@@ -189,8 +194,29 @@ class _FindingStartView extends StatelessWidget {
   }
 }
 
-class _SingingView extends StatelessWidget {
-  const _SingingView({required this.state, required this.controller, required this.notation});
+String _stageLabel(AppLocalizations l10n, TessituraStage stage) => switch (stage) {
+      TessituraStage.calibration => l10n.tessituraStageCalibration,
+      TessituraStage.explore => l10n.tessituraStageExplore,
+      TessituraStage.hold => l10n.tessituraStageHold,
+      TessituraStage.repeat => l10n.tessituraStageRepeat,
+      TessituraStage.melodic => l10n.tessituraStageMelodic,
+    };
+
+String _cueText(AppLocalizations l10n, TessituraCue cue) => switch (cue) {
+      TessituraCue.calibrate => l10n.tessituraCueCalibrate,
+      TessituraCue.recenter => l10n.tessituraCueRecenter,
+      TessituraCue.notHeard => l10n.tessituraCueNotHeard,
+      TessituraCue.retry => l10n.tessituraCueRetry,
+      TessituraCue.stepUp => l10n.tessituraCueStepUp,
+      TessituraCue.stepDown => l10n.tessituraCueStepDown,
+      TessituraCue.backToComfort => l10n.tessituraCueBackToComfort,
+      TessituraCue.hold => l10n.tessituraCueHold,
+      TessituraCue.repeat => l10n.tessituraCueRepeat,
+      TessituraCue.melodic => l10n.tessituraCueMelodic,
+    };
+
+class _AttemptView extends StatelessWidget {
+  const _AttemptView({required this.state, required this.controller, required this.notation});
 
   final TessituraTestState state;
   final TessituraTestController controller;
@@ -201,9 +227,21 @@ class _SingingView extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final l10n = context.l10n;
-    final sustaining = state.phase == TessituraPhase.sustaining;
-    final root = state.rootMidi!;
-    final target = state.targetMidi!;
+    final step = state.step!;
+    final target = step.midi;
+    final singing = state.attemptStep == AttemptStep.singing;
+    final instruction = switch (step.stage) {
+      TessituraStage.hold => l10n.tessituraInstructionHold,
+      TessituraStage.repeat => l10n.tessituraInstructionRepeat(step.repetition, step.repetitions),
+      TessituraStage.melodic => l10n.tessituraInstructionMelodic(step.repetition, step.repetitions),
+      _ => l10n.tessituraInstructionNote,
+    };
+    final status = switch (state.attemptStep) {
+      AttemptStep.ready => l10n.tessituraGetReady,
+      AttemptStep.guide => l10n.tessituraListen,
+      AttemptStep.waiting => l10n.tessituraYourTurn,
+      AttemptStep.singing => l10n.tessituraSinging,
+    };
 
     return Column(
       children: [
@@ -211,60 +249,29 @@ class _SingingView extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
+              // Una sola indicazione alla volta: perché questa nota.
               MascotCoach(
-                mood: MascotMood.listening,
-                message: sustaining ? l10n.tessituraCoachSustain : l10n.tessituraCoachSing,
+                key: const ValueKey('tessitura-cue'),
+                mood: singing ? MascotMood.listening : MascotMood.greeting,
+                message: _cueText(l10n, step.cue),
               ),
               const SizedBox(height: 12),
               Text(
-                l10n.tessituraTrial(state.trialNumber),
-                key: const ValueKey('tessitura-trial'),
+                _stageLabel(l10n, step.stage),
+                key: const ValueKey('tessitura-stage'),
                 style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
-              // Il frammento della prova, con la nota corrente evidenziata.
-              Row(
-                children: [
-                  for (final (index, step) in TessituraTrial.pattern.indexed)
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: index == state.noteIndex
-                              ? colors.primary
-                              : index < state.noteIndex
-                                  ? colors.primaryContainer
-                                  : colors.surfaceContainerHighest,
-                        ),
-                        alignment: Alignment.center,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: NoteText(
-                            spelledMidi(root + step),
-                            notation: notation,
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: index == state.noteIndex ? colors.onPrimary : colors.onSurface,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
               Card(
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
-                  onTap: controller.replayNote,
+                  onTap: state.attemptStep == AttemptStep.waiting ? controller.replayNote : null,
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        Text(sustaining ? l10n.tessituraHoldNote : l10n.rangeSingThisNote,
-                            style: theme.textTheme.labelLarge),
+                        Text(instruction,
+                            textAlign: TextAlign.center, style: theme.textTheme.labelLarge),
                         const SizedBox(height: 6),
                         NoteText(
                           spelledMidi(target),
@@ -273,9 +280,20 @@ class _SingingView extends StatelessWidget {
                           style:
                               theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.w800),
                         ),
-                        if (sustaining) ...[
-                          const SizedBox(height: 12),
-                          LinearProgressIndicator(value: state.sustainProgress, minHeight: 8),
+                        const SizedBox(height: 6),
+                        Text(status,
+                            key: const ValueKey('tessitura-status'),
+                            style: theme.textTheme.bodyMedium?.copyWith(color: colors.primary)),
+                        const SizedBox(height: 10),
+                        LinearProgressIndicator(value: state.progress, minHeight: 8),
+                        if (state.attemptStep == AttemptStep.waiting) ...[
+                          const SizedBox(height: 8),
+                          TextButton.icon(
+                            key: const ValueKey('tessitura-replay'),
+                            onPressed: controller.replayNote,
+                            icon: const Icon(Icons.volume_up_outlined, size: 18),
+                            label: Text(l10n.tessituraReplay),
+                          ),
                         ],
                       ],
                     ),
@@ -285,8 +303,19 @@ class _SingingView extends StatelessWidget {
               const SizedBox(height: 12),
               PitchFeedbackPanel(
                 detection: state.detected,
-                toleranceCents: 40,
+                toleranceCents: TessituraThresholds.standard.toleranceCents,
                 root: MusicalNote.fromMidi(target),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FilterChip(
+                  key: const ValueKey('tessitura-register'),
+                  selected: state.registerShift,
+                  onSelected: (_) => controller.toggleRegisterShift(),
+                  avatar: const Icon(Icons.swap_vert, size: 18),
+                  label: Text(l10n.tessituraRegisterShift),
+                ),
               ),
             ],
           ),
@@ -296,28 +325,55 @@ class _SingingView extends StatelessWidget {
           color: colors.surfaceContainerLow,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    key: const ValueKey('tessitura-skip'),
-                    onPressed: controller.skipNote,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(l10n.rangeSkipNote, maxLines: 1),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        key: const ValueKey('tessitura-skip'),
+                        onPressed: controller.skipNote,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(l10n.rangeSkipNote, maxLines: 1),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: step.stage == TessituraStage.hold && singing
+                          ? FilledButton.tonal(
+                              key: const ValueKey('tessitura-end-note'),
+                              onPressed: controller.endNote,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(l10n.tessituraEndNote, maxLines: 1),
+                              ),
+                            )
+                          : OutlinedButton(
+                              key: const ValueKey('tessitura-strain'),
+                              style: OutlinedButton.styleFrom(foregroundColor: colors.error),
+                              onPressed: controller.reportStrain,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(l10n.tessituraStrain, maxLines: 1),
+                              ),
+                            ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextButton(
-                    key: const ValueKey('tessitura-finish'),
-                    onPressed: controller.finish,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(l10n.tessituraFinishNow, maxLines: 1),
-                    ),
+                if (step.stage == TessituraStage.hold && singing)
+                  TextButton(
+                    key: const ValueKey('tessitura-strain'),
+                    style: TextButton.styleFrom(foregroundColor: colors.error),
+                    onPressed: controller.reportStrain,
+                    child: Text(l10n.tessituraStrain),
                   ),
+                TextButton(
+                  key: const ValueKey('tessitura-finish'),
+                  onPressed: controller.finish,
+                  child: Text(l10n.tessituraFinishNow),
                 ),
               ],
             ),
@@ -338,40 +394,111 @@ class _RatingView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
-    Widget option(ComfortRating rating, IconData icon, String label) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: FilledButton.tonalIcon(
-            key: ValueKey('tessitura-rate-${rating.name}'),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(54),
-              alignment: Alignment.centerLeft,
-            ),
-            onPressed: () => controller.rate(rating),
-            icon: Icon(icon),
-            label: Text(label),
-          ),
-        );
-
+    final labels = [
+      l10n.tessituraEffort1,
+      l10n.tessituraEffort2,
+      l10n.tessituraEffort3,
+      l10n.tessituraEffort4,
+      l10n.tessituraEffort5,
+    ];
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         MascotCoach(mood: MascotMood.greeting, message: l10n.tessituraCoachRate),
         const SizedBox(height: 20),
         Text(
-          l10n.tessituraRateQuestion,
+          l10n.tessituraEffortQuestion,
           style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 16),
-        option(ComfortRating.easy, Icons.sentiment_very_satisfied_outlined, l10n.tessituraRateEasy),
-        option(ComfortRating.effort, Icons.sentiment_neutral_outlined, l10n.tessituraRateEffort),
-        option(ComfortRating.hard, Icons.sentiment_dissatisfied_outlined, l10n.tessituraRateHard),
+        for (final rating in EffortRating.values)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: FilledButton.tonal(
+              key: ValueKey('tessitura-effort-${rating.value}'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                alignment: Alignment.centerLeft,
+              ),
+              onPressed: () => controller.rate(rating),
+              child: Text(labels[rating.value - 1]),
+            ),
+          ),
         TextButton(
-          key: const ValueKey('tessitura-rate-failed'),
+          key: const ValueKey('tessitura-effort-skip'),
           onPressed: () => controller.rate(null),
-          child: Text(l10n.tessituraRateFailed),
+          child: Text(l10n.tessituraEffortSkip),
         ),
         const SizedBox(height: 8),
         TextButton(onPressed: controller.finish, child: Text(l10n.tessituraFinishNow)),
+      ],
+    );
+  }
+}
+
+class _StrainView extends StatelessWidget {
+  const _StrainView({required this.controller});
+
+  final TessituraTestController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        MascotCoach(mood: MascotMood.greeting, message: l10n.tessituraStrainTitle),
+        const SizedBox(height: 16),
+        Text(l10n.tessituraStrainBody, style: theme.textTheme.bodyLarge),
+        const SizedBox(height: 24),
+        FilledButton(
+          key: const ValueKey('tessitura-strain-continue'),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+          onPressed: controller.continueAfterStrain,
+          child: Text(l10n.tessituraStrainContinue),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          key: const ValueKey('tessitura-strain-finish'),
+          style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+          onPressed: controller.finish,
+          child: Text(l10n.tessituraStrainFinish),
+        ),
+      ],
+    );
+  }
+}
+
+class _MelodicOfferView extends StatelessWidget {
+  const _MelodicOfferView({required this.controller});
+
+  final TessituraTestController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        MascotCoach(mood: MascotMood.greeting, message: l10n.tessituraMelodicTitle),
+        const SizedBox(height: 16),
+        Text(l10n.tessituraMelodicBody, style: theme.textTheme.bodyLarge),
+        const SizedBox(height: 24),
+        FilledButton(
+          key: const ValueKey('tessitura-melodic-yes'),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+          onPressed: () => controller.chooseMelodic(true),
+          child: Text(l10n.tessituraMelodicYes),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          key: const ValueKey('tessitura-melodic-no'),
+          style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+          onPressed: () => controller.chooseMelodic(false),
+          child: Text(l10n.tessituraMelodicNo),
+        ),
       ],
     );
   }
@@ -386,22 +513,33 @@ class _DoneView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final l10n = context.l10n;
-    final record = state.record!;
+    final record = state.record;
+    final insufficient = record == null || !record.hasZone;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         MascotCoach(
-          mood: record.provisional ? MascotMood.greeting : MascotMood.success,
-          message: record.provisional ? l10n.tessituraCoachProvisional : l10n.tessituraCoachDone,
+          mood: insufficient || record.provisional ? MascotMood.greeting : MascotMood.success,
+          message: insufficient
+              ? l10n.tessituraInsufficientHint
+              : record.provisional
+                  ? l10n.tessituraCoachProvisional
+                  : l10n.tessituraCoachDone,
         ),
+        if (state.message == TessituraMessage.interrupted) ...[
+          const SizedBox(height: 12),
+          Text(l10n.tessituraInterrupted, style: TextStyle(color: theme.colorScheme.error)),
+        ],
         const SizedBox(height: 16),
-        TessituraResultCard(record: record, previous: state.previous, notation: notation),
+        if (record != null)
+          TessituraResultCard(record: record, previous: state.previous, notation: notation)
+        else
+          Text(l10n.tessituraNoValidData,
+              key: const ValueKey('tessitura-no-data'), style: theme.textTheme.bodyLarge),
         const SizedBox(height: 12),
-        Text(
-          l10n.tessituraLegend,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        Text(l10n.tessituraLegend, style: theme.textTheme.bodySmall),
         const SizedBox(height: 20),
         FilledButton(
           key: const ValueKey('tessitura-done'),

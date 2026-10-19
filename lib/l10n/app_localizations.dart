@@ -2154,7 +2154,7 @@ abstract class AppLocalizations {
   /// No description provided for @tessituraHowItWorks.
   ///
   /// In en, this message translates to:
-  /// **'You sing short phrases that go up and come back down (about 3–5 minutes). After each one, tell me how comfortable it felt. I also listen to how steady and centred each note is and whether you can hold it, but your answer counts the most.'**
+  /// **'You sing one note at a time after hearing it on the piano: first a comfortable note to check that I can hear you, then up and down by semitones, a few notes held longer and a few repeated. Now and then I ask how much effort it took. About 5–8 minutes; you can stop whenever you like.'**
   String get tessituraHowItWorks;
 
   /// No description provided for @tessituraUsesRange.
@@ -2187,28 +2187,16 @@ abstract class AppLocalizations {
   /// **'Hold a note that feels easy.'**
   String get tessituraCoachFindStart;
 
-  /// No description provided for @tessituraCoachSing.
-  ///
-  /// In en, this message translates to:
-  /// **'Sing along, no need to push.'**
-  String get tessituraCoachSing;
-
-  /// No description provided for @tessituraCoachSustain.
-  ///
-  /// In en, this message translates to:
-  /// **'Now hold it steady…'**
-  String get tessituraCoachSustain;
-
   /// No description provided for @tessituraCoachRate.
   ///
   /// In en, this message translates to:
-  /// **'How did that one feel?'**
+  /// **'Tell me how it went.'**
   String get tessituraCoachRate;
 
   /// No description provided for @tessituraCoachDone.
   ///
   /// In en, this message translates to:
-  /// **'Here\'s your comfort zone!'**
+  /// **'Here is your estimate!'**
   String get tessituraCoachDone;
 
   /// No description provided for @tessituraCoachProvisional.
@@ -2216,18 +2204,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A first estimate: repeat the test to make it more precise.'**
   String get tessituraCoachProvisional;
-
-  /// No description provided for @tessituraTrial.
-  ///
-  /// In en, this message translates to:
-  /// **'Phrase {number}'**
-  String tessituraTrial(int number);
-
-  /// No description provided for @tessituraHoldNote.
-  ///
-  /// In en, this message translates to:
-  /// **'Hold this note'**
-  String get tessituraHoldNote;
 
   /// No description provided for @tessituraFinishNow.
   ///
@@ -2241,36 +2217,6 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get tessituraCancel;
 
-  /// No description provided for @tessituraRateQuestion.
-  ///
-  /// In en, this message translates to:
-  /// **'How comfortable was it to sing?'**
-  String get tessituraRateQuestion;
-
-  /// No description provided for @tessituraRateEasy.
-  ///
-  /// In en, this message translates to:
-  /// **'Comfortable'**
-  String get tessituraRateEasy;
-
-  /// No description provided for @tessituraRateEffort.
-  ///
-  /// In en, this message translates to:
-  /// **'A bit of effort'**
-  String get tessituraRateEffort;
-
-  /// No description provided for @tessituraRateHard.
-  ///
-  /// In en, this message translates to:
-  /// **'Hard or strained'**
-  String get tessituraRateHard;
-
-  /// No description provided for @tessituraRateFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'I couldn\'t sing it'**
-  String get tessituraRateFailed;
-
   /// No description provided for @tessituraComfortZone.
   ///
   /// In en, this message translates to:
@@ -2280,14 +2226,8 @@ abstract class AppLocalizations {
   /// No description provided for @tessituraNoZone.
   ///
   /// In en, this message translates to:
-  /// **'Not enough data yet'**
+  /// **'Not enough data'**
   String get tessituraNoZone;
-
-  /// No description provided for @tessituraMaxRange.
-  ///
-  /// In en, this message translates to:
-  /// **'Maximum range'**
-  String get tessituraMaxRange;
 
   /// No description provided for @tessituraToVerify.
   ///
@@ -2316,7 +2256,7 @@ abstract class AppLocalizations {
   /// No description provided for @tessituraReliabilityHigh.
   ///
   /// In en, this message translates to:
-  /// **'good'**
+  /// **'high'**
   String get tessituraReliabilityHigh;
 
   /// No description provided for @tessituraProvisional.
@@ -2346,7 +2286,7 @@ abstract class AppLocalizations {
   /// No description provided for @tessituraLegend.
   ///
   /// In en, this message translates to:
-  /// **'Coloured band: comfort zone. Light band: maximum range. Dots: notes to check again (uncertain or inconsistent results). The estimate is indicative and can change with the day, warm-up and tiredness.'**
+  /// **'Three separate bands: observed range (every note reached), usable range (notes sung reliably) and comfort zone (notes that are steady, repeatable and easy for you). Dots: notes to check again. It is an estimate based on the trials and on your own judgement, not a physiological measurement: it can change with the day, warm-up and tiredness.'**
   String get tessituraLegend;
 
   /// No description provided for @workoutTitle.
@@ -3164,6 +3104,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap the gear at the top to open the settings.'**
   String get guideOpenSettingsText;
+
+  /// No description provided for @tessituraStageCalibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm-up'**
+  String get tessituraStageCalibration;
+
+  /// No description provided for @tessituraStageExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Exploration'**
+  String get tessituraStageExplore;
+
+  /// No description provided for @tessituraStageHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Holding'**
+  String get tessituraStageHold;
+
+  /// No description provided for @tessituraStageRepeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeatability'**
+  String get tessituraStageRepeat;
+
+  /// No description provided for @tessituraStageMelodic.
+  ///
+  /// In en, this message translates to:
+  /// **'Melodic phrase'**
+  String get tessituraStageMelodic;
+
+  /// No description provided for @tessituraInstructionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing this note on “ah” for about 3 seconds'**
+  String get tessituraInstructionNote;
+
+  /// No description provided for @tessituraInstructionHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold it on “ah” for about 6 seconds, if it feels comfortable'**
+  String get tessituraInstructionHold;
+
+  /// No description provided for @tessituraInstructionRepeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat the note ({number} of {total})'**
+  String tessituraInstructionRepeat(int number, int total);
+
+  /// No description provided for @tessituraInstructionMelodic.
+  ///
+  /// In en, this message translates to:
+  /// **'Note {number} of {total} of the phrase'**
+  String tessituraInstructionMelodic(int number, int total);
+
+  /// No description provided for @tessituraCueCalibrate.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s start from a comfortable note.'**
+  String get tessituraCueCalibrate;
+
+  /// No description provided for @tessituraCueRecenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s start from the note that comes naturally to you.'**
+  String get tessituraCueRecenter;
+
+  /// No description provided for @tessituraCueNotHeard.
+  ///
+  /// In en, this message translates to:
+  /// **'I couldn\'t hear you well: try again, a little closer to the microphone.'**
+  String get tessituraCueNotHeard;
+
+  /// No description provided for @tessituraCueRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s try this note again, calmly.'**
+  String get tessituraCueRetry;
+
+  /// No description provided for @tessituraCueStepUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Up one semitone.'**
+  String get tessituraCueStepUp;
+
+  /// No description provided for @tessituraCueStepDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Down one semitone.'**
+  String get tessituraCueStepDown;
+
+  /// No description provided for @tessituraCueBackToComfort.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to comfortable notes, now going down.'**
+  String get tessituraCueBackToComfort;
+
+  /// No description provided for @tessituraCueHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Now a few notes held for longer.'**
+  String get tessituraCueHold;
+
+  /// No description provided for @tessituraCueRepeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s repeat a few notes to see how reliable they are.'**
+  String get tessituraCueRepeat;
+
+  /// No description provided for @tessituraCueMelodic.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing the notes one after the other.'**
+  String get tessituraCueMelodic;
+
+  /// No description provided for @tessituraGetReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Get ready…'**
+  String get tessituraGetReady;
+
+  /// No description provided for @tessituraListen.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to the note…'**
+  String get tessituraListen;
+
+  /// No description provided for @tessituraYourTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing when you\'re ready'**
+  String get tessituraYourTurn;
+
+  /// No description provided for @tessituraSinging.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening'**
+  String get tessituraSinging;
+
+  /// No description provided for @tessituraReplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen again'**
+  String get tessituraReplay;
+
+  /// No description provided for @tessituraEndNote.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s enough'**
+  String get tessituraEndNote;
+
+  /// No description provided for @tessituraStrain.
+  ///
+  /// In en, this message translates to:
+  /// **'Too much effort'**
+  String get tessituraStrain;
+
+  /// No description provided for @tessituraRegisterShift.
+  ///
+  /// In en, this message translates to:
+  /// **'I changed register'**
+  String get tessituraRegisterShift;
+
+  /// No description provided for @tessituraEffortQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How much effort did this note take?'**
+  String get tessituraEffortQuestion;
+
+  /// No description provided for @tessituraEffort1.
+  ///
+  /// In en, this message translates to:
+  /// **'1 · Very easy'**
+  String get tessituraEffort1;
+
+  /// No description provided for @tessituraEffort2.
+  ///
+  /// In en, this message translates to:
+  /// **'2 · Easy'**
+  String get tessituraEffort2;
+
+  /// No description provided for @tessituraEffort3.
+  ///
+  /// In en, this message translates to:
+  /// **'3 · Moderate'**
+  String get tessituraEffort3;
+
+  /// No description provided for @tessituraEffort4.
+  ///
+  /// In en, this message translates to:
+  /// **'4 · Hard'**
+  String get tessituraEffort4;
+
+  /// No description provided for @tessituraEffort5.
+  ///
+  /// In en, this message translates to:
+  /// **'5 · Very hard'**
+  String get tessituraEffort5;
+
+  /// No description provided for @tessituraEffortSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'d rather not say'**
+  String get tessituraEffortSkip;
+
+  /// No description provided for @tessituraStrainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s pause for a moment'**
+  String get tessituraStrainTitle;
+
+  /// No description provided for @tessituraStrainBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t force your voice. If you feel discomfort or pain, stop: you can go back to comfortable notes or finish here.'**
+  String get tessituraStrainBody;
+
+  /// No description provided for @tessituraStrainContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to comfortable notes'**
+  String get tessituraStrainContinue;
+
+  /// No description provided for @tessituraStrainFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish the test'**
+  String get tessituraStrainFinish;
+
+  /// No description provided for @tessituraMelodicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Melodic check (optional)'**
+  String get tessituraMelodicTitle;
+
+  /// No description provided for @tessituraMelodicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A 9-note phrase inside the zone found, to see whether the notes also work one after the other. About 30 seconds.'**
+  String get tessituraMelodicBody;
+
+  /// No description provided for @tessituraMelodicYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Do the check'**
+  String get tessituraMelodicYes;
+
+  /// No description provided for @tessituraMelodicNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip and show the result'**
+  String get tessituraMelodicNo;
+
+  /// No description provided for @tessituraCannotCalibrate.
+  ///
+  /// In en, this message translates to:
+  /// **'I can\'t hear your voice well: try somewhere quieter, a little closer to the microphone.'**
+  String get tessituraCannotCalibrate;
+
+  /// No description provided for @tessituraInterrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'The microphone stopped: here is the result from the trials so far.'**
+  String get tessituraInterrupted;
+
+  /// No description provided for @tessituraObserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Observed range'**
+  String get tessituraObserved;
+
+  /// No description provided for @tessituraUsable.
+  ///
+  /// In en, this message translates to:
+  /// **'Usable range'**
+  String get tessituraUsable;
+
+  /// No description provided for @tessituraLowestObserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest detected'**
+  String get tessituraLowestObserved;
+
+  /// No description provided for @tessituraHighestObserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest detected'**
+  String get tessituraHighestObserved;
+
+  /// No description provided for @tessituraInsufficientHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The data collected is not enough to estimate a reliable comfort zone. Repeat the test calmly, somewhere quiet.'**
+  String get tessituraInsufficientHint;
+
+  /// No description provided for @tessituraReliabilityInsufficient.
+  ///
+  /// In en, this message translates to:
+  /// **'insufficient'**
+  String get tessituraReliabilityInsufficient;
+
+  /// No description provided for @tessituraRegisterNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible register change'**
+  String get tessituraRegisterNotes;
+
+  /// No description provided for @tessituraSignalIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'Several trials could not be assessed (noise or weak signal).'**
+  String get tessituraSignalIssues;
+
+  /// No description provided for @tessituraEstimateDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'An estimate based on the trials and your own judgement, not a physiological measurement.'**
+  String get tessituraEstimateDisclaimer;
+
+  /// No description provided for @tessituraNoValidData.
+  ///
+  /// In en, this message translates to:
+  /// **'No trial could be assessed: the result was not saved.'**
+  String get tessituraNoValidData;
+
+  /// No description provided for @extremeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find your extreme notes'**
+  String get extremeTitle;
+
+  /// No description provided for @extremeSectionIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing any song freely: Intonia finds the highest and lowest notes you sing.'**
+  String get extremeSectionIntro;
+
+  /// No description provided for @extremeIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Sing a song you like, however you like. Intonia listens and, when you\'re done, shows you the lowest and highest notes it recognised. No reference notes are needed and nothing is recorded.'**
+  String get extremeIntro;
+
+  /// No description provided for @extremeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start singing'**
+  String get extremeStart;
+
+  /// No description provided for @extremeListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening: sing freely'**
+  String get extremeListening;
+
+  /// No description provided for @extremeLowestSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest so far'**
+  String get extremeLowestSoFar;
+
+  /// No description provided for @extremeHighestSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest so far'**
+  String get extremeHighestSoFar;
+
+  /// No description provided for @extremeStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish and show the results'**
+  String get extremeStop;
+
+  /// No description provided for @extremeLowest.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest note detected'**
+  String get extremeLowest;
+
+  /// No description provided for @extremeHighest.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest note detected'**
+  String get extremeHighest;
+
+  /// No description provided for @extremeNone.
+  ///
+  /// In en, this message translates to:
+  /// **'I didn\'t recognise any note. Try again singing a little louder, close to the microphone.'**
+  String get extremeNone;
+
+  /// No description provided for @extremeSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'I recognised only one note: sing a more varied song to find the other end too.'**
+  String get extremeSingle;
+
+  /// No description provided for @extremeUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'uncertain'**
+  String get extremeUncertain;
+
+  /// No description provided for @extremeUncertainHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncertain notes were heard only briefly: they may be inaccurate.'**
+  String get extremeUncertainHint;
+
+  /// No description provided for @extremeQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Detection quality: {level}'**
+  String extremeQuality(String level);
+
+  /// No description provided for @extremeQualityGood.
+  ///
+  /// In en, this message translates to:
+  /// **'good'**
+  String get extremeQualityGood;
+
+  /// No description provided for @extremeQualityFair.
+  ///
+  /// In en, this message translates to:
+  /// **'fair'**
+  String get extremeQualityFair;
+
+  /// No description provided for @extremeQualityPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'poor'**
+  String get extremeQualityPoor;
+
+  /// No description provided for @extremeQualityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'With little singing or a lot of noise the result is less reliable.'**
+  String get extremeQualityHint;
+
+  /// No description provided for @extremeDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'These are the highest and lowest notes detected in this session, not the full range of your voice, and they don\'t change your comfort zone. Notes above about C6 are not detected.'**
+  String get extremeDisclaimer;
+
+  /// No description provided for @extremeAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Start over'**
+  String get extremeAgain;
+
+  /// No description provided for @extremeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Range'**
+  String get extremeBack;
+
+  /// No description provided for @extremeInterrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'The microphone stopped: here is what I heard until then.'**
+  String get extremeInterrupted;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

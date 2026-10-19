@@ -122,6 +122,8 @@ class RangeScreen extends ConsumerWidget {
                 label: Text(l10n.rangeHistoryInProfile),
               ),
             ),
+          const SizedBox(height: 22),
+          const _ExtremeNotesSection(),
         ],
       ),
     );
@@ -174,7 +176,7 @@ class _LatestResult extends StatelessWidget {
               style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
             ),
             const SizedBox(height: 16),
-            _RangeBar(low: record.minMidi, high: record.maxMidi),
+            RangeBar(low: record.minMidi, high: record.maxMidi),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -204,8 +206,8 @@ class _LatestResult extends StatelessWidget {
 
 /// Estensione sulla tastiera: binario neutro (DO2–DO6, allargato se serve) e
 /// tratto colorato fra la nota più grave e la più acuta.
-class _RangeBar extends StatelessWidget {
-  const _RangeBar({required this.low, required this.high});
+class RangeBar extends StatelessWidget {
+  const RangeBar({required this.low, required this.high, super.key});
 
   final int low;
   final int high;
@@ -418,6 +420,37 @@ class _TessituraSection extends ConsumerWidget {
                   icon: const Icon(Icons.replay, size: 18),
                   label: Text(l10n.tessituraRetake),
                 ),
+        ),
+      ],
+    );
+  }
+}
+
+/// "Trova le note estreme": canto libero, indipendente dalla tessitura.
+class _ExtremeNotesSection extends ConsumerWidget {
+  const _ExtremeNotesSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.extremeTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text(l10n.extremeSectionIntro,
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FilledButton.tonalIcon(
+            key: const ValueKey('extreme-open'),
+            onPressed: () => pushFullScreen(context, ref, '/extreme-notes'),
+            icon: const Icon(Icons.queue_music_rounded),
+            label: Text(l10n.extremeTitle),
+          ),
         ),
       ],
     );

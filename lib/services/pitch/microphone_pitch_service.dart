@@ -13,6 +13,11 @@ class MicrophonePitchService {
   static const sampleRate = 44100;
   static const frameSize = 2048;
 
+  /// Un risultato (anche di silenzio) ogni mezza finestra: ~23,2 ms. I frame
+  /// arrivano a gruppi, quindi le durate si contano in frame, non con
+  /// l'orologio.
+  static const double hopMs = frameSize / 2 / sampleRate * 1000;
+
   /// Analisi banda bassa (vocal fry): finestra doppia, decimata di 4x.
   static const _lowDecimation = 4;
   static const _lowWindowSize = 4096; // ~93 ms a 44.1 kHz

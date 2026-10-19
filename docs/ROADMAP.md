@@ -48,8 +48,14 @@ verifica esterna · `[?]` non determinabile.
   [x] *Allenamento del giorno* (sessione pronta da 5/10/15 minuti con gli
   esercizi esistenti, selezione locale e deterministica;
   `daily_workout_test`).
-- [x] Test di tessitura (zona comoda distinta dall'estensione, con comfort
-  dichiarato e misure dell'intonazione; `tessitura_test`).
+- [x] Test di tessitura a fasi (riscaldamento, esplorazione per semitoni,
+  tenuta, ripetibilità, sforzo 1–5, verifica melodica facoltativa): estensione
+  osservata, estensione utilizzabile e zona comoda distinte, attendibilità
+  separata dall'ampiezza (`tessitura_test`). Il registro non è riconosciuto
+  dal rilevatore: lo segnala l'utente.
+- [x] Trova le note estreme: canto libero, nota più alta e più bassa
+  riconosciute, senza note di riferimento e senza salvare nulla
+  (`extreme_notes_test`).
 - [x] Obiettivi, missioni e badge locali (16 obiettivi in 4 categorie,
   missioni giornaliere e settimanali, ricavati dalla cronologia;
   `achievements_test`).

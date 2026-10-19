@@ -1252,7 +1252,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tessituraHowItWorks =>
-      'Canti brevi frammenti che salgono e tornano giù (circa 3–5 minuti). Dopo ognuno mi dici quanto è stato comodo. Ascolto anche quanto ogni nota è ferma e centrata e se riesci a tenerla, ma la tua risposta conta più di tutto.';
+      'Canti una nota alla volta, dopo averla ascoltata al piano: prima una nota comoda per verificare che ti senta bene, poi salendo e scendendo per semitoni, alcune note tenute più a lungo e alcune ripetute. Ogni tanto ti chiedo quanto sforzo ti è costato. Circa 5–8 minuti; puoi fermarti quando vuoi.';
 
   @override
   String get tessituraUsesRange =>
@@ -1273,28 +1273,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tessituraCoachFindStart => 'Tieni una nota che ti viene facile.';
 
   @override
-  String get tessituraCoachSing => 'Canta con calma, senza forzare.';
+  String get tessituraCoachRate => 'Dimmi com\'è andata.';
 
   @override
-  String get tessituraCoachSustain => 'Ora tienila ferma…';
-
-  @override
-  String get tessituraCoachRate => 'Com\'è andata questa?';
-
-  @override
-  String get tessituraCoachDone => 'Ecco la tua zona comoda!';
+  String get tessituraCoachDone => 'Ecco la tua stima!';
 
   @override
   String get tessituraCoachProvisional =>
       'Una prima stima: ripeti il test per renderla più precisa.';
-
-  @override
-  String tessituraTrial(int number) {
-    return 'Frammento $number';
-  }
-
-  @override
-  String get tessituraHoldNote => 'Tieni questa nota';
 
   @override
   String get tessituraFinishNow => 'Termina ora';
@@ -1303,35 +1289,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tessituraCancel => 'Annulla';
 
   @override
-  String get tessituraRateQuestion => 'Quanto è stato comodo cantarlo?';
-
-  @override
-  String get tessituraRateEasy => 'Comodo';
-
-  @override
-  String get tessituraRateEffort => 'Un po\' faticoso';
-
-  @override
-  String get tessituraRateHard => 'Difficile o forzato';
-
-  @override
-  String get tessituraRateFailed => 'Non ci sono riuscito';
-
-  @override
   String get tessituraComfortZone => 'Zona comoda';
 
   @override
-  String get tessituraNoZone => 'Dati ancora insufficienti';
-
-  @override
-  String get tessituraMaxRange => 'Estensione massima';
+  String get tessituraNoZone => 'Dati insufficienti';
 
   @override
   String get tessituraToVerify => 'Da verificare';
 
   @override
   String tessituraReliability(String level) {
-    return 'Affidabilità: $level';
+    return 'Attendibilità: $level';
   }
 
   @override
@@ -1341,7 +1309,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tessituraReliabilityMedium => 'media';
 
   @override
-  String get tessituraReliabilityHigh => 'buona';
+  String get tessituraReliabilityHigh => 'alta';
 
   @override
   String get tessituraProvisional => 'Stima provvisoria';
@@ -1361,7 +1329,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tessituraLegend =>
-      'Fascia colorata: zona comoda. Fascia chiara: estensione massima. Punti: note da ricontrollare (risultati incerti o non coerenti). La stima è indicativa e può cambiare con la giornata, il riscaldamento e la stanchezza.';
+      'Tre fasce separate: estensione osservata (tutte le note raggiunte), estensione utilizzabile (note riuscite in modo affidabile) e zona comoda (note stabili, ripetibili e facili per te). Punti: note da ricontrollare. È una stima basata sulle prove e sul tuo giudizio, non una misura fisiologica: può cambiare con la giornata, il riscaldamento e la stanchezza.';
 
   @override
   String get workoutTitle => 'Allenamento del giorno';
@@ -1861,4 +1829,256 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get guideOpenSettingsText => 'Tocca l\'ingranaggio in alto per aprire le impostazioni.';
+
+  @override
+  String get tessituraStageCalibration => 'Riscaldamento';
+
+  @override
+  String get tessituraStageExplore => 'Esplorazione';
+
+  @override
+  String get tessituraStageHold => 'Tenuta';
+
+  @override
+  String get tessituraStageRepeat => 'Ripetibilità';
+
+  @override
+  String get tessituraStageMelodic => 'Frase melodica';
+
+  @override
+  String get tessituraInstructionNote => 'Canta questa nota su «a» per circa 3 secondi';
+
+  @override
+  String get tessituraInstructionHold => 'Tienila su «a» per circa 6 secondi, se ti è comodo';
+
+  @override
+  String tessituraInstructionRepeat(int number, int total) {
+    return 'Ripeti la nota ($number di $total)';
+  }
+
+  @override
+  String tessituraInstructionMelodic(int number, int total) {
+    return 'Nota $number di $total della frase';
+  }
+
+  @override
+  String get tessituraCueCalibrate => 'Partiamo da una nota comoda.';
+
+  @override
+  String get tessituraCueRecenter => 'Partiamo dalla nota che ti viene naturale.';
+
+  @override
+  String get tessituraCueNotHeard =>
+      'Non ti ho sentito bene: riprova, un po\' più vicino al microfono.';
+
+  @override
+  String get tessituraCueRetry => 'Riproviamo questa nota, con calma.';
+
+  @override
+  String get tessituraCueStepUp => 'Saliamo di un semitono.';
+
+  @override
+  String get tessituraCueStepDown => 'Scendiamo di un semitono.';
+
+  @override
+  String get tessituraCueBackToComfort => 'Torniamo a note comode e scendiamo verso il grave.';
+
+  @override
+  String get tessituraCueHold => 'Ora qualche nota tenuta più a lungo.';
+
+  @override
+  String get tessituraCueRepeat => 'Ripetiamo qualche nota per vedere quanto è sicura.';
+
+  @override
+  String get tessituraCueMelodic => 'Canta le note una dopo l\'altra.';
+
+  @override
+  String get tessituraGetReady => 'Preparati…';
+
+  @override
+  String get tessituraListen => 'Ascolta la nota…';
+
+  @override
+  String get tessituraYourTurn => 'Quando vuoi, canta';
+
+  @override
+  String get tessituraSinging => 'Ti ascolto';
+
+  @override
+  String get tessituraReplay => 'Riascolta';
+
+  @override
+  String get tessituraEndNote => 'Basta così';
+
+  @override
+  String get tessituraStrain => 'Troppo faticoso';
+
+  @override
+  String get tessituraRegisterShift => 'Ho cambiato registro';
+
+  @override
+  String get tessituraEffortQuestion => 'Quanto sforzo ti è costata questa nota?';
+
+  @override
+  String get tessituraEffort1 => '1 · Molto facile';
+
+  @override
+  String get tessituraEffort2 => '2 · Facile';
+
+  @override
+  String get tessituraEffort3 => '3 · Moderato';
+
+  @override
+  String get tessituraEffort4 => '4 · Difficile';
+
+  @override
+  String get tessituraEffort5 => '5 · Molto difficile';
+
+  @override
+  String get tessituraEffortSkip => 'Preferisco non rispondere';
+
+  @override
+  String get tessituraStrainTitle => 'Fermiamoci un attimo';
+
+  @override
+  String get tessituraStrainBody =>
+      'Non forzare la voce. Se senti fastidio o dolore, fermati: puoi tornare a note comode o terminare qui.';
+
+  @override
+  String get tessituraStrainContinue => 'Torna a note comode';
+
+  @override
+  String get tessituraStrainFinish => 'Termina il test';
+
+  @override
+  String get tessituraMelodicTitle => 'Verifica melodica (facoltativa)';
+
+  @override
+  String get tessituraMelodicBody =>
+      'Una frase di 9 note dentro la zona trovata, per vedere se le note funzionano anche una dopo l\'altra. Circa 30 secondi.';
+
+  @override
+  String get tessituraMelodicYes => 'Fai la verifica';
+
+  @override
+  String get tessituraMelodicNo => 'Salta e mostra il risultato';
+
+  @override
+  String get tessituraCannotCalibrate =>
+      'Non riesco a sentire bene la voce: prova in un posto più silenzioso, un po\' più vicino al microfono.';
+
+  @override
+  String get tessituraInterrupted =>
+      'Il microfono si è interrotto: ecco il risultato con le prove fatte.';
+
+  @override
+  String get tessituraObserved => 'Estensione osservata';
+
+  @override
+  String get tessituraUsable => 'Estensione utilizzabile';
+
+  @override
+  String get tessituraLowestObserved => 'Più grave rilevata';
+
+  @override
+  String get tessituraHighestObserved => 'Più acuta rilevata';
+
+  @override
+  String get tessituraInsufficientHint =>
+      'I dati raccolti non bastano per stimare una zona comoda affidabile. Ripeti il test con calma, in un posto silenzioso.';
+
+  @override
+  String get tessituraReliabilityInsufficient => 'insufficiente';
+
+  @override
+  String get tessituraRegisterNotes => 'Possibile cambio di registro';
+
+  @override
+  String get tessituraSignalIssues =>
+      'Diverse prove non erano valutabili (rumore o segnale debole).';
+
+  @override
+  String get tessituraEstimateDisclaimer =>
+      'Stima basata sulle prove e sul tuo giudizio, non una misura fisiologica.';
+
+  @override
+  String get tessituraNoValidData => 'Nessuna prova valutabile: il risultato non è stato salvato.';
+
+  @override
+  String get extremeTitle => 'Trova le note estreme';
+
+  @override
+  String get extremeSectionIntro =>
+      'Canta liberamente una canzone: Intonia trova la nota più alta e la più bassa che canti.';
+
+  @override
+  String get extremeIntro =>
+      'Canta una canzone che ti piace, come vuoi. Intonia ascolta e, quando hai finito, ti mostra la nota più bassa e la più alta che ha riconosciuto. Non servono note di riferimento e non viene registrato nulla.';
+
+  @override
+  String get extremeStart => 'Inizia a cantare';
+
+  @override
+  String get extremeListening => 'Ti ascolto: canta liberamente';
+
+  @override
+  String get extremeLowestSoFar => 'Più bassa finora';
+
+  @override
+  String get extremeHighestSoFar => 'Più alta finora';
+
+  @override
+  String get extremeStop => 'Termina e mostra i risultati';
+
+  @override
+  String get extremeLowest => 'Nota più bassa rilevata';
+
+  @override
+  String get extremeHighest => 'Nota più alta rilevata';
+
+  @override
+  String get extremeNone =>
+      'Non ho riconosciuto nessuna nota. Riprova cantando un po\' più forte, vicino al microfono.';
+
+  @override
+  String get extremeSingle =>
+      'Ho riconosciuto una sola nota: canta un brano più vario per trovare anche l\'altra estremità.';
+
+  @override
+  String get extremeUncertain => 'incerta';
+
+  @override
+  String get extremeUncertainHint =>
+      'Le note incerte sono state sentite solo per un attimo: potrebbero essere imprecise.';
+
+  @override
+  String extremeQuality(String level) {
+    return 'Qualità del rilevamento: $level';
+  }
+
+  @override
+  String get extremeQualityGood => 'buona';
+
+  @override
+  String get extremeQualityFair => 'discreta';
+
+  @override
+  String get extremeQualityPoor => 'scarsa';
+
+  @override
+  String get extremeQualityHint => 'Con poco canto o molto rumore il risultato è meno affidabile.';
+
+  @override
+  String get extremeDisclaimer =>
+      'Sono le note più alte e più basse rilevate in questa sessione, non l\'estensione massima della tua voce, e non cambiano la tua zona comoda. Le note sopra il DO6 circa non vengono rilevate.';
+
+  @override
+  String get extremeAgain => 'Ripeti da capo';
+
+  @override
+  String get extremeBack => 'Torna a Estensione';
+
+  @override
+  String get extremeInterrupted =>
+      'Il microfono si è interrotto: ecco cosa ho sentito fino a quel momento.';
 }
