@@ -561,6 +561,16 @@ void main() {
     expect(screen.contains(card.topLeft) && screen.contains(card.bottomRight - const Offset(1, 1)),
         isTrue,
         reason: '$card');
+    // I comandi restano visibili anche quando la spiegazione deve scorrere.
+    for (final key in ['guide-next', 'guide-tap-hint', 'guide-close']) {
+      final command = find.byKey(ValueKey(key));
+      if (command.evaluate().isNotEmpty) {
+        final rect = tester.getRect(command);
+        expect(card.contains(rect.topLeft) && card.contains(rect.bottomRight - const Offset(1, 1)),
+            isTrue,
+            reason: '$key $rect fuori da $card');
+      }
+    }
     if (find.byKey(const ValueKey('guide-highlight')).evaluate().isNotEmpty) {
       expect(card.overlaps(highlight(tester).deflate(2)), isFalse,
           reason: 'il riquadro non copre l\'elemento');
@@ -578,19 +588,19 @@ void main() {
     final app = await _launch(tester, guideSeen: false);
     await _frames(tester, 10);
     expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
-    expect(find.text('1 di 14'), findsOneWidget);
+    expect(find.text('1 di 28'), findsOneWidget);
     expect(find.text('Il microfono'), findsOneWidget);
     expectHighlighted(tester, find.byKey(const ValueKey('home-mic')));
     expectCardBeside(tester);
 
     await guideNext(tester);
-    expect(find.text('2 di 14'), findsOneWidget);
+    expect(find.text('2 di 28'), findsOneWidget);
     expectHighlighted(tester, find.byKey(const ValueKey('daily-workout-card')));
     expectCardBeside(tester);
 
     await tester.tap(find.byKey(const ValueKey('guide-back')));
     await _frames(tester, 5);
-    expect(find.text('1 di 14'), findsOneWidget);
+    expect(find.text('1 di 28'), findsOneWidget);
     expectHighlighted(tester, find.byKey(const ValueKey('home-mic')));
 
     // Durante la guida l'interfaccia sotto non risponde (niente stati incoerenti).
@@ -611,7 +621,27 @@ void main() {
     expect(find.byType(ExercisesScreen).hitTestable(), findsOneWidget);
   });
 
-  testWidgets('the guide visits every section, highlights its elements and closes cleanly',
+  /// Voce della barra di navigazione evidenziata dalla guida.
+  Finder navItem(String label) =>
+      find.ancestor(of: _tab(label), matching: find.byType(NavigationDestination));
+
+  /// Passaggio da toccare: niente Avanti, si tocca l'elemento evidenziato.
+  Future<void> guideTap(WidgetTester tester, Finder target) async {
+    expect(find.byKey(const ValueKey('guide-next')), findsNothing, reason: 'si prosegue toccando');
+    expect(find.byKey(const ValueKey('guide-tap-hint')), findsOneWidget);
+    expectHighlighted(tester, target);
+    expectCardBeside(tester);
+    await tester.tap(target);
+    await _frames(tester, 12);
+  }
+
+  /// La prima categoria (la scheda intera è l'elemento evidenziato).
+  Finder triadsCard() => find.ancestor(of: find.text('Triadi'), matching: find.byType(Card)).first;
+
+  int selectedTab(WidgetTester tester) =>
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex;
+
+  testWidgets('the guide visits every section: the user taps the bar, an exercise and its controls',
       (tester) async {
     await _launch(tester);
     expect(find.byKey(const ValueKey('guide-sheet')), findsNothing, reason: 'già vista');
@@ -624,61 +654,106 @@ void main() {
     await _frames(tester, 8);
 
     // Si parte dalla Home anche se la guida è aperta dalle Impostazioni.
-    expect(find.text('1 di 14'), findsOneWidget);
+    expect(find.text('1 di 28'), findsOneWidget);
     expect(find.byType(SettingsScreen), findsNothing);
     expectHighlighted(tester, find.byKey(const ValueKey('home-mic')));
 
     await guideNext(tester); // allenamento del giorno
     await guideNext(tester); // serie e cariche
-    // Serie e cariche insieme.
     expectHighlighted(
         tester, find.descendant(of: find.byType(HomeScreen), matching: find.byType(StatusChips)));
 
-    await guideNext(tester); // categorie, in Esercizi
-    expect(tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex, 1);
-    expectHighlighted(
-        tester, find.ancestor(of: find.text('Triadi'), matching: find.byType(Card)).first);
-    expectCardBeside(tester);
-    await guideNext(tester); // sequenze personalizzate
-    expect(find.text('5 di 14'), findsOneWidget);
+    await guideNext(tester); // "Vai a Esercizi": tocca l'utente
+    expect(find.text('Vai a Esercizi'), findsOneWidget);
+    expect(selectedTab(tester), 0, reason: 'la guida non cambia sezione da sola');
+    // Le altre voci restano bloccate: conta solo quella evidenziata.
+    await tester.tap(_tab('Estensione'), warnIfMissed: false);
+    await _frames(tester, 3);
+    expect(selectedTab(tester), 0);
+    expect(find.text('4 di 28'), findsOneWidget);
+    await tester.tap(_tab('Esercizi'));
+    // Subito dopo il tocco l'evidenziazione precedente non resta sulla
+    // nuova pagina (niente "salto" del riquadro).
+    await tester.pump();
+    await tester.pump();
+    expect(find.byKey(const ValueKey('guide-highlight')), findsNothing);
+    await _frames(tester, 12);
+    expect(selectedTab(tester), 1);
+    expect(find.text('5 di 28'), findsOneWidget);
+    expectHighlighted(tester, find.byKey(const ValueKey('create-sequence')));
 
-    await guideNext(tester); // test di estensione
+    await guideNext(tester); // categorie
+    expectHighlighted(tester, triadsCard());
+    await guideNext(tester); // apri una categoria
+    expect(find.text('Apri una categoria'), findsOneWidget);
+    await guideTap(tester, triadsCard());
+    // Categoria aperta: la guida prosegue da sola sul primo esercizio.
+    expect(find.text('8 di 28'), findsOneWidget);
+    final exercise = find.widgetWithText(ListTile, 'Triade maggiore');
+    await guideTap(tester, exercise);
+
+    // Nell'esercizio: le sue impostazioni una per una.
+    expect(find.byType(TrainerScreen), findsOneWidget);
+    expect(find.text('9 di 28'), findsOneWidget);
+    expectCardBeside(tester);
+    await guideNext(tester); // ottava
+    await guideNext(tester); // modalità
+    expectHighlighted(tester, find.byKey(const ValueKey('trainer-direction')));
+    await guideNext(tester); // vertice (la triade in Completo ne ha uno)
+    expectHighlighted(tester, find.byKey(const ValueKey('trainer-repeat-top')));
+    await guideNext(tester); // ascolto o allenamento
+    expect(find.text('Ascolto o allenamento'), findsOneWidget);
+    expectCardBeside(tester);
+    await guideNext(tester); // impostazioni avanzate
+    expect(find.text('14 di 28'), findsOneWidget);
+    await guideNext(tester); // il ? per rivederle
+    expectHighlighted(tester, find.byKey(const ValueKey('trainer-guide')));
+    await guideNext(tester); // torna agli esercizi: tocca l'utente
+    await guideTap(tester, find.byType(BackButton));
+    expect(find.byType(TrainerScreen), findsNothing);
+    expect(find.text('17 di 28'), findsOneWidget);
+
+    await guideTap(tester, navItem('Estensione'));
+    expect(selectedTab(tester), 2);
     expectHighlighted(tester, find.byKey(const ValueKey('range-start')));
     await guideNext(tester); // zona comoda (più in basso: la pagina scorre)
     expectHighlighted(tester, find.byKey(const ValueKey('tessitura-open')));
     expectCardBeside(tester);
 
-    await guideNext(tester); // statistiche: profilo vuoto, nessun elemento
-    expect(find.text('8 di 14'), findsOneWidget);
+    await guideNext(tester); // "Vai a Profilo"
+    await guideTap(tester, navItem('Profilo'));
+    expect(find.text('21 di 28'), findsOneWidget);
+    // Statistiche: profilo vuoto, nessun elemento ma la spiegazione resta.
     expect(find.byKey(const ValueKey('guide-no-target')), findsOneWidget);
     expect(find.byKey(const ValueKey('guide-highlight')), findsNothing);
     await guideNext(tester); // obiettivi e badge (c'è anche a profilo vuoto)
     expectHighlighted(tester, find.byKey(const ValueKey('achievements-card')));
     await guideNext(tester); // cronologia: non ancora
     expect(find.byKey(const ValueKey('guide-no-target')), findsOneWidget);
+    await guideNext(tester); // apri le impostazioni: tocca l'utente
+    await guideTap(tester, find.byKey(const ValueKey('profile-settings')));
 
-    await guideNext(tester); // lingua, nelle Impostazioni
     expect(find.byType(SettingsScreen), findsOneWidget);
+    expect(find.text('25 di 28'), findsOneWidget);
     expectHighlighted(tester, find.byKey(const ValueKey('settings-language')));
     await guideNext(tester); // tema
     await guideNext(tester); // notazione
     expectHighlighted(tester, find.byKey(const ValueKey('settings-notation')));
     expectCardBeside(tester);
 
-    // Indietro dalle Impostazioni torna alla sezione precedente.
-    await tester.tap(find.byKey(const ValueKey('guide-back')));
-    await _frames(tester, 5);
-    await tester.tap(find.byKey(const ValueKey('guide-back')));
-    await _frames(tester, 5);
-    await tester.tap(find.byKey(const ValueKey('guide-back')));
-    await _frames(tester, 8);
-    expect(find.text('10 di 14'), findsOneWidget);
+    // Indietro dalle Impostazioni torna al profilo, all'ingranaggio da toccare.
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.byKey(const ValueKey('guide-back')));
+      await _frames(tester, 8);
+    }
+    expect(find.text('24 di 28'), findsOneWidget);
     expect(find.byType(SettingsScreen), findsNothing);
+    await guideTap(tester, find.byKey(const ValueKey('profile-settings')));
 
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 3; i++) {
       await guideNext(tester);
     }
-    expect(find.text('14 di 14'), findsOneWidget);
+    expect(find.text('28 di 28'), findsOneWidget);
     expect(find.byKey(const ValueKey('guide-skip')), findsNothing);
     expectHighlighted(tester, find.byKey(const ValueKey('settings-guide')));
     await guideNext(tester);
@@ -687,12 +762,43 @@ void main() {
     expect(find.byType(SettingsScreen).hitTestable(), findsOneWidget);
   });
 
+  testWidgets('leaving the exercise during the guide moves on; back returns to the exercise list',
+      (tester) async {
+    await _launch(tester, guideSeen: false);
+    await _frames(tester, 10);
+    for (var i = 0; i < 3; i++) {
+      await guideNext(tester);
+    }
+    await guideTap(tester, navItem('Esercizi'));
+    await guideNext(tester);
+    await guideNext(tester);
+    await guideTap(tester, triadsCard());
+    await guideTap(tester, find.widgetWithText(ListTile, 'Triade maggiore'));
+    expect(find.text('9 di 28'), findsOneWidget);
+
+    // "Indietro" di sistema: l'esercizio si chiude, la guida va avanti.
+    await tester.binding.handlePopRoute();
+    await _frames(tester, 15);
+    expect(find.byType(TrainerScreen), findsNothing);
+    expect(find.text('17 di 28'), findsOneWidget);
+    expectHighlighted(tester, navItem('Estensione'));
+
+    // Indietro salta i passaggi dell'esercizio chiuso: si torna a sceglierne uno.
+    await tester.tap(find.byKey(const ValueKey('guide-back')));
+    await _frames(tester, 12);
+    expect(find.text('8 di 28'), findsOneWidget);
+    await guideTap(tester, find.widgetWithText(ListTile, 'Triade maggiore'));
+    expect(find.byType(TrainerScreen), findsOneWidget);
+    expect(find.text('9 di 28'), findsOneWidget);
+  });
+
   testWidgets('closing the guide on any step leaves no overlay behind', (tester) async {
     await _launch(tester, guideSeen: false);
     await _frames(tester, 5);
     await guideNext(tester);
     await guideNext(tester);
-    await guideNext(tester); // in Esercizi
+    await guideNext(tester);
+    await guideTap(tester, navItem('Esercizi'));
     await tester.tap(find.byKey(const ValueKey('guide-close')));
     await _frames(tester, 5);
     expect(find.byKey(const ValueKey('guide-scrim')), findsNothing);
@@ -706,11 +812,25 @@ void main() {
       (tester) async {
     await _launch(tester, guideSeen: false, size: const Size(320, 568));
     await _frames(tester, 10);
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 3; i++) {
       expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
       expectCardBeside(tester);
       await guideNext(tester);
     }
+    await guideTap(tester, navItem('Esercizi'));
+    for (var i = 0; i < 2; i++) {
+      expectCardBeside(tester);
+      await guideNext(tester);
+    }
+    await guideTap(tester, triadsCard());
+    await guideTap(tester, find.widgetWithText(ListTile, 'Triade maggiore'));
+    for (var i = 0; i < 7; i++) {
+      expect(find.byKey(const ValueKey('guide-sheet')), findsOneWidget);
+      expectCardBeside(tester);
+      await guideNext(tester);
+    }
+    expect(find.text('Torna agli esercizi'), findsOneWidget);
+    expectCardBeside(tester);
   });
 
   testWidgets('the exercise guide highlights only the controls on screen', (tester) async {
@@ -723,8 +843,9 @@ void main() {
     expect(find.byKey(const ValueKey('trainer-direction')), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('trainer-guide')));
     await _frames(tester, 5);
-    // Tonalità, ottava, modalità e vertice (la triade in Completo ha un vertice).
-    expect(find.text('1 di 4'), findsOneWidget);
+    // Tonalità, ottava, modalità, vertice (la triade in Completo ne ha uno),
+    // ascolto/allenamento e impostazioni avanzate.
+    expect(find.text('1 di 6'), findsOneWidget);
     expect(find.byType(TrainerScreen), findsOneWidget, reason: 'la guida resta sull\'esercizio');
     await guideNext(tester);
     await guideNext(tester);
@@ -741,7 +862,7 @@ void main() {
     expect(find.byKey(const ValueKey('trainer-repeat-top')), findsNothing);
     await tester.tap(find.byKey(const ValueKey('trainer-guide')));
     await _frames(tester, 5);
-    expect(find.text('1 di 3'), findsOneWidget);
+    expect(find.text('1 di 5'), findsOneWidget);
   });
 
   testWidgets('home fits one screen on a short phone, even with larger text', (tester) async {

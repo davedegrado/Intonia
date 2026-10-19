@@ -134,30 +134,37 @@ class _TrainerScreenState extends ConsumerState<TrainerScreen> with WidgetsBindi
 
     return Scaffold(
       appBar: AppBar(
+        leading: const GuideAnchor(target: GuideTarget.trainerBack, child: BackButton()),
         title: Text(l10n.exerciseName(widget.exercise)),
         actions: [
-          IconButton(
-            key: const ValueKey('trainer-guide'),
-            tooltip: l10n.guideTitle,
-            icon: const Icon(Icons.help_outline),
-            onPressed: () {
-              final exercise = widget.exercise;
-              final direction = state.settings.direction ?? exercise.defaultDirection;
-              showGuide(
-                context,
-                exerciseGuideSteps(
-                  l10n,
-                  // Le sequenze con nota di partenza fissa non hanno i selettori.
-                  hasKeyAndOctave: !(exercise.isCustom && exercise.rootMidi != null),
-                  hasRepeatTop: direction == PlaybackDirection.complete && exercise.hasApex,
-                ),
-              );
-            },
+          GuideAnchor(
+            target: GuideTarget.trainerHelp,
+            child: IconButton(
+              key: const ValueKey('trainer-guide'),
+              tooltip: l10n.guideTitle,
+              icon: const Icon(Icons.help_outline),
+              onPressed: () {
+                final exercise = widget.exercise;
+                final direction = state.settings.direction ?? exercise.defaultDirection;
+                showGuide(
+                  context,
+                  exerciseGuideSteps(
+                    l10n,
+                    // Le sequenze con nota di partenza fissa non hanno i selettori.
+                    hasKeyAndOctave: !(exercise.isCustom && exercise.rootMidi != null),
+                    hasRepeatTop: direction == PlaybackDirection.complete && exercise.hasApex,
+                  ),
+                );
+              },
+            ),
           ),
-          IconButton(
-            tooltip: l10n.trainerAdvancedSettings,
-            icon: const Icon(Icons.tune),
-            onPressed: state.isPlaying ? null : _openAdvancedSettings,
+          GuideAnchor(
+            target: GuideTarget.trainerAdvanced,
+            child: IconButton(
+              tooltip: l10n.trainerAdvancedSettings,
+              icon: const Icon(Icons.tune),
+              onPressed: state.isPlaying ? null : _openAdvancedSettings,
+            ),
           ),
         ],
       ),
@@ -376,24 +383,27 @@ class _BottomControlBar extends ConsumerWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                SegmentedButton<TrainerMode>(
-                  showSelectedIcon: false,
-                  segments: [
-                    ButtonSegment(
-                      value: TrainerMode.listen,
-                      icon: const Icon(Icons.headphones),
-                      tooltip: l10n.trainerModeListen,
-                    ),
-                    ButtonSegment(
-                      value: TrainerMode.train,
-                      icon: const Icon(Icons.mic),
-                      tooltip: l10n.trainerModeTrain,
-                    ),
-                  ],
-                  selected: {state.settings.mode},
-                  onSelectionChanged: state.isPlaying
-                      ? null
-                      : (selection) => controller.updateMode(selection.first),
+                GuideAnchor(
+                  target: GuideTarget.trainerMode,
+                  child: SegmentedButton<TrainerMode>(
+                    showSelectedIcon: false,
+                    segments: [
+                      ButtonSegment(
+                        value: TrainerMode.listen,
+                        icon: const Icon(Icons.headphones),
+                        tooltip: l10n.trainerModeListen,
+                      ),
+                      ButtonSegment(
+                        value: TrainerMode.train,
+                        icon: const Icon(Icons.mic),
+                        tooltip: l10n.trainerModeTrain,
+                      ),
+                    ],
+                    selected: {state.settings.mode},
+                    onSelectionChanged: state.isPlaying
+                        ? null
+                        : (selection) => controller.updateMode(selection.first),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

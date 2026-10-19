@@ -17,31 +17,68 @@ void main() {
         (GuideTarget.homeMic, '/'),
         (GuideTarget.dailyWorkout, '/'),
         (GuideTarget.homeStatus, '/'),
-        (GuideTarget.exerciseCategories, '/exercises'),
+        (GuideTarget.navExercises, '/'),
         (GuideTarget.customSequences, '/exercises'),
+        (GuideTarget.exerciseCategories, '/exercises'),
+        (GuideTarget.exerciseCategories, '/exercises'),
+        (GuideTarget.firstExercise, '/exercises'),
+        (GuideTarget.trainerKey, '/trainer'),
+        (GuideTarget.trainerOctave, '/trainer'),
+        (GuideTarget.trainerDirection, '/trainer'),
+        (GuideTarget.trainerRepeatTop, '/trainer'),
+        (GuideTarget.trainerMode, '/trainer'),
+        (GuideTarget.trainerAdvanced, '/trainer'),
+        (GuideTarget.trainerHelp, '/trainer'),
+        (GuideTarget.trainerBack, '/trainer'),
+        (GuideTarget.navRange, '/exercises'),
         (GuideTarget.rangeTest, '/range'),
         (GuideTarget.tessitura, '/range'),
+        (GuideTarget.navProfile, '/range'),
         (GuideTarget.profileStats, '/profile'),
         (GuideTarget.profileAchievements, '/profile'),
         (GuideTarget.profileHistory, '/profile'),
+        (GuideTarget.profileSettings, '/profile'),
         (GuideTarget.settingsLanguage, '/settings'),
         (GuideTarget.settingsTheme, '/settings'),
         (GuideTarget.settingsNotation, '/settings'),
         (GuideTarget.settingsGuide, '/settings'),
       ]);
-      // Sezioni raggruppate: la guida non salta avanti e indietro.
-      final sections = [for (final s in steps) s.section];
-      final order = <String?>[];
-      for (final section in sections) {
-        if (order.isEmpty || order.last != section) {
-          order.add(section);
-        }
-      }
-      expect(order.toSet(), hasLength(order.length));
       for (final step in steps) {
         expect(step.title, isNotEmpty);
         expect(step.text, isNotEmpty);
       }
+    });
+
+    test('the user moves between sections: each change of page waits for a tap', () {
+      final steps = appGuideSteps(_it);
+      for (var i = 1; i < steps.length; i++) {
+        final previous = steps[i - 1];
+        final step = steps[i];
+        if (step.section != previous.section) {
+          // Si arriva in una nuova sezione solo dopo un passaggio da toccare
+          // che porta proprio lì.
+          expect(previous.awaitRoute, step.section, reason: '${step.title} (${i + 1})');
+        }
+      }
+      final interactive = [
+        for (final s in steps)
+          if (s.interactive) s
+      ];
+      expect([
+        for (final s in interactive) s.awaitRoute ?? s.awaitTarget
+      ], [
+        '/exercises',
+        GuideTarget.firstExercise,
+        '/trainer',
+        '/exercises',
+        '/range',
+        '/profile',
+        '/settings',
+      ]);
+      // Le voci della barra: "Vai a Esercizi" / "Tocca «Esercizi»…".
+      expect(steps[3].title, 'Vai a Esercizi');
+      expect(steps[3].text, contains('«Esercizi»'));
+      expect(interactive.every((s) => s.skipIfMissing), isTrue);
     });
 
     test('the exercise guide stays on the exercise and lists only the controls on screen', () {
@@ -53,10 +90,18 @@ void main() {
         GuideTarget.trainerOctave,
         GuideTarget.trainerDirection,
         GuideTarget.trainerRepeatTop,
+        GuideTarget.trainerMode,
+        GuideTarget.trainerAdvanced,
       ]);
-      expect(full.every((s) => s.section == null), isTrue);
+      expect(full.every((s) => s.section == null && !s.interactive), isTrue);
       final fixed = exerciseGuideSteps(_it, hasKeyAndOctave: false, hasRepeatTop: false);
-      expect([for (final s in fixed) s.target], [GuideTarget.trainerDirection]);
+      expect([
+        for (final s in fixed) s.target
+      ], [
+        GuideTarget.trainerDirection,
+        GuideTarget.trainerMode,
+        GuideTarget.trainerAdvanced,
+      ]);
     });
   });
 
@@ -88,6 +133,28 @@ void main() {
       expect(container.read(guideTourProvider), isNull);
     });
 
+    test('a step that cannot be shown is skipped in the direction of travel', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final tour = container.read(guideTourProvider.notifier);
+      final done = tour.start(appGuideSteps(_it).take(4).toList());
+      tour.skip(); // avanti dal primo
+      expect(container.read(guideTourProvider)!.index, 1);
+      tour.next();
+      tour.back();
+      expect(container.read(guideTourProvider)!.forward, isFalse);
+      tour.skip(); // si tornava indietro: si continua indietro
+      expect(container.read(guideTourProvider)!.index, 0);
+      tour.skip(); // al primo non si può tornare oltre: si va avanti
+      expect(container.read(guideTourProvider)!.index, 1);
+      expect(container.read(guideTourProvider)!.forward, isTrue);
+      tour.next();
+      tour.next();
+      tour.skip(); // oltre l'ultimo: la guida finisce
+      await done;
+      expect(container.read(guideTourProvider), isNull);
+    });
+
     test('skip or close end the guide at any step', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -112,7 +179,7 @@ void main() {
           tour.start(exerciseGuideSteps(_it, hasKeyAndOctave: true, hasRepeatTop: false));
       await Future<void>.delayed(Duration.zero);
       expect(firstEnded, isTrue);
-      expect(container.read(guideTourProvider)!.steps, hasLength(3));
+      expect(container.read(guideTourProvider)!.steps, hasLength(5));
       tour.close();
       await second;
     });

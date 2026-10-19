@@ -60,6 +60,7 @@ class ExercisesScreen extends ConsumerWidget {
                   category: category,
                   exercises: sections[category]!,
                   accent: decor.accent(index),
+                  anchorFirst: true,
                 ),
               )
             else
@@ -160,11 +161,15 @@ class _CategoryAccordion extends StatelessWidget {
     required this.category,
     required this.exercises,
     required this.accent,
+    this.anchorFirst = false,
   });
 
   final ExerciseCategory category;
   final List<ExerciseDefinition> exercises;
   final Color accent;
+
+  /// Il primo esercizio è quello che la guida fa aprire.
+  final bool anchorFirst;
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +207,14 @@ class _CategoryAccordion extends StatelessWidget {
           ),
         ),
         children: [
-          for (final exercise in exercises) _ExerciseTile(exercise: exercise, dense: true),
+          for (final (index, exercise) in exercises.indexed)
+            if (anchorFirst && index == 0)
+              GuideAnchor(
+                target: GuideTarget.firstExercise,
+                child: _ExerciseTile(exercise: exercise, dense: true),
+              )
+            else
+              _ExerciseTile(exercise: exercise, dense: true),
           const SizedBox(height: 4),
         ],
       ),

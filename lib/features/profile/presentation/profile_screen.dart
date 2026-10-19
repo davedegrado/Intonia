@@ -296,11 +296,14 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   List<Widget> _actions(BuildContext context) => [
-        IconButton(
-          key: const ValueKey('profile-settings'),
-          tooltip: context.l10n.profileSettingsTooltip,
-          icon: const Icon(Icons.settings_outlined),
-          onPressed: () => context.push('/settings'),
+        GuideAnchor(
+          target: GuideTarget.profileSettings,
+          child: IconButton(
+            key: const ValueKey('profile-settings'),
+            tooltip: context.l10n.profileSettingsTooltip,
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
+          ),
         ),
         const SizedBox(width: 4),
       ];

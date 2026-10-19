@@ -1758,7 +1758,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCategoriesText =>
-      'Exercises are grouped by category: open one, pick an exercise and press Play to train with your voice.';
+      'Exercises are grouped by category: triads, arpeggios, scales and more. Each one trains a different side of your voice.';
 
   @override
   String get guideCustomText =>
@@ -1805,4 +1805,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideTargetUnavailable =>
       'You\'ll find it here once you\'ve used this part of the app.';
+
+  @override
+  String guideNavTitle(String section) {
+    return 'Go to $section';
+  }
+
+  @override
+  String guideNavText(String section) {
+    return 'Tap “$section” in the bar at the bottom to continue.';
+  }
+
+  @override
+  String get guideTapHint => 'Tap the highlighted spot to continue';
+
+  @override
+  String get guideOpenCategoryTitle => 'Open a category';
+
+  @override
+  String get guideOpenCategoryText => 'Tap the category to see its exercises.';
+
+  @override
+  String get guideOpenExerciseTitle => 'Open an exercise';
+
+  @override
+  String get guideOpenExerciseText => 'Now tap an exercise: I\'ll show you its settings.';
+
+  @override
+  String get guideModeTitle => 'Listen or train';
+
+  @override
+  String get guideModeText =>
+      'With the headphones you listen to the sequence; with the microphone you sing and I check your pitch. Then press Play.';
+
+  @override
+  String get guideAdvancedText =>
+      'Speed, tolerance, how long to hold each note, the guide on every note and background noise calibration.';
+
+  @override
+  String get guideHelpTitle => 'Help in every exercise';
+
+  @override
+  String get guideHelpText => 'Tap ? in any exercise to see these explanations again.';
+
+  @override
+  String get guideBackTitle => 'Back to the exercises';
+
+  @override
+  String get guideBackText => 'Tap the arrow at the top to go back to the list of exercises.';
+
+  @override
+  String get guideOpenSettingsTitle => 'Open the settings';
+
+  @override
+  String get guideOpenSettingsText => 'Tap the gear at the top to open the settings.';
 }
