@@ -446,13 +446,10 @@ class TessituraTestController extends Notifier<TessituraTestState> {
   /// Chiude il test con le prove fatte finora e salva il risultato (anche
   /// provvisorio). Senza prove non salva nulla.
   Future<void> finish() async {
-    await _stopAudio();
-    if (!ref.mounted) {
-      return;
-    }
     final trials = state.trials;
     if (trials.isEmpty) {
       state = state.copyWith(phase: TessituraPhase.intro);
+      await _stopAudio();
       return;
     }
     final estimate = TessituraEstimate.from(trials);
@@ -467,8 +464,11 @@ class TessituraTestController extends Notifier<TessituraTestState> {
       rangeLow: _rangeLow ?? (validated.isEmpty ? null : validated.reduce(math.min)),
       rangeHigh: _rangeHigh ?? (validated.isEmpty ? null : validated.reduce(math.max)),
     );
+    // Prima il risultato (e il salvataggio), poi il rilascio di microfono e
+    // piano: un rilascio lento non deve far perdere il test.
     state = state.copyWith(phase: TessituraPhase.done, estimate: estimate, record: record);
     await ref.read(tessituraHistoryProvider.notifier).add(record);
+    await _stopAudio();
   }
 
   /// Annulla senza salvare.

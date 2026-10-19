@@ -302,7 +302,10 @@ class _SingingView extends StatelessWidget {
                   child: OutlinedButton(
                     key: const ValueKey('tessitura-skip'),
                     onPressed: controller.skipNote,
-                    child: Text(l10n.rangeSkipNote),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(l10n.rangeSkipNote, maxLines: 1),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -310,7 +313,10 @@ class _SingingView extends StatelessWidget {
                   child: TextButton(
                     key: const ValueKey('tessitura-finish'),
                     onPressed: controller.finish,
-                    child: Text(l10n.tessituraFinishNow),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(l10n.tessituraFinishNow, maxLines: 1),
+                    ),
                   ),
                 ),
               ],
