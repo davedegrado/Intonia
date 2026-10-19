@@ -149,7 +149,7 @@ final tessituraTestControllerProvider =
 
 /// Test guidato della tessitura (vedi [TessituraPlanner] e
 /// [TessituraEstimate]): una nota alla volta, con la nota di riferimento del
-/// piano, l'ascolto dei frame grezzi del microfono e, dopo alcune prove, la
+/// piano, l'ascolto dei frame validati del microfono e, dopo alcune prove, la
 /// domanda sullo sforzo percepito. Riusa microfono e piano dell'app.
 class TessituraTestController extends Notifier<TessituraTestState> {
   static const _guideNoteDuration = Duration(milliseconds: 650);
@@ -185,7 +185,9 @@ class TessituraTestController extends Notifier<TessituraTestState> {
   DateTime? _onset;
   DateTime? _lastVoiced;
   final _frames = <PitchFrame>[];
-  final _display = PitchStabilizer();
+
+  /// Validazione temporale dei frame (stessa di esercizi e accordatore).
+  final _validator = PitchStabilizer();
   TessituraAttempt? _pending;
 
   // Ricerca della nota di partenza.
@@ -287,7 +289,7 @@ class TessituraTestController extends Notifier<TessituraTestState> {
 
   void _startAttempt(TessituraStep step) {
     _frames.clear();
-    _display.reset();
+    _validator.reset();
     _waitingSince = null;
     _onset = null;
     _lastVoiced = null;
@@ -372,8 +374,8 @@ class TessituraTestController extends Notifier<TessituraTestState> {
           state = state.copyWith(attemptStep: AttemptStep.waiting);
         }
       case AttemptStep.waiting:
-        _record(detection, now);
-        if (_isVoiced(detection)) {
+        final validated = _record(detection, now);
+        if (_isVoiced(validated)) {
           _onset = now;
           _lastVoiced = now;
           state = state.copyWith(attemptStep: AttemptStep.singing);
@@ -381,8 +383,8 @@ class TessituraTestController extends Notifier<TessituraTestState> {
           _completeAttempt();
         }
       case AttemptStep.singing:
-        _record(detection, now);
-        if (_isVoiced(detection)) {
+        final validated = _record(detection, now);
+        if (_isVoiced(validated)) {
           _lastVoiced = now;
         }
         final elapsed = now.difference(_onset!);
@@ -399,17 +401,22 @@ class TessituraTestController extends Notifier<TessituraTestState> {
   static bool _isVoiced(PitchDetectionResult detection) =>
       detection.isStable && detection.frequency > 0;
 
-  void _record(PitchDetectionResult detection, DateTime now) {
+  /// Registra il frame già validato dalla pipeline comune (rilevatore con
+  /// verifica dell'ottava + stabilizzatore): un errore d'ottava isolato non
+  /// entra nelle misure della prova. Ritorna il frame validato.
+  PitchDetectionResult _record(PitchDetectionResult detection, DateTime now) {
+    final validated = _validator.process(detection, now);
     // Tempo in frame (uno ogni ~23 ms, silenzio compreso): i frame arrivano
     // a gruppi e l'orologio sottostimerebbe le durate.
     _frames.add(PitchFrame(
       atMs: (_frames.length * MicrophonePitchService.hopMs).round(),
-      frequency: detection.frequency,
-      confidence: detection.confidence,
-      voiced: _isVoiced(detection),
+      frequency: validated.frequency,
+      confidence: validated.confidence,
+      voiced: _isVoiced(validated),
     ));
-    final shown = _display.process(detection, now);
-    state = state.copyWith(detected: shown.isStable ? shown : null, clearDetected: !shown.isStable);
+    state = state.copyWith(
+        detected: validated.isStable ? validated : null, clearDetected: !validated.isStable);
+    return validated;
   }
 
   /// Fine della nota tenuta prima del tempo ("Basta così").

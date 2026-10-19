@@ -12,7 +12,11 @@ import 'pitch_recognition_config.dart';
 ///   I salti più ampi di [PitchRecognitionConfig.immediateSwitchCents] sono
 ///   immediati.
 /// - Cadute brevi del segnale ([PitchRecognitionConfig.dropoutGraceMs]) non
-///   cancellano la nota in corso.
+///   cancellano la nota in corso; i frame incerti del rilevatore (ottava
+///   ambigua) contano come cadute brevi.
+/// - Un salto di circa un'ottava è accettato solo dopo
+///   [PitchRecognitionConfig.octaveConfirmFrames] frame coerenti: è il tipico
+///   errore del rilevatore, mentre un cambio d'ottava reale dura.
 ///
 /// Non modifica la frequenza rilevata (salvo la mediana) né valuta
 /// l'intonazione: lo scostamento in cent è sempre riferito alla nota
@@ -28,11 +32,15 @@ class PitchStabilizer {
   DateTime? _lastVoiced;
   PitchDetectionResult? _current;
 
+  /// Frame consecutivi a circa un'ottava dalla nota riconosciuta.
+  int _octaveFrames = 0;
+
   /// Ultima nota riconosciuta, mantenuta durante le brevi cadute di segnale;
   /// null in silenzio.
   PitchDetectionResult? get current => _current;
 
   void reset() {
+    _octaveFrames = 0;
     _recentMidi.clear();
     _heldNote = null;
     _otherSideSince = null;
@@ -62,20 +70,36 @@ class PitchStabilizer {
       _recentMidi.clear();
       _heldNote = null;
       _otherSideSince = null;
+      _octaveFrames = 0;
     }
     _lastVoiced = now;
-    _recentMidi.add(_midiOf(detected.frequency));
+    final midi = _midiOf(detected.frequency);
+    final held = _heldNote;
+    final current = _current;
+    if (held != null && current != null && _isOctaveJump(midi - held.midiNumber)) {
+      // Possibile errore d'ottava: la nota resta quella di prima finché il
+      // salto non è confermato da frame consecutivi.
+      if (++_octaveFrames < config.octaveConfirmFrames) {
+        return current;
+      }
+      // Confermato: cambio d'ottava reale, la mediana riparte dalla nuova.
+      _recentMidi.clear();
+      _heldNote = null;
+      _otherSideSince = null;
+    }
+    _octaveFrames = 0;
+    _recentMidi.add(midi);
     while (_recentMidi.length > config.smoothingFrames) {
       _recentMidi.removeAt(0);
     }
-    final midi = _median(_recentMidi);
-    final note = _recognize(midi, now);
-    final frequency = 440 * math.pow(2, (midi - 69) / 12).toDouble();
+    final smoothed = _median(_recentMidi);
+    final note = _recognize(smoothed, now);
+    final frequency = 440 * math.pow(2, (smoothed - 69) / 12).toDouble();
 
     return _current = PitchDetectionResult(
       frequency: frequency,
       note: note,
-      cents: (midi - note.midiNumber) * 100,
+      cents: (smoothed - note.midiNumber) * 100,
       confidence: detected.confidence,
       isStable: true,
     );
@@ -100,6 +124,12 @@ class PitchStabilizer {
       return _heldNote = nearest;
     }
     return held;
+  }
+
+  /// Distanza (semitoni) a meno di 70 cent da una o due ottave esatte.
+  static bool _isOctaveJump(double semitones) {
+    final distance = semitones.abs();
+    return (distance - 12).abs() <= 0.7 || (distance - 24).abs() <= 0.7;
   }
 
   static double _midiOf(double frequency) => 69 + 12 * math.log(frequency / 440) / math.ln2;

@@ -1,12 +1,15 @@
 /// Parametri del riconoscimento delle note cantate, in un unico punto.
 ///
 /// Il riconoscimento è diviso in tre livelli:
-/// 1. **Rilevamento della frequenza** (YinPitchDetector): non cambia qui, resta
-///    preciso al centesimo.
+/// 1. **Rilevamento della frequenza** (YinPitchDetector, PitchFrameAnalyzer):
+///    resta preciso al centesimo. Verifica l'ottava confrontando il periodo
+///    scelto con il doppio e i sottomultipli nella funzione YIN; scarta le
+///    sottoarmoniche della banda bassa; marca incerti i frame ambigui.
 /// 2. **Riconoscimento della nota** ([PitchStabilizer]): decide quale nota
 ///    mostrare. È volutamente tollerante, perché la voce non è uno strumento
 ///    stabile: filtra i frame anomali, ignora il vibrato e le brevi cadute di
-///    segnale.
+///    segnale, conferma i salti d'ottava prima di accettarli. È anche il punto
+///    comune da cui test di tessitura e note estreme raccolgono le note.
 /// 3. **Valutazione dell'esercizio** (TrainingStateMachine): confronta la nota
 ///    riconosciuta con quella richiesta usando la tolleranza dell'esercizio
 ///    ([defaultExerciseToleranceCents], regolabile dall'utente).
@@ -16,6 +19,7 @@ class PitchRecognitionConfig {
     this.noteSwitchMs = 80,
     this.immediateSwitchCents = 150,
     this.dropoutGraceMs = 100,
+    this.octaveConfirmFrames = 3,
   });
 
   static const standard = PitchRecognitionConfig();
@@ -40,6 +44,14 @@ class PitchRecognitionConfig {
   /// frame) che non interrompono la nota in corso. Deve restare sotto la
   /// pausa che distingue un nuovo attacco (TrainingStateMachine.breakMs).
   final int dropoutGraceMs;
+
+  /// Un salto di circa un'ottava (o due) dalla nota riconosciuta è il tipico
+  /// errore del rilevatore: diventa la nota nuova solo dopo questo numero di
+  /// frame consecutivi coerenti (3 ≈ 70 ms), contati in frame perché
+  /// arrivano a gruppi. Un vero cambio d'ottava resta quasi immediato; due
+  /// frame sbagliati di fila non cambiano la nota. Gli altri salti ampi
+  /// restano immediati.
+  final int octaveConfirmFrames;
 
   /// Tolleranza predefinita degli esercizi: distanza massima dal centro della
   /// nota richiesta perché sia considerata corretta. Larga, adatta alla voce
