@@ -1080,7 +1080,7 @@
   "guideWorkoutText": "A ready-made session with the exercises you know: open this card, choose 5, 10 or 15 minutes and start.",
   "guideStatusTitle": "Streak and charges",
   "guideStatusText": "Here you see how many days in a row you've practised and your exercise charges: each session uses one, and they refill over time.",
-  "guideCategoriesText": "Exercises are grouped by category: open one, pick an exercise and press Play to train with your voice.",
+  "guideCategoriesText": "Exercises are grouped by category: triads, arpeggios, scales and more. Each one trains a different side of your voice.",
   "guideCustomText": "Here you compose your own sequences, from scratch or starting from an exercise (Intonia Pro).",
   "guideRangeText": "Find the lowest and highest notes you can sing. Your results stay here and in your profile.",
   "guideTessituraText": "The comfort zone test looks for the part of your voice where singing feels easy.",
@@ -1093,5 +1093,35 @@
   "guideThemeText": "System, Light, Dark or Neon: choose the look you like best.",
   "guideNotationText": "C D E or DO RE MI: changes the note names throughout the app.",
   "guideReopenText": "You can reopen this guide from here whenever you like. Enjoy singing!",
-  "guideTargetUnavailable": "You'll find it here once you've used this part of the app."
+  "guideTargetUnavailable": "You'll find it here once you've used this part of the app.",
+  "guideNavTitle": "Go to {section}",
+  "@guideNavTitle": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "guideNavText": "Tap “{section}” in the bar at the bottom to continue.",
+  "@guideNavText": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "guideTapHint": "Tap the highlighted spot to continue",
+  "guideOpenCategoryTitle": "Open a category",
+  "guideOpenCategoryText": "Tap the category to see its exercises.",
+  "guideOpenExerciseTitle": "Open an exercise",
+  "guideOpenExerciseText": "Now tap an exercise: I'll show you its settings.",
+  "guideModeTitle": "Listen or train",
+  "guideModeText": "With the headphones you listen to the sequence; with the microphone you sing and I check your pitch. Then press Play.",
+  "guideAdvancedText": "Speed, tolerance, how long to hold each note, the guide on every note and background noise calibration.",
+  "guideHelpTitle": "Help in every exercise",
+  "guideHelpText": "Tap ? in any exercise to see these explanations again.",
+  "guideBackTitle": "Back to the exercises",
+  "guideBackText": "Tap the arrow at the top to go back to the list of exercises.",
+  "guideOpenSettingsTitle": "Open the settings",
+  "guideOpenSettingsText": "Tap the gear at the top to open the settings."
 }

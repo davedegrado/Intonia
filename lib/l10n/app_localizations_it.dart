@@ -1762,7 +1762,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get guideCategoriesText =>
-      'Gli esercizi sono divisi per categoria: aprine una, scegli un esercizio e premi Play per allenarti con la voce.';
+      'Gli esercizi sono divisi per categoria: triadi, arpeggi, scale e altro. Ognuna allena un aspetto diverso della voce.';
 
   @override
   String get guideCustomText =>
@@ -1807,4 +1807,58 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get guideTargetUnavailable => 'Lo troverai qui quando avrai usato questa parte dell\'app.';
+
+  @override
+  String guideNavTitle(String section) {
+    return 'Vai a $section';
+  }
+
+  @override
+  String guideNavText(String section) {
+    return 'Tocca «$section» nella barra in basso per continuare.';
+  }
+
+  @override
+  String get guideTapHint => 'Tocca il punto evidenziato per continuare';
+
+  @override
+  String get guideOpenCategoryTitle => 'Apri una categoria';
+
+  @override
+  String get guideOpenCategoryText => 'Tocca la categoria per vedere i suoi esercizi.';
+
+  @override
+  String get guideOpenExerciseTitle => 'Apri un esercizio';
+
+  @override
+  String get guideOpenExerciseText => 'Ora tocca un esercizio: ti mostro le sue impostazioni.';
+
+  @override
+  String get guideModeTitle => 'Ascolto o allenamento';
+
+  @override
+  String get guideModeText =>
+      'Con le cuffie ascolti la sequenza; con il microfono canti e io controllo l\'intonazione. Poi premi Play.';
+
+  @override
+  String get guideAdvancedText =>
+      'Velocità, tolleranza, quanto tenere ogni nota, guida su ogni nota e calibrazione del rumore di fondo.';
+
+  @override
+  String get guideHelpTitle => 'Aiuto in ogni esercizio';
+
+  @override
+  String get guideHelpText => 'Tocca ? in qualsiasi esercizio per rivedere queste spiegazioni.';
+
+  @override
+  String get guideBackTitle => 'Torna agli esercizi';
+
+  @override
+  String get guideBackText => 'Tocca la freccia in alto per tornare all\'elenco degli esercizi.';
+
+  @override
+  String get guideOpenSettingsTitle => 'Apri le impostazioni';
+
+  @override
+  String get guideOpenSettingsText => 'Tocca l\'ingranaggio in alto per aprire le impostazioni.';
 }

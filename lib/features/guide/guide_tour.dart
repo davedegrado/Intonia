@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,10 +16,14 @@ import 'guide.dart';
 
 /// Passaggio corrente della guida.
 class GuideTourState {
-  const GuideTourState({required this.steps, required this.index});
+  const GuideTourState({required this.steps, required this.index, this.forward = true});
 
   final List<GuideStep> steps;
   final int index;
+
+  /// Si sta andando avanti (true) o indietro: un passaggio da saltare si
+  /// salta nella stessa direzione.
+  final bool forward;
 
   GuideStep get step => steps[index];
   bool get isFirst => index == 0;
@@ -67,7 +72,21 @@ class GuideTourController extends Notifier<GuideTourState?> {
   void back() {
     final tour = state;
     if (tour != null && !tour.isFirst) {
-      state = GuideTourState(steps: tour.steps, index: tour.index - 1);
+      state = GuideTourState(steps: tour.steps, index: tour.index - 1, forward: false);
+    }
+  }
+
+  /// Salta il passaggio corrente (elemento assente, sezione non
+  /// raggiungibile) proseguendo nella direzione in cui si stava andando.
+  void skip() {
+    final tour = state;
+    if (tour == null) {
+      return;
+    }
+    if (tour.forward || tour.isFirst) {
+      next();
+    } else {
+      back();
     }
   }
 
@@ -94,16 +113,19 @@ class GuideTourLayer extends ConsumerStatefulWidget {
 
   final Widget child;
 
-  /// Attesa dopo un cambio di sezione: la transizione della pagina deve
-  /// finire prima di misurare dove si trova l'elemento.
+  /// Attesa dopo un cambio di sezione quando l'elemento non c'è ancora (le
+  /// transizioni delle pagine con l'elemento si attendono direttamente).
   static const navigationSettle = Duration(milliseconds: 400);
+
+  /// Limite all'attesa di una transizione di pagina.
+  static const transitionTimeout = Duration(milliseconds: 1200);
 
   @override
   ConsumerState<GuideTourLayer> createState() => _GuideTourLayerState();
 }
 
 class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   final _layerKey = GlobalKey();
 
   /// Elemento evidenziato (coordinate del livello); null = nessuno.
@@ -118,9 +140,22 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
 
   late final AnimationController _pulse;
 
+  /// Segue l'elemento a ogni fotogramma mentre la guida è aperta (una
+  /// categoria che si apre, una pagina che scorre) e si accorge quando
+  /// compare l'elemento atteso da un passaggio da toccare.
+  late final Ticker _tracker;
+
   /// La guida stessa sta cambiando sezione: i cambi di pagina che ne
   /// derivano non vanno trattati come navigazione dell'utente.
   bool _selfNavigating = false;
+
+  /// Un passaggio è in preparazione: il riquadro resta nascosto e
+  /// l'evidenziazione precedente non viene mostrata sulla nuova pagina.
+  bool _preparing = false;
+
+  /// L'utente ha appena cambiato pagina toccando l'elemento evidenziato: il
+  /// passaggio successivo attende la fine della transizione.
+  bool _userNavigated = false;
 
   late final _router = ref.read(appRouterProvider);
 
@@ -128,6 +163,7 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
   void initState() {
     super.initState();
     _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
+    _tracker = createTicker(_track);
     WidgetsBinding.instance.addObserver(this);
     _router.routerDelegate.addListener(_onRouteChanged);
     // Livello ricreato con una guida già aperta (es. alla fine dello splash):
@@ -135,6 +171,7 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final tour = mounted ? ref.read(guideTourProvider) : null;
       if (tour != null) {
+        _tracker.start();
         unawaited(_prepare(tour, navigate: false));
       }
     });
@@ -144,25 +181,61 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _router.routerDelegate.removeListener(_onRouteChanged);
+    _tracker.dispose();
     _pulse.dispose();
     super.dispose();
   }
 
-  /// Pagina cambiata durante la guida senza i suoi comandi (es. "indietro"
-  /// di sistema su Android): si rimisura, e se l'elemento non c'è più la
-  /// spiegazione resta leggibile al centro.
+  /// Ultima pagina aperta, anche se aperta con push (l'uri resta quello
+  /// della scheda).
+  String? get _location => _router.routerDelegate.currentConfiguration.lastOrNull?.matchedLocation;
+
+  /// Pagina cambiata dall'utente. Se è quella attesa dal passaggio da
+  /// toccare la guida prosegue; altrimenti (es. "indietro" di sistema) si
+  /// rimisura, e se l'elemento non c'è più la spiegazione resta leggibile al
+  /// centro.
   void _onRouteChanged() {
     final tour = ref.read(guideTourProvider);
     if (tour == null || _selfNavigating) {
       return;
     }
-    Future<void>.delayed(GuideTourLayer.navigationSettle, () {
-      final current = mounted ? ref.read(guideTourProvider) : null;
-      if (current != null && !_selfNavigating) {
-        unawaited(_prepare(current, navigate: false));
-      }
-    });
+    final awaited = tour.step.awaitRoute;
+    if (awaited != null && awaited == _location) {
+      _userNavigated = true;
+      ref.read(guideTourProvider.notifier).next();
+      return;
+    }
+    _userNavigated = true;
+    unawaited(_prepare(tour, navigate: false));
   }
+
+  /// A ogni fotogramma: l'elemento atteso è comparso? L'elemento evidenziato
+  /// si è spostato o ingrandito?
+  void _track(Duration _) {
+    final tour = ref.read(guideTourProvider);
+    if (tour == null || _preparing || !mounted) {
+      return;
+    }
+    final step = tour.step;
+    final awaited = step.awaitTarget;
+    if (awaited != null && GuideAnchor.contextOf(awaited) != null) {
+      ref.read(guideTourProvider.notifier).next();
+      return;
+    }
+    final target = step.target;
+    final current = _target;
+    final anchor = target == null || current == null ? null : GuideAnchor.contextOf(target);
+    final rect = anchor == null ? null : _measure(anchor);
+    if (rect != null && !_sameRect(rect, current!)) {
+      setState(() => _target = rect);
+    }
+  }
+
+  static bool _sameRect(Rect a, Rect b) =>
+      (a.left - b.left).abs() < 0.5 &&
+      (a.top - b.top).abs() < 0.5 &&
+      (a.right - b.right).abs() < 0.5 &&
+      (a.bottom - b.bottom).abs() < 0.5;
 
   @override
   void didChangeMetrics() {
@@ -178,21 +251,53 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
   Future<void> _prepare(GuideTourState tour, {bool navigate = true}) async {
     final token = ++_token;
     final step = tour.step;
-    var waited = false;
-    if (navigate && step.section != null) {
-      waited = _goTo(step.section!);
+    // Il riquadro sparisce finché il nuovo elemento non è misurato: niente
+    // evidenziazione del passaggio precedente sulla nuova pagina.
+    _preparing = true;
+    _setStateSafely(() {
+      _target = null;
+      _missing = false;
+    });
+    final section = step.section;
+    // Sezioni in cui solo l'utente può portare (es. l'esercizio aperto):
+    // se non c'è più, quei passaggi si saltano.
+    final unreachable =
+        section != null && section != _location && !guideReachableSections.contains(section);
+    if (unreachable) {
+      // Subito, senza attendere un fotogramma per ciascuno dei passaggi saltati.
+      scheduleMicrotask(() => _skip(token));
+      return;
+    }
+    var navigated = _userNavigated;
+    _userNavigated = false;
+    if (navigate && section != null) {
+      navigated = _goTo(section) || navigated;
     }
     await SchedulerBinding.instance.endOfFrame;
-    if (waited) {
-      await Future<void>.delayed(GuideTourLayer.navigationSettle);
-      if (token == _token) {
-        _selfNavigating = false;
-      }
-    }
     if (!mounted || token != _token) {
       return;
     }
+    final awaited = step.awaitTarget;
+    if (awaited != null && GuideAnchor.contextOf(awaited) != null) {
+      // Già fatto (es. categoria già aperta).
+      _skip(token);
+      return;
+    }
     final target = step.target;
+    if (navigated) {
+      final anchor = target == null ? null : GuideAnchor.contextOf(target);
+      if (anchor != null && anchor.mounted) {
+        await _routesSettled(anchor);
+      } else {
+        await Future<void>.delayed(GuideTourLayer.navigationSettle);
+      }
+      if (token == _token) {
+        _selfNavigating = false;
+      }
+      if (!mounted || token != _token) {
+        return;
+      }
+    }
     final anchor = target == null ? null : GuideAnchor.contextOf(target);
     if (anchor != null && anchor.mounted) {
       // L'elemento può essere fuori schermo in una pagina che scorre.
@@ -209,23 +314,89 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
     // Si rilegge dopo le attese: l'elemento può essere stato smontato.
     final current = target == null ? null : GuideAnchor.contextOf(target);
     final rect = current != null && current.mounted ? _measure(current) : null;
+    if (target != null && rect == null && step.skipIfMissing) {
+      _skip(token);
+      return;
+    }
+    _preparing = false;
     setState(() {
       _target = rect;
       _missing = target != null && rect == null;
     });
-    if (rect != null && !_reduceMotion) {
-      _pulse.repeat(count: 2);
-    } else {
+    if (rect == null || _reduceMotion) {
       _pulse.value = 0;
+    } else if (step.interactive) {
+      // Da toccare: l'onda continua finché l'utente non tocca.
+      _pulse.repeat();
+    } else {
+      _pulse.repeat(count: 2);
     }
+  }
+
+  void _skip(int token) {
+    if (token == _token) {
+      _preparing = false;
+      _selfNavigating = false;
+      ref.read(guideTourProvider.notifier).skip();
+    }
+  }
+
+  /// setState anche se chiamato mentre si costruisce un fotogramma.
+  void _setStateSafely(VoidCallback update) {
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+      update();
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    } else {
+      setState(update);
+    }
+  }
+
+  /// Attende che le pagine attorno all'elemento abbiano finito di entrare o
+  /// di scoprirsi (push, pop), così la misura è quella definitiva.
+  Future<void> _routesSettled(BuildContext anchor) async {
+    final waits = <Future<void>>[];
+    BuildContext? context = anchor;
+    while (context != null && context.mounted) {
+      final route = ModalRoute.of(context);
+      if (route == null) {
+        break;
+      }
+      final entering = route.animation;
+      if (entering != null && entering.status != AnimationStatus.completed) {
+        waits.add(_untilStatus(entering, AnimationStatus.completed));
+      }
+      final covered = route.secondaryAnimation;
+      if (covered != null && covered.status != AnimationStatus.dismissed) {
+        waits.add(_untilStatus(covered, AnimationStatus.dismissed));
+      }
+      context = route.navigator?.context;
+    }
+    if (waits.isNotEmpty) {
+      await Future.wait(waits).timeout(GuideTourLayer.transitionTimeout, onTimeout: () => []);
+    }
+  }
+
+  static Future<void> _untilStatus(Animation<double> animation, AnimationStatus status) {
+    final done = Completer<void>();
+    void listener(AnimationStatus current) {
+      if (current == status && !done.isCompleted) {
+        animation.removeStatusListener(listener);
+        done.complete();
+      }
+    }
+
+    animation.addStatusListener(listener);
+    return done.future;
   }
 
   /// Porta alla sezione del passaggio; true se ha cambiato schermata.
   bool _goTo(String section) {
     final router = _router;
-    // L'ultima pagina, anche se aperta con push (l'uri resta quello della scheda).
-    final current = router.routerDelegate.currentConfiguration.lastOrNull?.matchedLocation;
-    if (current == section) {
+    if (_location == section) {
       return false;
     }
     _selfNavigating = true;
@@ -246,9 +417,24 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
     if (box is! RenderBox || !box.attached || !box.hasSize || layer is! RenderBox) {
       return null;
     }
-    // Su una pagina coperta da un'altra non si evidenzia nulla.
-    if (ModalRoute.of(anchor)?.isCurrent == false) {
-      return null;
+    // Su una pagina coperta da un'altra (anche a un livello superiore, es.
+    // le schede sotto un esercizio aperto) non si evidenzia nulla.
+    BuildContext? context = anchor;
+    while (context != null && context.mounted) {
+      final route = ModalRoute.of(context);
+      if (route == null) {
+        break;
+      }
+      if (!route.isCurrent) {
+        return null;
+      }
+      context = route.navigator?.context;
+    }
+    // Né in una scheda non visibile (le schede restano montate fuori scena).
+    for (RenderObject? node = box; node != null && node != layer; node = node.parent) {
+      if (node is RenderOffstage && node.offstage) {
+        return null;
+      }
     }
     final topLeft = box.localToGlobal(Offset.zero, ancestor: layer);
     final rect = topLeft & box.size;
@@ -265,7 +451,10 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
       if (next == null) {
         _token++;
         _selfNavigating = false;
+        _preparing = false;
+        _userNavigated = false;
         _pulse.stop();
+        _tracker.stop();
         setState(() {
           _target = null;
           _missing = false;
@@ -273,6 +462,9 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
       } else if (previous == null ||
           previous.index != next.index ||
           !identical(previous.steps, next.steps)) {
+        if (!_tracker.isActive) {
+          _tracker.start();
+        }
         unawaited(_prepare(next));
       }
     });
@@ -288,6 +480,7 @@ class _GuideTourLayerState extends ConsumerState<GuideTourLayer>
               tour: tour,
               target: _target,
               missing: _missing,
+              ready: !_preparing,
               pulse: _pulse,
             ),
           ),
@@ -301,12 +494,16 @@ class _TourOverlay extends ConsumerWidget {
     required this.tour,
     required this.target,
     required this.missing,
+    required this.ready,
     required this.pulse,
   });
 
   final GuideTourState tour;
   final Rect? target;
   final bool missing;
+
+  /// Passaggio pronto: il riquadro è visibile.
+  final bool ready;
   final Animation<double> pulse;
 
   @override
@@ -316,49 +513,91 @@ class _TourOverlay extends ConsumerWidget {
     final padding = MediaQuery.paddingOf(context);
     final ring = decor.ambient ? decor.heroBorder : colors.primary;
     final hole = target?.inflate(6);
+    final reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
-    return Semantics(
-      scopesRoute: true,
-      explicitChildNodes: true,
-      child: Stack(
-        children: [
-          // Il resto dell'interfaccia è attenuato e non risponde ai tocchi
-          // durante la guida (l'elemento evidenziato non è un pulsante).
-          Positioned.fill(
-            child: GestureDetector(
-              key: const ValueKey('guide-scrim'),
-              behavior: HitTestBehavior.opaque,
-              onTap: () {},
-              child: AnimatedBuilder(
-                animation: pulse,
-                builder: (context, _) => CustomPaint(
-                  painter: _ScrimPainter(
-                    hole: hole,
-                    dim: Colors.black.withValues(alpha: decor.ambient ? 0.62 : 0.5),
-                    ring: ring,
-                    glow: decor.ambient,
-                    pulse: pulse.value,
+    return _PassThroughHole(
+      // Nei passaggi da toccare l'elemento evidenziato risponde ai tocchi.
+      hole: tour.step.interactive ? hole : null,
+      child: Semantics(
+        scopesRoute: true,
+        explicitChildNodes: true,
+        child: Stack(
+          children: [
+            // Il resto dell'interfaccia è attenuato e non risponde ai tocchi
+            // durante la guida (l'elemento evidenziato solo nei passaggi da
+            // toccare).
+            Positioned.fill(
+              child: GestureDetector(
+                key: const ValueKey('guide-scrim'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () {},
+                child: AnimatedBuilder(
+                  animation: pulse,
+                  builder: (context, _) => CustomPaint(
+                    painter: _ScrimPainter(
+                      hole: hole,
+                      dim: Colors.black.withValues(alpha: decor.ambient ? 0.62 : 0.5),
+                      ring: ring,
+                      glow: decor.ambient,
+                      pulse: pulse.value,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          if (hole != null)
-            Positioned.fromRect(
-              rect: hole,
-              child: const IgnorePointer(
-                child: SizedBox(key: ValueKey('guide-highlight')),
+            if (hole != null)
+              Positioned.fromRect(
+                rect: hole,
+                child: const IgnorePointer(
+                  child: SizedBox(key: ValueKey('guide-highlight')),
+                ),
+              ),
+            Positioned.fill(
+              child: CustomSingleChildLayout(
+                delegate: _CardLayout(target: hole, padding: padding),
+                child: IgnorePointer(
+                  ignoring: !ready,
+                  child: AnimatedOpacity(
+                    opacity: ready ? 1 : 0,
+                    duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 160),
+                    child: _GuideCard(tour: tour, missing: missing),
+                  ),
+                ),
               ),
             ),
-          Positioned.fill(
-            child: CustomSingleChildLayout(
-              delegate: _CardLayout(target: hole, padding: padding),
-              child: _GuideCard(tour: tour, missing: missing),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+}
+
+/// Lascia passare i tocchi dentro [hole] all'app sotto la guida.
+class _PassThroughHole extends SingleChildRenderObjectWidget {
+  const _PassThroughHole({required this.hole, required super.child});
+
+  final Rect? hole;
+
+  @override
+  _RenderPassThroughHole createRenderObject(BuildContext context) => _RenderPassThroughHole(hole);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderPassThroughHole renderObject) {
+    renderObject.hole = hole;
+  }
+}
+
+class _RenderPassThroughHole extends RenderProxyBox {
+  _RenderPassThroughHole(this.hole);
+
+  Rect? hole;
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    if (hole?.contains(position) ?? false) {
+      return false;
+    }
+    return super.hitTest(result, position: position);
   }
 }
 
@@ -523,111 +762,136 @@ class _GuideCard extends ConsumerWidget {
           ),
         ),
         padding: const EdgeInsets.fromLTRB(14, 6, 6, 12),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    l10n.guideProgress(tour.index + 1, tour.steps.length),
-                    style: theme.textTheme.labelMedium,
+        // Intestazione e pulsanti sempre visibili; se lo spazio è poco scorre
+        // solo la spiegazione.
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Text(
+                  l10n.guideProgress(tour.index + 1, tour.steps.length),
+                  style: theme.textTheme.labelMedium,
+                ),
+                const Spacer(),
+                if (!tour.isLast)
+                  TextButton(
+                    key: const ValueKey('guide-skip'),
+                    onPressed: controller.close,
+                    child: Text(l10n.guideSkip),
                   ),
-                  const Spacer(),
-                  if (!tour.isLast)
-                    TextButton(
-                      key: const ValueKey('guide-skip'),
-                      onPressed: controller.close,
-                      child: Text(l10n.guideSkip),
-                    ),
-                  // Senza tooltip: la guida sta sopra il Navigator, dove non c'è
-                  // un Overlay; l'etichetta resta per i lettori di schermo.
-                  Semantics(
-                    label: l10n.commonClose,
-                    button: true,
-                    excludeSemantics: true,
-                    child: IconButton(
-                      key: const ValueKey('guide-close'),
-                      icon: const Icon(Icons.close),
-                      onPressed: controller.close,
-                    ),
+                // Senza tooltip: la guida sta sopra il Navigator, dove non c'è
+                // un Overlay; l'etichetta resta per i lettori di schermo.
+                Semantics(
+                  label: l10n.commonClose,
+                  button: true,
+                  excludeSemantics: true,
+                  child: IconButton(
+                    key: const ValueKey('guide-close'),
+                    icon: const Icon(Icons.close),
+                    onPressed: controller.close,
                   ),
-                ],
+                ),
+              ],
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IntoniaMascot(
+                        mood: tour.isFirst ? MascotMood.greeting : MascotMood.idle,
+                        size: 60,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(step.icon, size: 20, color: colors.primary),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    step.title,
+                                    key: const ValueKey('guide-title'),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(step.text,
+                                style: theme.textTheme.bodyMedium?.copyWith(height: 1.35)),
+                            if (missing) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                l10n.guideTargetUnavailable,
+                                key: const ValueKey('guide-no-target'),
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(color: colors.onSurfaceVariant),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IntoniaMascot(
-                      mood: tour.isFirst ? MascotMood.greeting : MascotMood.idle,
-                      size: 60,
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Row(
+                children: [
+                  if (!tour.isFirst) ...[
+                    // Nei passaggi da toccare Indietro si stringe e lascia
+                    // posto al suggerimento.
+                    Flexible(
+                      fit: step.interactive ? FlexFit.loose : FlexFit.tight,
+                      child: OutlinedButton(
+                        key: const ValueKey('guide-back'),
+                        onPressed: controller.back,
+                        child: Text(l10n.commonBack),
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                  ],
+                  Expanded(
+                    child: step.interactive
+                        // Nessun Avanti: si prosegue toccando l'elemento.
+                        ? Row(
+                            key: const ValueKey('guide-tap-hint'),
                             children: [
-                              Icon(step.icon, size: 20, color: colors.primary),
+                              Icon(Icons.touch_app_rounded, color: colors.primary),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  step.title,
-                                  key: const ValueKey('guide-title'),
-                                  style: theme.textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                  l10n.guideTapHint,
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    color: colors.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
                             ],
+                          )
+                        : FilledButton(
+                            key: const ValueKey('guide-next'),
+                            onPressed: controller.next,
+                            child: Text(tour.isLast ? l10n.guideDone : l10n.guideNext),
                           ),
-                          const SizedBox(height: 4),
-                          Text(step.text,
-                              style: theme.textTheme.bodyMedium?.copyWith(height: 1.35)),
-                          if (missing) ...[
-                            const SizedBox(height: 6),
-                            Text(
-                              l10n.guideTargetUnavailable,
-                              key: const ValueKey('guide-no-target'),
-                              style: theme.textTheme.bodySmall
-                                  ?.copyWith(color: colors.onSurfaceVariant),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Row(
-                  children: [
-                    if (!tour.isFirst) ...[
-                      Expanded(
-                        child: OutlinedButton(
-                          key: const ValueKey('guide-back'),
-                          onPressed: controller.back,
-                          child: Text(l10n.commonBack),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                    Expanded(
-                      child: FilledButton(
-                        key: const ValueKey('guide-next'),
-                        onPressed: controller.next,
-                        child: Text(tour.isLast ? l10n.guideDone : l10n.guideNext),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

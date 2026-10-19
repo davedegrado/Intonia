@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/guide/guide.dart';
 import '../features/tuner/application/tuner_controller.dart';
 import 'app_theme.dart';
 import 'l10n.dart';
@@ -80,10 +81,13 @@ class MainShell extends ConsumerWidget {
           },
           destinations: [
             for (final destination in mainDestinations)
-              NavigationDestination(
-                icon: Icon(destination.icon),
-                selectedIcon: Icon(destination.selected),
-                label: destinationLabel(context.l10n, destination.path),
+              GuideAnchor(
+                target: navTarget(destination.path),
+                child: NavigationDestination(
+                  icon: Icon(destination.icon),
+                  selectedIcon: Icon(destination.selected),
+                  label: destinationLabel(context.l10n, destination.path),
+                ),
               ),
           ],
         ),

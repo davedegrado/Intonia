@@ -2988,7 +2988,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCategoriesText.
   ///
   /// In en, this message translates to:
-  /// **'Exercises are grouped by category: open one, pick an exercise and press Play to train with your voice.'**
+  /// **'Exercises are grouped by category: triads, arpeggios, scales and more. Each one trains a different side of your voice.'**
   String get guideCategoriesText;
 
   /// No description provided for @guideCustomText.
@@ -3068,6 +3068,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You\'ll find it here once you\'ve used this part of the app.'**
   String get guideTargetUnavailable;
+
+  /// No description provided for @guideNavTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to {section}'**
+  String guideNavTitle(String section);
+
+  /// No description provided for @guideNavText.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap “{section}” in the bar at the bottom to continue.'**
+  String guideNavText(String section);
+
+  /// No description provided for @guideTapHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the highlighted spot to continue'**
+  String get guideTapHint;
+
+  /// No description provided for @guideOpenCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a category'**
+  String get guideOpenCategoryTitle;
+
+  /// No description provided for @guideOpenCategoryText.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the category to see its exercises.'**
+  String get guideOpenCategoryText;
+
+  /// No description provided for @guideOpenExerciseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open an exercise'**
+  String get guideOpenExerciseTitle;
+
+  /// No description provided for @guideOpenExerciseText.
+  ///
+  /// In en, this message translates to:
+  /// **'Now tap an exercise: I\'ll show you its settings.'**
+  String get guideOpenExerciseText;
+
+  /// No description provided for @guideModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen or train'**
+  String get guideModeTitle;
+
+  /// No description provided for @guideModeText.
+  ///
+  /// In en, this message translates to:
+  /// **'With the headphones you listen to the sequence; with the microphone you sing and I check your pitch. Then press Play.'**
+  String get guideModeText;
+
+  /// No description provided for @guideAdvancedText.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed, tolerance, how long to hold each note, the guide on every note and background noise calibration.'**
+  String get guideAdvancedText;
+
+  /// No description provided for @guideHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help in every exercise'**
+  String get guideHelpTitle;
+
+  /// No description provided for @guideHelpText.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap ? in any exercise to see these explanations again.'**
+  String get guideHelpText;
+
+  /// No description provided for @guideBackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the exercises'**
+  String get guideBackTitle;
+
+  /// No description provided for @guideBackText.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the arrow at the top to go back to the list of exercises.'**
+  String get guideBackText;
+
+  /// No description provided for @guideOpenSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the settings'**
+  String get guideOpenSettingsTitle;
+
+  /// No description provided for @guideOpenSettingsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the gear at the top to open the settings.'**
+  String get guideOpenSettingsText;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
