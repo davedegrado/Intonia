@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/achievements/presentation/achievement_toast.dart';
 import '../features/home_widget/application/home_widget_sync.dart';
 import '../features/settings/application/settings_providers.dart';
 import '../l10n/app_localizations.dart';
@@ -29,7 +30,9 @@ class VocalScaleTrainerApp extends ConsumerWidget {
         AppThemeSetting.system => ThemeMode.system,
       },
       routerConfig: ref.watch(appRouterProvider),
-      builder: (context, child) => SplashOverlay(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => SplashOverlay(
+        child: AchievementToastHost(child: child ?? const SizedBox.shrink()),
+      ),
       // Lingua: scelta manuale, altrimenti quella del dispositivo se
       // supportata, altrimenti inglese (vedi appLocaleProvider).
       locale: ref.watch(appLocaleProvider),

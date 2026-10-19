@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/app_theme.dart';
+import '../../achievements/presentation/achievements_card.dart';
 import '../../../app/date_format.dart';
 import '../../../app/l10n.dart';
 import '../../../app/neon_scene.dart';
@@ -50,6 +51,8 @@ class ProfileScreen extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium,
                 ),
+                const SizedBox(height: 24),
+                const AchievementsCard(),
               ],
             ),
           ),
@@ -112,6 +115,8 @@ class ProfileScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           children: [
             _StreakCard(streak: streak),
+            const SizedBox(height: 12),
+            const AchievementsCard(),
             const SizedBox(height: 12),
             _StatRow(children: [
               _StatCard(

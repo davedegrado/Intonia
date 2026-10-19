@@ -9,6 +9,8 @@ import 'package:vocal_scale_trainer/core/pitch/pitch_detection_result.dart';
 import 'package:vocal_scale_trainer/core/session/range_record.dart';
 import 'package:vocal_scale_trainer/core/session/session_record.dart';
 import 'package:vocal_scale_trainer/features/access/application/access_providers.dart';
+import 'package:vocal_scale_trainer/features/achievements/application/achievements_providers.dart';
+import 'package:vocal_scale_trainer/features/achievements/presentation/achievements_screen.dart';
 import 'package:vocal_scale_trainer/features/library/application/exercise_providers.dart';
 import 'package:vocal_scale_trainer/features/library/presentation/exercises_screen.dart';
 import 'package:vocal_scale_trainer/features/library/presentation/home_screen.dart';
@@ -154,6 +156,7 @@ Future<_App> _launch(
       rangeHistoryRepositoryProvider.overrideWithValue(_MemoryRanges([...ranges])),
       tessituraRepositoryProvider.overrideWithValue(_MemoryList([...tessitura])),
       workoutRepositoryProvider.overrideWithValue(app.workouts),
+      achievementsRepositoryProvider.overrideWithValue(_MemoryList<UnlockRecord?>([])),
       customExerciseRepositoryProvider.overrideWithValue(_MemoryCustom()),
       appSettingsRepositoryProvider.overrideWithValue(app.settings),
       deviceLocaleProvider.overrideWithValue(device),
@@ -768,6 +771,66 @@ void main() {
     await _frames(tester, 8);
     expect(find.byType(WorkoutScreen), findsNothing);
     expect(find.text('Fatto oggi: 0 di $total'), findsOneWidget);
+  });
+
+  testWidgets('goals: profile card, missions, badges with details', (tester) async {
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    await _launch(tester, sessions: [
+      SessionRecord(
+        timestamp: yesterday,
+        exerciseId: 'triad_major',
+        exerciseName: 'Triade maggiore',
+        correct: 5,
+        errors: 0,
+        durationSeconds: 30,
+        perNote: const {},
+        completed: true,
+      ),
+    ]);
+    await _openTab(tester, 'Profilo');
+    expect(find.byKey(const ValueKey('achievements-card')), findsOneWidget);
+    expect(find.textContaining('2/16 badge'), findsOneWidget);
+    expect(find.byKey(const ValueKey('achievement-toast')), findsNothing,
+        reason: 'sblocchi dalla cronologia precedente: niente annuncio');
+
+    await tester.tap(find.byKey(const ValueKey('achievements-card')));
+    await _frames(tester, 5);
+    expect(find.byType(AchievementsScreen), findsOneWidget);
+    expect(find.text('Missioni di oggi'), findsOneWidget);
+    expect(find.byKey(const ValueKey('achievements-streak')), findsOneWidget);
+    expect(find.text('2 di 16'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('badge-firstExercise')), 200,
+        scrollable: find
+            .descendant(of: find.byType(AchievementsScreen), matching: find.byType(Scrollable))
+            .first);
+    await tester.tap(find.byKey(const ValueKey('badge-firstExercise')));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('badge-details')), findsOneWidget);
+    expect(find.textContaining('Sbloccato il'), findsOneWidget);
+    expect(find.text('Completa il tuo primo esercizio.'), findsOneWidget);
+  });
+
+  testWidgets('a badge unlocked now is announced without leaving the screen', (tester) async {
+    await _launch(tester);
+    final container = _container(tester);
+    await tester.runAsync(() => container.read(sessionHistoryProvider.notifier).add(SessionRecord(
+          timestamp: DateTime.now(),
+          exerciseId: 'triad_major',
+          exerciseName: 'Triade maggiore',
+          correct: 4,
+          errors: 1,
+          durationSeconds: 30,
+          perNote: const {},
+          completed: true,
+        )));
+    await _frames(tester, 5);
+    expect(find.byKey(const ValueKey('achievement-toast')), findsOneWidget);
+    expect(find.text('Primo passo'), findsOneWidget);
+    expect(find.byType(NavigationBar).hitTestable(), findsOneWidget, reason: "l'app resta usabile");
+    await _frames(tester, 40);
+    expect(find.byKey(const ValueKey('achievement-toast')), findsNothing,
+        reason: 'sparisce da solo');
   });
 
   testWidgets('"Not me" removes a range test from the results and the history', (tester) async {

@@ -960,5 +960,127 @@
         "type": "int"
       }
     }
-  }
+  },
+  "achievementsTitle": "Goals and badges",
+  "achievementsCoach": "Every small step counts!",
+  "achievementsStreakCurrent": "Current streak",
+  "achievementsStreakBest": "Best streak",
+  "achievementsBadges": "Badges",
+  "achievementsDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@achievementsDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsBadgeCount": "{unlocked} of {total}",
+  "@achievementsBadgeCount": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsDaily": "Today's missions",
+  "achievementsDailyHint": "New missions every day at midnight.",
+  "achievementsWeekly": "This week's missions",
+  "achievementsWeeklyHint": "Until Sunday {date}.",
+  "@achievementsWeeklyHint": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "MMMd"
+      }
+    }
+  },
+  "achievementsMissionDone": "Done",
+  "achievementsProgress": "{value} of {target}",
+  "@achievementsProgress": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsUnlockedOn": "Unlocked on {date}",
+  "@achievementsUnlockedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "achievementsLocked": "Locked",
+  "achievementsUnlocked": "Unlocked",
+  "achievementsToastTitle": "Badge unlocked!",
+  "achievementsProfileSummary": "{unlocked}/{total} badges · today's missions {done}/{missions}",
+  "@achievementsProfileSummary": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "done": {
+        "type": "int"
+      },
+      "missions": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsCategoryConsistency": "Consistency",
+  "achievementsCategoryTraining": "Practice",
+  "achievementsCategoryAccuracy": "Accuracy",
+  "achievementsCategoryExploration": "Exploration",
+  "achievementsCountingRules": "Only completed exercises count (not interrupted ones), and each one counts once. Accuracy goals need at least 5 sung notes. The streak counts days with at least one session: opening the app is not enough.",
+  "achievementNoteRunHint": "Counted from sessions recorded by this version of Intonia onwards.",
+  "achievementFirstExerciseName": "First step",
+  "achievementFirstExerciseDesc": "Complete your first exercise.",
+  "achievementDays3Name": "Three days",
+  "achievementDays3Desc": "Complete exercises on 3 different days.",
+  "achievementDays7Name": "Seven days",
+  "achievementDays7Desc": "Complete exercises on 7 different days.",
+  "achievementStreak7Name": "7-day streak",
+  "achievementStreak7Desc": "Practise 7 days in a row.",
+  "achievementStreak30Name": "30-day streak",
+  "achievementStreak30Desc": "Practise 30 days in a row.",
+  "achievementExercises5Name": "Warming up",
+  "achievementExercises5Desc": "Complete 5 exercises.",
+  "achievementExercises25Name": "In good shape",
+  "achievementExercises25Desc": "Complete 25 exercises.",
+  "achievementFirstWorkoutName": "First workout",
+  "achievementFirstWorkoutDesc": "Complete a daily workout.",
+  "achievementWorkouts5Name": "Five workouts",
+  "achievementWorkouts5Desc": "Complete 5 daily workouts.",
+  "achievementWorkouts10Name": "Ten workouts",
+  "achievementWorkouts10Desc": "Complete 10 daily workouts.",
+  "achievementPerfectName": "Spot on!",
+  "achievementPerfectDesc": "Complete an exercise with 100% accuracy.",
+  "achievementAccurate5Name": "Sharp ear",
+  "achievementAccurate5Desc": "Complete 5 exercises with at least 90% accuracy.",
+  "achievementNoteRun10Name": "Ten in a row",
+  "achievementNoteRun10Desc": "Sing 10 correct notes in a row in one exercise.",
+  "achievementCategories3Name": "Explorer",
+  "achievementCategories3Desc": "Complete exercises in 3 different categories.",
+  "achievementFirstTessituraName": "Comfort zone",
+  "achievementFirstTessituraDesc": "Complete the comfort zone test.",
+  "achievementSecondTessituraName": "Back in the zone",
+  "achievementSecondTessituraDesc": "Take the comfort zone test again on another day.",
+  "missionDailyExercises2": "Complete 2 exercises today",
+  "missionDailyExercises3": "Complete 3 exercises today",
+  "missionDailyWorkout": "Complete the daily workout",
+  "missionDailyAccuracy90": "Get at least 90% in an exercise",
+  "missionWeeklyCategories2": "Complete exercises in 2 categories",
+  "missionWeeklyDays3": "Complete exercises on 3 different days",
+  "missionWeeklyWorkouts2": "Complete 2 daily workouts"
 }

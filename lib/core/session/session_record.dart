@@ -16,6 +16,8 @@ class SessionRecord {
     this.octave,
     this.direction,
     this.repeatTop,
+    this.completed,
+    this.longestCorrectRun,
   });
 
   factory SessionRecord.fromStats({
@@ -26,8 +28,18 @@ class SessionRecord {
     int? octave,
     String? direction,
     bool? repeatTop,
+    bool? completed,
   }) {
     final perNote = <int, List<int>>{};
+    // Note corrette consecutive, nell'ordine in cui sono state cantate.
+    var run = 0;
+    var longestRun = 0;
+    for (final attempt in stats.attempts) {
+      run = attempt.correct ? run + 1 : 0;
+      if (run > longestRun) {
+        longestRun = run;
+      }
+    }
     int? minCorrect;
     int? maxCorrect;
     for (final attempt in stats.attempts) {
@@ -56,6 +68,8 @@ class SessionRecord {
       octave: octave,
       direction: direction,
       repeatTop: repeatTop,
+      completed: completed,
+      longestCorrectRun: longestRun,
     );
   }
 
@@ -80,6 +94,8 @@ class SessionRecord {
       octave: json['octave'] as int?,
       direction: json['direction'] as String?,
       repeatTop: json['repeatTop'] as bool?,
+      completed: json['completed'] as bool?,
+      longestCorrectRun: json['longestCorrectRun'] as int?,
     );
   }
 
@@ -103,6 +119,14 @@ class SessionRecord {
   final int? octave;
   final String? direction;
   final bool? repeatTop;
+
+  /// True se l'esercizio è stato completato (tutte le note convalidate),
+  /// false se interrotto. Null per le sessioni salvate prima di questo dato.
+  final bool? completed;
+
+  /// Massimo numero di note corrette di fila nella sessione. Null per le
+  /// sessioni salvate prima di questo dato.
+  final int? longestCorrectRun;
 
   int get totalAttempts => correct + errors;
 
@@ -131,6 +155,8 @@ class SessionRecord {
         if (octave != null) 'octave': octave,
         if (direction != null) 'direction': direction,
         if (repeatTop != null) 'repeatTop': repeatTop,
+        if (completed != null) 'completed': completed,
+        if (longestCorrectRun != null) 'longestCorrectRun': longestCorrectRun,
       };
 }
 
