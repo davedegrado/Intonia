@@ -2,10 +2,10 @@
 <resources>
     <string name="widget_description">La tua serie di allenamenti con la mascotte di Intonia</string>
     <string name="widget_mascot_description">Mascotte di Intonia</string>
-    <string name="widget_default_title">Allena l\'orecchio</string>
-    <string name="widget_default_message">Pronto ad allenarti? 🎵</string>
-    <string name="widget_message_trained">Fatto! Sei inarrestabile ✨</string>
-    <string name="widget_message_keep_streak">Allenati oggi: salva la serie! 🔥</string>
+    <string name="widget_message_start">Inizia oggi la tua serie!</string>
+    <string name="widget_message_keep_streak">Allenati oggi per non perdere la serie!</string>
+    <string name="widget_message_first_day">Primo giorno: ottimo inizio!</string>
+    <string name="widget_message_trained">Continua così, sei sulla strada giusta!</string>
     <plurals name="widget_streak_title">
         <item quantity="one">%d giorno di fila</item>
         <item quantity="other">%d giorni di fila</item>
@@ -14,4 +14,29 @@
         <item quantity="one">giorno\ndi fila</item>
         <item quantity="other">giorni\ndi fila</item>
     </plurals>
+
+    <string name="precision_widget_label">Precisione Intonia</string>
+    <string name="precision_widget_description">La tua precisione media della settimana, giorno per giorno</string>
+    <string name="precision_widget_title">Precisione media</string>
+    <string name="precision_widget_period">Questa settimana</string>
+    <string name="precision_widget_none">Nessuna precisione misurata questa settimana</string>
+    <string name="precision_widget_percent">Precisione media della settimana: %d per cento</string>
+    <string name="precision_message_empty">Fai un esercizio per misurarla</string>
+    <string name="precision_message_improved">Voce sempre più intonata!</string>
+    <string name="precision_message_high">Intonazione eccellente!</string>
+    <string name="precision_message_mid">Buona intonazione, continua così!</string>
+    <string name="precision_message_low">Ogni esercizio affina la tua voce</string>
+    <string-array name="precision_weekdays">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mer</item>
+        <item>Gio</item>
+        <item>Ven</item>
+        <item>Sab</item>
+        <item>Dom</item>
+    </string-array>
+    <string name="precision_day_measured">%1$s: precisione %2$d per cento</string>
+    <string name="precision_day_activity">%1$s: allenamento senza note valutate</string>
+    <string name="precision_day_empty">%1$s: nessun allenamento</string>
+    <string name="precision_day_future">%1$s: non ancora arrivato</string>
 </resources>

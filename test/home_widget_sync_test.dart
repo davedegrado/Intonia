@@ -6,6 +6,7 @@ import 'package:vocal_scale_trainer/app/app_theme.dart';
 import 'package:vocal_scale_trainer/core/music/note.dart';
 import 'package:vocal_scale_trainer/core/session/session_record.dart';
 import 'package:vocal_scale_trainer/features/home_widget/application/home_widget_sync.dart';
+import 'package:vocal_scale_trainer/features/home_widget/domain/widget_precision.dart';
 import 'package:vocal_scale_trainer/features/home_widget/domain/widget_streak.dart';
 import 'package:vocal_scale_trainer/features/profile/application/history_providers.dart';
 import 'package:vocal_scale_trainer/features/settings/application/settings_providers.dart';
@@ -14,11 +15,16 @@ import 'package:vocal_scale_trainer/services/storage/session_history_repository.
 import 'package:vocal_scale_trainer/services/widget/home_widget_service.dart';
 
 class _RecordingWidgetService extends HomeWidgetService {
-  final published = <({WidgetStreakData data, String languageCode})>[];
+  final published =
+      <({WidgetStreakData data, WidgetPrecisionData precision, String languageCode})>[];
 
   @override
-  Future<void> publish(WidgetStreakData data, {required String languageCode}) async {
-    published.add((data: data, languageCode: languageCode));
+  Future<void> publish(
+    WidgetStreakData data, {
+    required WidgetPrecisionData precision,
+    required String languageCode,
+  }) async {
+    published.add((data: data, precision: precision, languageCode: languageCode));
   }
 }
 

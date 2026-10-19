@@ -92,8 +92,8 @@ dispositivo, OS, build ed esito.
 - [ ] **Free/Pro** — consumo e ricarica delle cariche in una build senza Pro
   sviluppatore; limite dello storico Free (8 sessioni).
 - [ ] **Profilo e storico** — sessioni, estensione, "Non ero io".
-- [ ] **Widget Home** — Android e iOS: aggiunta, aggiornamento dopo una
-  sessione, cambio giorno.
+- [ ] **Widget Home** — Android e iOS, serie e precisione: aggiunta,
+  aggiornamento dopo una sessione, cambio giorno e di settimana.
 - [ ] **Impostazioni → Info → Licenze** — presente la licenza FluidR3.
 
 ## 3. Test audio su dispositivi reali
@@ -138,7 +138,8 @@ Procedura completa in `AUDIO_MANUAL_TEST_CHECKLIST.md`.
 - [x] File JSON nella cartella documenti dell'app: `app_settings.json`,
   `custom_exercises.json`, `session_history.json` (ultime 500 sessioni),
   `range_history.json`, `charges.json`. Widget: giorno dell'ultimo
-  allenamento, serie e lingua nei dati condivisi (App Group su iOS).
+  allenamento, serie, totali giornalieri di note corrette/valutate delle
+  ultime due settimane e lingua nei dati condivisi (App Group su iOS).
   Nessun account, nessun dato trasmesso. Si cancellano disinstallando l'app.
 
 ### 4.3 Permesso microfono

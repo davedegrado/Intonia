@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Allenamento di oggi fatto. -->
+<!-- Messaggio del widget della precisione. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="#3310B981" />
+    <solid android:color="#12FFFFFF" />
     <stroke
         android:width="1dp"
-        android:color="#34D399" />
-    <corners android:radius="14dp" />
+        android:color="#3B3592" />
+    <corners android:radius="18dp" />
 </shape>
