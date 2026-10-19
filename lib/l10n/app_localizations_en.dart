@@ -2080,4 +2080,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get extremeInterrupted => 'The microphone stopped: here is what I heard until then.';
+
+  @override
+  String get streakCardStart => 'Start your streak today!';
+
+  @override
+  String get streakCardKeepGoing => 'Practise today to keep your streak!';
+
+  @override
+  String get streakCardStarted => 'Day one: great start!';
+
+  @override
+  String get streakCardActive => 'Keep it up, you\'re on track!';
+
+  @override
+  String streakCardDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days\nin a row',
+      one: 'day\nin a row',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get precisionCardTitle => 'Average accuracy';
+
+  @override
+  String get precisionCardPeriod => 'This week';
+
+  @override
+  String get precisionCardEmpty => 'Do an exercise to measure it';
+
+  @override
+  String get precisionCardImproved => 'Your voice is more and more in tune!';
+
+  @override
+  String get precisionCardHigh => 'Excellent pitch, well done!';
+
+  @override
+  String get precisionCardMid => 'Good pitch, keep going!';
+
+  @override
+  String get precisionCardLow => 'Every exercise makes your voice more precise';
+
+  @override
+  String precisionCardSemantics(int percent) {
+    return 'Average accuracy this week: $percent percent';
+  }
+
+  @override
+  String get weekdaysShort => 'Mon,Tue,Wed,Thu,Fri,Sat,Sun';
+
+  @override
+  String precisionDayMeasured(String day, int percent) {
+    return '$day: accuracy $percent percent';
+  }
+
+  @override
+  String precisionDayActivity(String day) {
+    return '$day: practice without scored notes';
+  }
+
+  @override
+  String precisionDayEmpty(String day) {
+    return '$day: no practice';
+  }
+
+  @override
+  String precisionDayFuture(String day) {
+    return '$day: not yet';
+  }
 }

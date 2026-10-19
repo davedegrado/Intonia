@@ -3566,6 +3566,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The microphone stopped: here is what I heard until then.'**
   String get extremeInterrupted;
+
+  /// No description provided for @streakCardStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your streak today!'**
+  String get streakCardStart;
+
+  /// No description provided for @streakCardKeepGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise today to keep your streak!'**
+  String get streakCardKeepGoing;
+
+  /// No description provided for @streakCardStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Day one: great start!'**
+  String get streakCardStarted;
+
+  /// No description provided for @streakCardActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it up, you\'re on track!'**
+  String get streakCardActive;
+
+  /// No description provided for @streakCardDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{day\nin a row} other{days\nin a row}}'**
+  String streakCardDays(int count);
+
+  /// No description provided for @precisionCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Average accuracy'**
+  String get precisionCardTitle;
+
+  /// No description provided for @precisionCardPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get precisionCardPeriod;
+
+  /// No description provided for @precisionCardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Do an exercise to measure it'**
+  String get precisionCardEmpty;
+
+  /// No description provided for @precisionCardImproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Your voice is more and more in tune!'**
+  String get precisionCardImproved;
+
+  /// No description provided for @precisionCardHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent pitch, well done!'**
+  String get precisionCardHigh;
+
+  /// No description provided for @precisionCardMid.
+  ///
+  /// In en, this message translates to:
+  /// **'Good pitch, keep going!'**
+  String get precisionCardMid;
+
+  /// No description provided for @precisionCardLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Every exercise makes your voice more precise'**
+  String get precisionCardLow;
+
+  /// No description provided for @precisionCardSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Average accuracy this week: {percent} percent'**
+  String precisionCardSemantics(int percent);
+
+  /// No description provided for @weekdaysShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Mon,Tue,Wed,Thu,Fri,Sat,Sun'**
+  String get weekdaysShort;
+
+  /// No description provided for @precisionDayMeasured.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: accuracy {percent} percent'**
+  String precisionDayMeasured(String day, int percent);
+
+  /// No description provided for @precisionDayActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: practice without scored notes'**
+  String precisionDayActivity(String day);
+
+  /// No description provided for @precisionDayEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: no practice'**
+  String precisionDayEmpty(String day);
+
+  /// No description provided for @precisionDayFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: not yet'**
+  String precisionDayFuture(String day);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

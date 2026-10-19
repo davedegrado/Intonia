@@ -185,6 +185,8 @@ void main() {
   testWidgets('choosing English in Settings switches live, persists and survives a relaunch',
       (tester) async {
     final app = await _launch(tester);
+    await tester.ensureVisible(find.byKey(const ValueKey('quick-settings')));
+    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('quick-settings')));
     await _frames(tester, 5);
     expect(find.byType(SettingsScreen), findsOneWidget);
@@ -210,6 +212,8 @@ void main() {
     expect(find.text('Start listening'), findsOneWidget);
 
     // E ritorno all'italiano.
+    await tester.ensureVisible(find.byKey(const ValueKey('quick-settings')));
+    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('quick-settings')));
     await _frames(tester, 5);
     await tester.tap(find.text('Italiano'));
@@ -220,6 +224,8 @@ void main() {
 
   testWidgets('notation is independent of the language', (tester) async {
     final app = await _launch(tester, device: const Locale('en'));
+    await tester.ensureVisible(find.byKey(const ValueKey('quick-notation')));
+    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('quick-notation')));
     await _frames(tester, 2);
     expect(find.text('Start listening'), findsOneWidget);
